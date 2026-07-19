@@ -5,6 +5,7 @@ snake
 - had to do the following cmd line to build from mingw32
 	- gcc snake.c -o snake.exe -I"d:\allegro-mingw-4.2.2\include" -L"d:\allegro-mingw-4.2.2\lib" -lalleg -fgnu89-inline
 - used allegro-mingw-4.2.2 to get this to build (uncertain of original version but this is best guess based on date)
+- had to copy alleg42.dll to application directory
 
 saturn dev faqs
 ---------------
