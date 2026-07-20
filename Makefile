@@ -23,4 +23,4 @@ $(TARGET): $(OBJS)
 
 # Rule to clean up compiled files and start fresh
 clean:
-	del /Q $(subst /,\,$(OBJS)) $(TARGET) 2>nul || exit 0
+	rm -f $(OBJS) $(TARGET) 2>/dev/null || true
