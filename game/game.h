@@ -1,3 +1,6 @@
+#ifndef GAME_H
+#define GAME_H
+
 #include <stdlib.h>
 #include <time.h>
 #include <stdio.h>
@@ -9,10 +12,6 @@
 
 void game_run(void);
 void generate_new_apple();
-
-extern int objMap[MAP_HEIGHT][MAP_WIDTH];//This will contain all the objects. will use it to keep track of collisions
-extern int gamespeed; //this is a value between 1 and 3
-extern int score;//score for the game
 
 typedef enum
 {
@@ -31,3 +30,5 @@ typedef enum
 {
 	left = 0, right, up, down
 }direction;
+
+#endif

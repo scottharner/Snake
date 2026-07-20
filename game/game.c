@@ -7,9 +7,9 @@
 *   Author: Scott Harner
 */
 
-int objMap[MAP_HEIGHT][MAP_WIDTH];
-int gamespeed = 0;
-int score = 0;
+static int objMap[MAP_HEIGHT][MAP_WIDTH];//This will contain all the objects. will use it to keep track of collisions
+static int gamespeed; //this is a value between 1 and 3
+static int score;//score for the game
 
 // finds a random location to place the next apple
 void generate_new_apple()
@@ -64,5 +64,5 @@ void game_run(void)
     //     platform_end_frame();
     // }
 
-    // platform_shutdown();
+    platform_shutdown();
 }

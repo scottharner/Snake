@@ -52,6 +52,12 @@ void platform_initialize()
     install_int(timer1, 1000);
 }
 
+//Windows implementation of platform shutdown
+void platform_shutdown()
+{
+
+}
+
 int main(void)
 {
     game_run();
