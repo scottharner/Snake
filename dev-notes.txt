@@ -4,6 +4,7 @@ snake
 	- set_gfx_mode( GFX_GDI, MAP_WIDTH * TILE_SIZE, MAP_HEIGHT * TILE_SIZE, 0, 0);
 - had to do the following cmd line to build from mingw32
 	- gcc snake.c -o snake.exe -I"d:\allegro-mingw-4.2.2\include" -L"d:\allegro-mingw-4.2.2\lib" -lalleg -fgnu89-inline
+	- as we add files we have to list each individual c file so i have instead moved to using a Makefile and running make
 - used allegro-mingw-4.2.2 to get this to build (uncertain of original version but this is best guess based on date)
 - had to copy alleg42.dll to application directory
 
