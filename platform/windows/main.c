@@ -15,10 +15,14 @@ volatile int resting, rested;
 
 BITMAP *buffer;//This will be our temporary bitmap for double buffering 
 
-void timer1(void);
+//do something while resting (?)
+static void rest1(void)
+{
+    resting++;
+}
 
 //calculate framerate every second
-void timer1(void)
+static void timer1(void)
 {
     counter++;
     framerate = ticks;
@@ -51,10 +55,19 @@ void platform_initialize()
     install_int(timer1, 1000);
 }
 
-//Windows implementation of platform shutdown
+// Windows implementation of platform shutdown
 void platform_shutdown()
 {
 
+}
+
+// any logic for making certain that graphics finish rendering at an appropriate speed
+void platform_adjust_speed(int gamespeed)
+{
+    //this formula is hacked together. This number is the one which determines how slow the game is. The
+    //higher the number the longer we wait. So higher gamespeed means a lower wait.
+    // todo - allegro
+    rest_callback(100-gamespeed * 30, rest1);
 }
 
 // check if the game is still running

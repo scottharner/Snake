@@ -188,10 +188,7 @@ void game_run(void)
         // //slow the game down
         // resting=0;
 
-        // //this formula is hacked together. This number is the one which determines how slow the game is. The
-        // //higher the number the longer we wait. So higher gamespeed means a lower wait.
-        // // todo - allegro
-        // rest_callback(100-gamespeed * 30, rest1);
+        platform_adjust_speed(gamespeed);
     }
 
     platform_shutdown();
