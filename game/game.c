@@ -53,8 +53,8 @@ void game_run(void)
     srand(time(NULL));
     generate_new_apple();
     
-    // while (platform_is_running())
-    // {
+    while (platform_is_running())
+    {
     //     platform_begin_frame();
 
     //     game_update();
@@ -62,7 +62,7 @@ void game_run(void)
     //     game_render();
 
     //     platform_end_frame();
-    // }
+    }
 
     platform_shutdown();
 }

@@ -58,6 +58,11 @@ void platform_shutdown()
 
 }
 
+bool platform_is_running()
+{
+    return !key[KEY_ESC];
+}
+
 int main(void)
 {
     game_run();
