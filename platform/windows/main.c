@@ -1,5 +1,4 @@
 #include <allegro.h>
-#include "../../game/game.h"
 #include "../platform.h"
 
 /*
@@ -58,9 +57,24 @@ void platform_shutdown()
 
 }
 
+// check if the game is still running
 bool platform_is_running()
 {
     return !key[KEY_ESC];
+}
+
+// retrieve the input direction from the user
+direction platform_get_input_direction()
+{
+    direction inputDirection = none;
+    clear_keybuf();
+
+    if (key[KEY_LEFT]) inputDirection = left;
+    else if (key[KEY_RIGHT]) inputDirection = right;
+    else if (key[KEY_DOWN]) inputDirection = down;
+    else if (key[KEY_UP]) inputDirection = up;
+
+    return inputDirection;
 }
 
 int main(void)

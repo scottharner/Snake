@@ -11,7 +11,6 @@
 //32x24 tiles, 20 px in size
 
 void game_run(void);
-void generate_new_apple();
 
 typedef enum
 {
@@ -28,7 +27,7 @@ typedef struct snake_node
 
 typedef enum
 {
-	left = 0, right, up, down
+	none = 0, left, right, up, down
 }direction;
 
 #endif
