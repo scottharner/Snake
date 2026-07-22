@@ -180,7 +180,7 @@ void game_run(void)
     while (platform_is_running())
     {
         move(player);
-        // draw();
+        platform_draw_game_screen(objMap, score);
 
         platform_update_game_state();
 
