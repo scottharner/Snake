@@ -9,5 +9,6 @@ void platform_shutdown();
 bool platform_is_running();
 direction platform_get_input_direction();
 void platform_adjust_speed(int);
+void platform_update_game_state();
 
 #endif

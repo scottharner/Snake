@@ -10,6 +10,7 @@
 //timer variables
 volatile int counter;
 volatile int ticks;
+// todo - check if framerate can be removed as it seems unused in original code
 volatile int framerate;
 volatile int resting, rested;
 
@@ -64,6 +65,9 @@ void platform_shutdown()
 // any logic for making certain that graphics finish rendering at an appropriate speed
 void platform_adjust_speed(int gamespeed)
 {
+    //slow the game down
+    resting=0;
+
     //this formula is hacked together. This number is the one which determines how slow the game is. The
     //higher the number the longer we wait. So higher gamespeed means a lower wait.
     // todo - allegro
@@ -88,6 +92,12 @@ direction platform_get_input_direction()
     else if (key[KEY_UP]) inputDirection = up;
 
     return inputDirection;
+}
+
+void platform_update_game_state()
+{
+    //update ticks
+    ticks++;
 }
 
 int main(void)

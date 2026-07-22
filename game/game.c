@@ -182,11 +182,7 @@ void game_run(void)
         move(player);
         // draw();
 
-        // //update ticks
-        // ticks++;
-
-        // //slow the game down
-        // resting=0;
+        platform_update_game_state();
 
         platform_adjust_speed(gamespeed);
     }
