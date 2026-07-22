@@ -8,9 +8,10 @@
 */
 
 //timer variables
+//it seems like framerate and some other variables my have no useful purpose
+//since our goal is primarily porting we will leave that be for now
 volatile int counter;
 volatile int ticks;
-// todo - check if framerate can be removed as it seems unused in original code
 volatile int framerate;
 volatile int resting, rested;
 
