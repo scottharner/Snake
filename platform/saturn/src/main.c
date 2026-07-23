@@ -27,7 +27,7 @@
 */
 
 #include <jo/jo.h>
-#include "../platform.h"
+#include "../../platform.h"
 
 /*
 *   Snake: Sega Saturn implementation of snake using joengine framework.

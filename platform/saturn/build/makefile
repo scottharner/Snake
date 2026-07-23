@@ -21,8 +21,8 @@ JO_COMPILE_USING_SGL = 1
 #
 
 SRCS = \
-    platform/saturn/main.c \
-    game/game.c
+    ../src/main.c \
+    ../../../game/game.c
 
 #
 # Adjust these paths for your installation

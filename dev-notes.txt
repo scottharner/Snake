@@ -7,8 +7,10 @@ snake
 	- as we add files we have to list each individual c file so i have instead moved to using a Makefile and running make
 - used allegro-mingw-4.2.2 to get this to build (uncertain of original version but this is best guess based on date)
 - had to copy alleg42.dll to application directory
-- we have one make file per platform now, so we need a different make command
-  - make -f Makefile.windows
+- we have one make file per platform now, so to make we need to
+  - cd into the platform specific build directory
+  - run make clean (optional)
+  - run make
 
 saturn dev faqs
 ---------------

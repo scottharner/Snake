@@ -1,5 +1,5 @@
 #include <allegro.h>
-#include "../platform.h"
+#include "../../platform.h"
 
 /*
 *   Snake: Windows implementation of snake using allegro framework.
