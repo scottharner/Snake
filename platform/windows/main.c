@@ -71,7 +71,6 @@ void platform_adjust_speed(int gamespeed)
 
     //this formula is hacked together. This number is the one which determines how slow the game is. The
     //higher the number the longer we wait. So higher gamespeed means a lower wait.
-    // todo - allegro
     rest_callback(100-gamespeed * 30, rest1);
 }
 
@@ -104,7 +103,6 @@ void platform_update_game_state()
 void platform_draw_game_screen(int objMap[MAP_HEIGHT][MAP_WIDTH], int score)
 {
     int i,j;
-    // todo - allegro
     acquire_screen();	//O(N^2) runtime for this, 24^2 is pretty big.. so we may change this
                         //but for now, we draw every tile every frame!
     for (i = 0; i < MAP_HEIGHT; i++)
@@ -113,18 +111,14 @@ void platform_draw_game_screen(int objMap[MAP_HEIGHT][MAP_WIDTH], int score)
         {
             int c; //color to draw
             if (objMap[i][j] == nothing){
-                // todo - allegro
                 c = makecol(0,0,0);
             }else if (objMap[i][j] == apple){
-                // todo - allegro
                 c = makecol(255,0,0);
             }
             else if (objMap[i][j] == snake){
-                // todo - allegro
                 c = makecol(0,255,0);
             }
 
-            // todo - allegro
             rectfill ( buffer, TILE_SIZE*j, TILE_SIZE*i, TILE_SIZE*(j+1),TILE_SIZE*(i+1), c);
         }
     }
@@ -132,14 +126,11 @@ void platform_draw_game_screen(int objMap[MAP_HEIGHT][MAP_WIDTH], int score)
     //draw the score
     char scoretxt[10];
     sprintf(scoretxt,"score: %d",score);
-    // todo - allegro
     textout_ex(buffer, font, scoretxt, TILE_SIZE*(MAP_WIDTH)*3/4, TILE_SIZE, makecol(255,255,255), makecol(0,0,0));
 
     //draw an outline of the game map
-    // todo - allegro
     rect( buffer, 0, 0, TILE_SIZE*MAP_WIDTH-1, TILE_SIZE*MAP_HEIGHT-1, makecol( 0, 0, 255));
 
-    // todo - allegro
     draw_sprite( screen, buffer, 0, 0); //draw buffer image on screen every time we draw.
     release_screen();
 }
