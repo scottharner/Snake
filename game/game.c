@@ -14,8 +14,9 @@ static int score;//score for the game
 // display game over message
 static void game_over()
 {
-	printf("\ngame over. score = %d\n",score);
-	exit(0);
+	// todo - platform specific
+    // printf("\ngame over. score = %d\n",score);
+	//exit(0);
 }
 
 // finds a random location to place the next apple
@@ -112,8 +113,8 @@ static void move(snake_node* player)
     } 
     else 
     {
-
-        exit(0);
+	    // todo - platform specific
+        //exit(0);
     }
 
     if (objMap[tempy][tempx] == apple) //the snake has run into an apple and another node is created
@@ -127,7 +128,8 @@ static void move(snake_node* player)
         int newNodex = temp->x; //when we reach the final node, we store its location with two variables
         int newNodey = temp->y;
         player = move_body(player,tempx,tempy);
-        snake_node* newNode = malloc(sizeof(snake_node)); //after we move the whole body we make a new node line( screen, 130, 130, 150, 150, makecol( 255, 0, 0));
+        // todo - platform specific
+        snake_node* newNode;// = malloc(sizeof(snake_node)); //after we move the whole body we make a new node line( screen, 130, 130, 150, 150, makecol( 255, 0, 0));
         newNode->x = newNodex;
         newNode->y = newNodey; //we set this new node's location variables
         newNode->dir = temp->dir;
@@ -152,13 +154,15 @@ void game_run(void)
 {
     
     //basic info from user about game speed.
-    printf("\nSet your game speed (1,2,3): \n");
-    scanf("%d",&gamespeed);
+    // todo - platform specific
+    // printf("\nSet your game speed (1,2,3): \n");
+    // scanf("%d",&gamespeed);
     score = 0;
     
     platform_initialize();
 
-    snake_node* player = malloc(sizeof(snake_node));
+    // todo - platform specific
+    snake_node* player;// = malloc(sizeof(snake_node));
     player->dir =  left; //init direction
     player->x = MAP_WIDTH/2;
     player->y = MAP_HEIGHT/2;
@@ -174,7 +178,8 @@ void game_run(void)
     }
     // we need to seed our rand() and generate our first random object
     //srand(time(NULL));
-    srand(time(NULL));
+    // todo - platform specific
+    //srand(time(NULL));
     generate_new_apple();
     
     while (platform_is_running())
