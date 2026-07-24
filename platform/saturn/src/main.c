@@ -42,6 +42,13 @@ void platform_initialize()
     jo_printf(10, 0, "* Tiny Sonic Demo *");
 }
 
+// display a game over screen
+void platform_draw_game_over_screen(int score)
+{
+    // todo - implement this
+    (void)score;
+}
+
 // platform specific setting of random generator seed
 void platform_set_random_seed(unsigned int seed)
 {
@@ -69,12 +76,13 @@ void platform_shutdown()
 // end the game immediately
 void platform_quit()
 {
-    
+    // todo - implement this
 }
 
 // any logic for making certain that graphics finish rendering at an appropriate speed
 void platform_adjust_speed(int gamespeed)
 {
+    // we dont need to adjust the speed for this platform
     (void)gamespeed; // avoid compiler warnings
 }
 
@@ -82,17 +90,18 @@ void platform_adjust_speed(int gamespeed)
 direction platform_get_input_direction()
 {
     direction inputDirection = none;
-
+    // todo - implement this
     return inputDirection;
 }
 
 void platform_update_platform_state()
 {
-
+    // we dont have any updates to make on this platform
 }
 
 void platform_draw_game_screen(int objMap[MAP_HEIGHT][MAP_WIDTH], int score)
 {
+    // todo - implement this
     (void)objMap; // avoid compiler warnings
     (void)score; // avoid compiler warnings
 }

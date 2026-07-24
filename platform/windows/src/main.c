@@ -59,6 +59,12 @@ void platform_initialize()
     install_int(timer1, 1000);
 }
 
+// display a game over screen
+void platform_draw_game_over_screen(int score)
+{
+    printf("\ngame over. score = %d\n",score);
+}
+
 // platform specific setting of random generator seed
 void platform_set_random_seed(unsigned int seed)
 {

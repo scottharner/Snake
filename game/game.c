@@ -15,8 +15,7 @@ static struct snake_node* player;
 // display game over message
 static void game_over()
 {
-	// todo - platform specific
-    //printf("\ngame over. score = %d\n",score);
+    platform_draw_game_over_screen(score);
 	platform_quit();
 }
 
