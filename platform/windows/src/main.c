@@ -59,6 +59,12 @@ void platform_initialize()
     install_int(timer1, 1000);
 }
 
+// platform specific setting of random generator seed
+void platform_set_random_seed(unsigned int seed)
+{
+    srand(seed);
+}
+
 // platform specific random number generation
 int platform_get_random(int max)
 {

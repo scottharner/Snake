@@ -42,6 +42,12 @@ void platform_initialize()
     jo_printf(10, 0, "* Tiny Sonic Demo *");
 }
 
+// platform specific setting of random generator seed
+void platform_set_random_seed(unsigned int seed)
+{
+    jo_random_seed = seed;
+}
+
 // platform specific random number generation
 int platform_get_random(int max)
 {

@@ -185,8 +185,7 @@ void game_initialize(void)
     }
     // we need to seed our rand() and generate our first random object
     //srand(time(NULL));
-    // todo - platform specific
-    //srand(time(NULL));
+    platform_set_random_seed(time(NULL));
     generate_new_apple();
 }
 
