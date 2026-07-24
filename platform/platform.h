@@ -6,6 +6,7 @@
 
 void platform_initialize();
 void platform_shutdown();
+void platform_quit();
 direction platform_get_input_direction();
 void platform_adjust_speed(int);
 void platform_update_platform_state();

@@ -57,10 +57,16 @@ void platform_initialize()
     install_int(timer1, 1000);
 }
 
-// Windows implementation of platform shutdown
+// steps to prepare to exit the game
 void platform_shutdown()
 {
 
+}
+
+// end the game immediately
+void platform_quit()
+{
+    exit(0);
 }
 
 // any logic for making certain that graphics finish rendering at an appropriate speed

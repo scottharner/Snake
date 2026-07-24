@@ -42,16 +42,22 @@ void platform_initialize()
     jo_printf(10, 0, "* Tiny Sonic Demo *");
 }
 
-// Saturn implementation of platform shutdown
+// steps to prepare to exit the game
 void platform_shutdown()
 {
 
 }
 
+// end the game immediately
+void platform_quit()
+{
+    
+}
+
 // any logic for making certain that graphics finish rendering at an appropriate speed
 void platform_adjust_speed(int gamespeed)
 {
-
+    (void)gamespeed; // avoid compiler warnings
 }
 
 // retrieve the input direction from the user
@@ -69,7 +75,8 @@ void platform_update_platform_state()
 
 void platform_draw_game_screen(int objMap[MAP_HEIGHT][MAP_WIDTH], int score)
 {
-
+    (void)objMap; // avoid compiler warnings
+    (void)score; // avoid compiler warnings
 }
 
 void jo_main(void)

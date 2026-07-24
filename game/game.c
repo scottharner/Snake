@@ -17,7 +17,7 @@ static void game_over()
 {
 	// todo - platform specific
     //printf("\ngame over. score = %d\n",score);
-	//exit(0);
+	platform_quit();
 }
 
 // finds a random location to place the next apple
@@ -113,8 +113,7 @@ static void move()
     } 
     else 
     {
-	    // todo - platform specific
-        //exit(0);
+        platform_quit();
     }
 
     if (objMap[tempy][tempx] == apple) //the snake has run into an apple and another node is created
