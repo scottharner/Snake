@@ -42,6 +42,18 @@ void platform_initialize()
     jo_printf(10, 0, "* Tiny Sonic Demo *");
 }
 
+// platform specific random number generation
+int platform_get_random(int max)
+{
+    return jo_random(max);
+}
+
+// platform specific memory allocation
+void * platform_memory_allocate(unsigned int size)
+{
+    return jo_malloc(size);
+}
+
 // steps to prepare to exit the game
 void platform_shutdown()
 {

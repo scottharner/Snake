@@ -25,9 +25,9 @@ static void generate_new_apple()
 {
 	int randy, randx;
 
-	do{
-		randy = (int)(rand()%24);
-		randx = (int)(rand()%32);
+    do{
+		randy = (int)(platform_get_random(MAP_HEIGHT/2));
+		randx = (int)(platform_get_random(MAP_WIDTH/2));
 	}while (objMap[randy][randx] != nothing); //while we generate a spot that's taken, keep going;
 	objMap[randy][randx] = apple;
 }
@@ -127,8 +127,7 @@ static void move()
         int newNodex = temp->x; //when we reach the final node, we store its location with two variables
         int newNodey = temp->y;
         player = move_body(player, tempx,tempy);
-        // todo - platform specific
-        snake_node* newNode;// = malloc(sizeof(snake_node)); //after we move the whole body we make a new node line( screen, 130, 130, 150, 150, makecol( 255, 0, 0));
+        snake_node* newNode = platform_memory_allocate(sizeof(snake_node)); //after we move the whole body we make a new node line( screen, 130, 130, 150, 150, makecol( 255, 0, 0));
         newNode->x = newNodex;
         newNode->y = newNodey; //we set this new node's location variables
         newNode->dir = temp->dir;
@@ -170,8 +169,7 @@ void game_initialize(void)
     
     platform_initialize();
 
-    // todo - plaform specific
-    //player = malloc(sizeof(snake_node));
+    player = platform_memory_allocate(sizeof(snake_node));
     player->dir =  left; //init direction
     player->x = MAP_WIDTH/2;
     player->y = MAP_HEIGHT/2;

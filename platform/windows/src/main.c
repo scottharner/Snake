@@ -1,4 +1,6 @@
 #include <allegro.h>
+#include <stdbool.h>
+#include <stdlib.h>
 #include "../../platform.h"
 
 /*
@@ -55,6 +57,19 @@ void platform_initialize()
     LOCK_FUNCTION(rest1);
 
     install_int(timer1, 1000);
+}
+
+// platform specific random number generation
+int platform_get_random(int max)
+{
+    if (max <= 0) return 0;
+    return rand() % max;
+}
+
+// platform specific memory allocation
+void * platform_memory_allocate(unsigned int size)
+{
+    return malloc(size);
 }
 
 // steps to prepare to exit the game
