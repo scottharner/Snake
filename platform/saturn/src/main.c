@@ -49,6 +49,13 @@ void platform_draw_game_over_screen(int score)
     (void)score;
 }
 
+// display a title screen
+void platform_draw_title_screen(int *gamespeed)
+{
+    // todo - implement this
+    (void)gamespeed;
+}
+
 // platform specific setting of random generator seed
 void platform_set_random_seed(unsigned int seed)
 {

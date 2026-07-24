@@ -161,9 +161,7 @@ void game_initialize(void)
 {
     
     //basic info from user about game speed.
-    // todo - platform specific
-    //printf("\nSet your game speed (1,2,3): \n");
-    //scanf("%d",&gamespeed);
+    platform_draw_title_screen(&gamespeed);
     score = 0;
     
     platform_initialize();

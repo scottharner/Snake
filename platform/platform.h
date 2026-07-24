@@ -14,5 +14,6 @@ void platform_adjust_speed(int);
 void platform_update_platform_state();
 void platform_draw_game_screen(int[MAP_HEIGHT][MAP_WIDTH], int);
 void platform_draw_game_over_screen(int);
+void platform_draw_title_screen(int *);
 
 #endif

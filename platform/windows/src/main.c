@@ -65,6 +65,13 @@ void platform_draw_game_over_screen(int score)
     printf("\ngame over. score = %d\n",score);
 }
 
+// display a title screen
+void platform_draw_title_screen(int *gamespeed)
+{
+    printf("\nSet your game speed (1,2,3): \n");
+    scanf("%d",gamespeed);
+}
+
 // platform specific setting of random generator seed
 void platform_set_random_seed(unsigned int seed)
 {
