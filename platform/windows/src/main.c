@@ -75,7 +75,7 @@ void platform_adjust_speed(int gamespeed)
 }
 
 // check if the game is still running
-bool platform_is_running()
+static bool is_running()
 {
     return !key[KEY_ESC];
 }
@@ -94,7 +94,7 @@ direction platform_get_input_direction()
     return inputDirection;
 }
 
-void platform_update_game_state()
+void platform_update_platform_state()
 {
     //update ticks
     ticks++;
@@ -137,7 +137,14 @@ void platform_draw_game_screen(int objMap[MAP_HEIGHT][MAP_WIDTH], int score)
 
 int main(void)
 {
-    game_run();
+    game_initialize();
+    
+    while (is_running())
+    {
+        game_update();
+    }
+
+    game_shutdown();
     return 0;
 }
 END_OF_MAIN();

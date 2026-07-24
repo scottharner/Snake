@@ -10,12 +10,13 @@
 static int objMap[MAP_HEIGHT][MAP_WIDTH];//This will contain all the objects. will use it to keep track of collisions
 static int gamespeed; //this is a value between 1 and 3
 static int score;//score for the game
+static struct snake_node* player;
 
 // display game over message
 static void game_over()
 {
 	// todo - platform specific
-    // printf("\ngame over. score = %d\n",score);
+    //printf("\ngame over. score = %d\n",score);
 	//exit(0);
 }
 
@@ -35,26 +36,25 @@ static void generate_new_apple()
 *  This function recursively moves the snake. It goes all the way to the last node of the snake, changes its coordinates,
 *  and then changes its coordinates, all the way up.
 */
-static snake_node* move_body(snake_node* player, int tempx, int tempy)
+static snake_node* move_body(snake_node* currentNode, int tempx, int tempy)
 {
-	if (player->next == NULL) //we've reached the end of the snake's body
+	if (currentNode->next == NULL) //we've reached the end of the snake's body
 	{
-		objMap[player->y][player->x] = nothing; //reset the object map at this position
+		objMap[currentNode->y][currentNode->x] = nothing; //reset the object map at this position
 	}
 	else //we need to keep traversing
 	{
-		player->next = move_body(player->next,player->x,player->y);
+		currentNode->next = move_body(currentNode->next,currentNode->x,currentNode->y);
 	}
-	player->x = tempx;
-	player->y = tempy;
-	return player;
+	currentNode->x = tempx;
+	currentNode->y = tempy;
+    return currentNode;
 
 }
 
-static void move(snake_node* player)
+static void move()
 {
     //this contains the array of flags which tell which button has been pressed. It must be cleared before every input.
-    // todo - move to allegro platform
     direction inputDirection = platform_get_input_direction();
     if (inputDirection == left)	 player->dir = left;
     if (inputDirection == right) player->dir = right;
@@ -127,7 +127,7 @@ static void move(snake_node* player)
         }
         int newNodex = temp->x; //when we reach the final node, we store its location with two variables
         int newNodey = temp->y;
-        player = move_body(player,tempx,tempy);
+        player = move_body(player, tempx,tempy);
         // todo - platform specific
         snake_node* newNode;// = malloc(sizeof(snake_node)); //after we move the whole body we make a new node line( screen, 130, 130, 150, 150, makecol( 255, 0, 0));
         newNode->x = newNodex;
@@ -149,20 +149,30 @@ static void move(snake_node* player)
     objMap[tempy][tempx] = snake; //update the object map to the new snake head position
 }
 
+void game_update(void)
+{
+        move();
+        platform_draw_game_screen(objMap, score);
+
+        platform_update_platform_state();
+
+        platform_adjust_speed(gamespeed);
+}
+
 // platform agnostic primary game logic
-void game_run(void)
+void game_initialize(void)
 {
     
     //basic info from user about game speed.
     // todo - platform specific
-    // printf("\nSet your game speed (1,2,3): \n");
-    // scanf("%d",&gamespeed);
+    //printf("\nSet your game speed (1,2,3): \n");
+    //scanf("%d",&gamespeed);
     score = 0;
     
     platform_initialize();
 
-    // todo - platform specific
-    snake_node* player;// = malloc(sizeof(snake_node));
+    // todo - plaform specific
+    //player = malloc(sizeof(snake_node));
     player->dir =  left; //init direction
     player->x = MAP_WIDTH/2;
     player->y = MAP_HEIGHT/2;
@@ -181,16 +191,9 @@ void game_run(void)
     // todo - platform specific
     //srand(time(NULL));
     generate_new_apple();
-    
-    while (platform_is_running())
-    {
-        move(player);
-        platform_draw_game_screen(objMap, score);
+}
 
-        platform_update_game_state();
-
-        platform_adjust_speed(gamespeed);
-    }
-
+void game_shutdown(void)
+{
     platform_shutdown();
 }

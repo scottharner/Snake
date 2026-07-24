@@ -38,7 +38,8 @@
 // Saturn implementation of platform initialization
 void platform_initialize()
 {
-
+    jo_core_init(JO_COLOR_Black);
+    jo_printf(10, 0, "* Tiny Sonic Demo *");
 }
 
 // Saturn implementation of platform shutdown
@@ -53,12 +54,6 @@ void platform_adjust_speed(int gamespeed)
 
 }
 
-// check if the game is still running
-bool platform_is_running()
-{
-    return true;
-}
-
 // retrieve the input direction from the user
 direction platform_get_input_direction()
 {
@@ -67,7 +62,7 @@ direction platform_get_input_direction()
     return inputDirection;
 }
 
-void platform_update_game_state()
+void platform_update_platform_state()
 {
 
 }
@@ -77,18 +72,11 @@ void platform_draw_game_screen(int objMap[MAP_HEIGHT][MAP_WIDTH], int score)
 
 }
 
-void run_game_loop()
-{
-
-}
-
 void jo_main(void)
 {
-    jo_core_init(JO_COLOR_Black);
-    jo_printf(10, 0, "* Tiny Sonic Demo *");
-    jo_core_add_callback(run_game_loop);
+    game_initialize();
+    jo_core_add_callback(game_update);
     jo_core_run();
-    // game_run();
 }
 
 /*

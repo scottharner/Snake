@@ -10,7 +10,9 @@
 #define TILE_SIZE 10
 //32x24 tiles, 20 px in size
 
-void game_run(void);
+void game_initialize(void);
+void game_update(void);
+void game_shutdown(void);
 
 typedef enum
 {
