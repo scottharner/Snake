@@ -27,6 +27,7 @@
 *.so
 *.so.*
 *.dylib
+!platform/windows/build/allegro42.dll
 
 # Executables
 *.exe
