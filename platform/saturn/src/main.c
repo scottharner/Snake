@@ -99,20 +99,8 @@ input_type platform_get_input_type(mode gameMode)
 {
     input_type inputType = INPUT_TYPE_NOTHING;
     // todo - implement this
+    (void)gameMode; // avoid compiler warnings
     return inputType;
-}
-
-// track all current and previous input states so we can check on input presses
-void platform_update_input_states()
-{
-    // todo - implement this
-}
-
-// check if input was newly pressed
-bool platform_input_pressed(input_type candidateInput)
-{
-    // todo - implement this
-    return false;
 }
 
 // platform specific game reset logic
