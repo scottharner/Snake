@@ -39,7 +39,6 @@
 void platform_initialize()
 {
     jo_core_init(JO_COLOR_Black);
-    jo_printf(10, 0, "* Tiny Sonic Demo *");
 }
 
 // display a game over screen
@@ -49,11 +48,22 @@ void platform_draw_game_over_screen(int score)
     (void)score;
 }
 
+// calculate the color to display for a menu option
+static int getOptionColor(speed selectedSpeed, speed optionSpeed)
+{
+    int selectedColor = JO_COLOR_INDEX_Yellow;
+    int defaultColor = JO_COLOR_INDEX_White;
+    return selectedSpeed == optionSpeed ? selectedColor : defaultColor;
+}
+
 // display a title screen
 void platform_draw_title_screen(speed gameSpeed)
 {
-    // todo - implement this
-    (void)gameSpeed;
+    jo_printf_with_color(0, 1, JO_COLOR_INDEX_White, "SNAKE");
+
+    jo_printf_with_color(0, 5, getOptionColor(gameSpeed, SPEED_SLOW), "Slow");
+    jo_printf_with_color(0, 7, getOptionColor(gameSpeed, SPEED_MEDIUM), "Medium");
+    jo_printf_with_color(0, 9, getOptionColor(gameSpeed, SPEED_FAST), "Fast");
 }
 
 // platform specific setting of random generator seed
