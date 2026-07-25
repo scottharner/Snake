@@ -27,7 +27,7 @@
 *.so
 *.so.*
 *.dylib
-!platform/windows/build/allegro42.dll
+!platform/windows/build/alleg42.dll
 
 # Executables
 *.exe
@@ -57,4 +57,3 @@ dkms.conf
 game.cue
 game.iso
 game.raw
-platform/saturn/build/cd/0.bin
