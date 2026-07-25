@@ -1,6 +1,7 @@
 #include <allegro.h>
 #include <stdbool.h>
 #include <stdlib.h>
+#include <stdio.h>
 #include "../../platform.h"
 
 /*
@@ -8,6 +9,10 @@
 *   Last Update: Jul 19, 2026
 *   Author: Scott Harner
 */
+
+// track key changes for better title menu input handling
+static bool current_keystates[INPUT_TYPE_COUNT];
+static bool previous_keystates[INPUT_TYPE_COUNT];
 
 //timer variables
 //it seems like framerate and some other variables my have no useful purpose
@@ -62,7 +67,12 @@ void platform_initialize()
 // display a game over screen
 void platform_draw_game_over_screen(int score)
 {
-    printf("\ngame over. score = %d\n",score);
+    clear_to_color(buffer, makecol(0, 0, 0));
+    
+    textout_ex(buffer, font, "Game Over", 50, 50, makecol(255,255,255), -1);
+    textprintf_ex(buffer, font, 50, 70, makecol(255,255,255), -1, "Score: %d", score);
+
+    blit(buffer, screen, 0, 0, 0, 0, SCREEN_W, SCREEN_H);
 }
 
 // calculate the color to display for a menu option
@@ -76,19 +86,14 @@ static int getOptionColor(speed selectedSpeed, speed optionSpeed)
 // display a title screen
 void platform_draw_title_screen(speed gameSpeed)
 {
-    //printf("\nSet your game speed (1,2,3): \n");
-    //scanf("%d",gameSpeed);
-
     clear_to_color(buffer, makecol(0, 0, 0));
     textout_ex(buffer, font, "SNAKE", 50, 10, makecol(255,255,255), -1);
     
-    textout_ex(buffer, font, "Slow", 50, 50, getOptionColor(gameSpeed, slow), -1);
-    textout_ex(buffer, font, "Medium", 50, 70, getOptionColor(gameSpeed, medium), -1);
-    textout_ex(buffer, font, "Fast", 50, 90, getOptionColor(gameSpeed, fast), -1);
+    textout_ex(buffer, font, "Slow", 50, 50, getOptionColor(gameSpeed, SPEED_SLOW), -1);
+    textout_ex(buffer, font, "Medium", 50, 70, getOptionColor(gameSpeed, SPEED_MEDIUM), -1);
+    textout_ex(buffer, font, "Fast", 50, 90, getOptionColor(gameSpeed, SPEED_FAST), -1);
 
     blit(buffer, screen, 0, 0, 0, 0, SCREEN_W, SCREEN_H);
-
-    rest(10);
 }
 
 // platform specific setting of random generator seed
@@ -130,13 +135,14 @@ void platform_adjust_speed(speed gameSpeed, mode gameMode)
     //higher the number the longer we wait. So higher gameSpeed means a lower wait.
     switch(gameMode)
     {
-        case title:
+        case MODE_TITLE:
             resting=0;
 
-            rest_callback(100-slow * 30, rest1);
+            rest_callback(100-SPEED_SLOW * 30, rest1);
             break;
 
-        case gameover:
+        case MODE_GAMEOVER:
+            rest(3000);
             break;
 
         default:
@@ -154,19 +160,64 @@ static bool is_running()
     return !key[KEY_ESC];
 }
 
-// retrieve the input type from the user
-input_type platform_get_input_type()
+// track all current and previous input states so we can check on input presses
+static void update_key_states()
 {
-    input_type inputType = none;
+    // save previous state
+    for (int i = 0; i < INPUT_TYPE_COUNT; i++)
+        previous_keystates[i] = current_keystates[i];
+
+    // read current state
+    current_keystates[INPUT_TYPE_UP] = key[KEY_UP];
+    current_keystates[INPUT_TYPE_DOWN] = key[KEY_DOWN];
+    current_keystates[INPUT_TYPE_LEFT] = key[KEY_LEFT];
+    current_keystates[INPUT_TYPE_RIGHT] = key[KEY_RIGHT];
+    current_keystates[INPUT_TYPE_START] = key[KEY_ENTER];    
+}
+
+// check if input was newly pressed
+static bool key_pressed(input_type candidateInput)
+{
+    return current_keystates[candidateInput] && !previous_keystates[candidateInput];
+}
+
+
+// retrieve the input type from the user
+input_type platform_get_input_type(mode gameMode)
+{
+    input_type currentInput = INPUT_TYPE_NOTHING;
     clear_keybuf();
 
-    if (key[KEY_LEFT]) inputType = left;
-    else if (key[KEY_RIGHT]) inputType = right;
-    else if (key[KEY_DOWN]) inputType = down;
-    else if (key[KEY_UP]) inputType = up;
-    else if (key[KEY_ENTER]) inputType = start;
+    switch(gameMode)
+    {
+        case MODE_TITLE:
+            update_key_states();
+            if (key_pressed(INPUT_TYPE_START)) currentInput = INPUT_TYPE_START;
+            else if (key_pressed(INPUT_TYPE_DOWN)) currentInput = INPUT_TYPE_DOWN;
+            else if (key_pressed(INPUT_TYPE_UP)) currentInput = INPUT_TYPE_UP;
+            break;
 
-    return inputType;
+        default:
+            if (key[KEY_LEFT]) currentInput = INPUT_TYPE_LEFT;
+            else if (key[KEY_RIGHT]) currentInput = INPUT_TYPE_RIGHT;
+            else if (key[KEY_DOWN]) currentInput = INPUT_TYPE_DOWN;
+            else if (key[KEY_UP]) currentInput = INPUT_TYPE_UP;
+            else if (key[KEY_ENTER]) currentInput = INPUT_TYPE_START;
+
+            break;
+    }
+
+    return currentInput;
+}
+
+// platform specific game reset logic
+void platform_reset()
+{
+    for (int i = 0; i < INPUT_TYPE_COUNT; i++)
+    {
+        previous_keystates[i] = false;
+        current_keystates[i] = false;
+    }
 }
 
 void platform_update_platform_state()
@@ -185,12 +236,12 @@ void platform_draw_game_screen(int objMap[MAP_HEIGHT][MAP_WIDTH], int score)
         for (j = 0; j < MAP_WIDTH; j++)
         {
             int c; //color to draw
-            if (objMap[i][j] == nothing){
+            if (objMap[i][j] == OBJECT_NOTHING){
                 c = makecol(0,0,0);
-            }else if (objMap[i][j] == apple){
+            }else if (objMap[i][j] == OBJECT_APPLE){
                 c = makecol(255,0,0);
             }
-            else if (objMap[i][j] == snake){
+            else if (objMap[i][j] == OBJECT_SNAKE){
                 c = makecol(0,255,0);
             }
 

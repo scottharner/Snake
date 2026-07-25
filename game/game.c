@@ -8,17 +8,10 @@
 */
 
 static int objMap[MAP_HEIGHT][MAP_WIDTH];//This will contain all the objects. will use it to keep track of collisions
-static speed gameSpeed;
+static speed gameSpeed = SPEED_SLOW;
 static int score;//score for the game
 static struct snake_node* player;
 static mode gameMode;
-
-// display game over message
-static void game_over()
-{
-    platform_draw_game_over_screen(score);
-	platform_quit();
-}
 
 // finds a random location to place the next apple
 static void generate_new_apple()
@@ -28,8 +21,8 @@ static void generate_new_apple()
     do{
 		randy = (int)(platform_get_random(MAP_HEIGHT/2));
 		randx = (int)(platform_get_random(MAP_WIDTH/2));
-	}while (objMap[randy][randx] != nothing); //while we generate a spot that's taken, keep going;
-	objMap[randy][randx] = apple;
+	}while (objMap[randy][randx] != OBJECT_NOTHING); //while we generate a spot that's taken, keep going;
+	objMap[randy][randx] = OBJECT_APPLE;
 }
 
 /*
@@ -40,7 +33,7 @@ static snake_node* move_body(snake_node* currentNode, int tempx, int tempy)
 {
 	if (currentNode->next == NULL) //we've reached the end of the snake's body
 	{
-		objMap[currentNode->y][currentNode->x] = nothing; //reset the object map at this position
+		objMap[currentNode->y][currentNode->x] = OBJECT_NOTHING; //reset the object map at this position
 	}
 	else //we need to keep traversing
 	{
@@ -55,42 +48,42 @@ static snake_node* move_body(snake_node* currentNode, int tempx, int tempy)
 static void title_screen_read_input()
 {
     //this contains the array of flags which tell which button has been pressed. It must be cleared before every input.
-    input_type inputType = platform_get_input_type();
-    if (inputType == start)
+    input_type inputType = platform_get_input_type(MODE_TITLE);
+    if (inputType == INPUT_TYPE_START)
     {
-        gameMode = game;
+        gameMode = MODE_GAME;
     }
-    else if (inputType == down) 
+    else if (inputType == INPUT_TYPE_DOWN) 
     {
         switch (gameSpeed)
         {
-            case slow:
-                gameSpeed = medium;
+            case SPEED_SLOW:
+                gameSpeed = SPEED_MEDIUM;
                 break;
 
-            case medium:
-                gameSpeed = fast;
+            case SPEED_MEDIUM:
+                gameSpeed = SPEED_FAST;
                 break;
 
             default:
-                gameSpeed = slow;
+                gameSpeed = SPEED_SLOW;
                 break;
         }
     }
-    else if (inputType == up) 
+    else if (inputType == INPUT_TYPE_UP) 
     {
         switch (gameSpeed)
         {
-            case slow:
-                gameSpeed = fast;
+            case SPEED_SLOW:
+                gameSpeed = SPEED_FAST;
                 break;
 
-            case medium:
-                gameSpeed = slow;
+            case SPEED_MEDIUM:
+                gameSpeed = SPEED_SLOW;
                 break;
 
             default:
-                gameSpeed = medium;
+                gameSpeed = SPEED_MEDIUM;
                 break;
         }
     }
@@ -99,15 +92,15 @@ static void title_screen_read_input()
 static void move()
 {
     //this contains the array of flags which tell which button has been pressed. It must be cleared before every input.
-    input_type inputType = platform_get_input_type();
-    if (inputType == left)	 player->dir = left;
-    if (inputType == right) player->dir = right;
-    if (inputType == down) player->dir = down;
-    if (inputType == up) player->dir = up;
+    input_type inputType = platform_get_input_type(MODE_GAME);
+    if (inputType == INPUT_TYPE_LEFT)	 player->dir = INPUT_TYPE_LEFT;
+    if (inputType == INPUT_TYPE_RIGHT) player->dir = INPUT_TYPE_RIGHT;
+    if (inputType == INPUT_TYPE_DOWN) player->dir = INPUT_TYPE_DOWN;
+    if (inputType == INPUT_TYPE_UP) player->dir = INPUT_TYPE_UP;
 
     int tempx = player->x, tempy = player->y;
 
-    if (player->dir == left)
+    if (player->dir == INPUT_TYPE_LEFT)
     {
 
         if (player->x > 0)
@@ -116,11 +109,12 @@ static void move()
         }
         else
         { //allow for wrap around
-            game_over();
+            gameMode = MODE_GAMEOVER;
+            return;
         }
 
     } 
-    else if (player->dir == right)
+    else if (player->dir == INPUT_TYPE_RIGHT)
     {
 
         if (player->x < MAP_WIDTH - 1)
@@ -129,10 +123,11 @@ static void move()
         }
         else
         {
-            game_over();
+            gameMode = MODE_GAMEOVER;
+            return;
         }
     } 
-    else if (player->dir == up)
+    else if (player->dir == INPUT_TYPE_UP)
     {
         if (player->y > 0)
         {
@@ -140,11 +135,12 @@ static void move()
         }
         else
         {
-            game_over();
+            gameMode = MODE_GAMEOVER;
+            return;
         }
 
     } 
-    else if (player->dir == down)
+    else if (player->dir == INPUT_TYPE_DOWN)
     {
 
         if (player->y < MAP_HEIGHT - 1)
@@ -152,7 +148,8 @@ static void move()
         	tempy = player->y + 1;
         }
         else{
-            game_over();
+            gameMode = MODE_GAMEOVER;
+            return;
         }
     } 
     else 
@@ -160,7 +157,7 @@ static void move()
         platform_quit();
     }
 
-    if (objMap[tempy][tempx] == apple) //the snake has run into an apple and another node is created
+    if (objMap[tempy][tempx] == OBJECT_APPLE) //the snake has run into an apple and another node is created
     {
 	    score++;
         snake_node* temp = player;
@@ -179,56 +176,61 @@ static void move()
         temp->next = newNode; //we set the temp node (the previous tail)'s next node to our new tail!
         generate_new_apple();
     }
-    else if (objMap[tempy][tempx] == snake)
+    else if (objMap[tempy][tempx] == OBJECT_SNAKE)
     {
-    	game_over();
+    	gameMode = MODE_GAMEOVER;
+        return;
     }
     else
     {
  	    player = move_body(player,tempx,tempy);
     }
 
-    objMap[tempy][tempx] = snake; //update the object map to the new snake head position
+    objMap[tempy][tempx] = OBJECT_SNAKE; //update the object map to the new snake head position
 }
 
 void game_update(void)
 {
     switch (gameMode)   
     {
-        case title:
+        case MODE_TITLE:
             title_screen_read_input();
             platform_draw_title_screen(gameSpeed);
-            platform_adjust_speed(gameSpeed, gameMode);
+            platform_adjust_speed(gameSpeed, MODE_TITLE);
             break;
         
-        case gameover:
+        case MODE_GAMEOVER:
+            platform_draw_game_over_screen(score);
+            platform_adjust_speed(gameSpeed, MODE_GAMEOVER);
+            game_reset(); // reset the game after showing game over
             break;
 
         default:
             move();
             platform_draw_game_screen(objMap, score);
             platform_update_platform_state();
-            platform_adjust_speed(gameSpeed, gameMode);
+            platform_adjust_speed(gameSpeed, MODE_GAME);
             break;
     }
 
 }
 
 // platform agnostic primary game logic
-void game_initialize(void)
+void game_initialize()
 {
     
-    //basic info from user about game speed.
-    gameMode = title;
-    gameSpeed = slow;
-    // todo - title refactor
-    //platform_draw_title_screen(&gameSpeed);
+    platform_initialize();
+    player = platform_memory_allocate(sizeof(snake_node));
+
+    game_reset();
+}
+
+void game_reset()
+{
+    gameMode = MODE_TITLE;
     score = 0;
     
-    platform_initialize();
-
-    player = platform_memory_allocate(sizeof(snake_node));
-    player->dir =  left; //init direction
+    player->dir =  INPUT_TYPE_LEFT; //init direction
     player->x = MAP_WIDTH/2;
     player->y = MAP_HEIGHT/2;
     player->next = NULL;
@@ -238,13 +240,14 @@ void game_initialize(void)
     {
         for (j = 0; j < MAP_WIDTH; j++)
         {
-            objMap[i][j] = nothing;
+            objMap[i][j] = OBJECT_NOTHING;
         }
     }
     // we need to seed our rand() and generate our first random object
     //srand(time(NULL));
     platform_set_random_seed(time(NULL));
     generate_new_apple();
+    platform_reset();
 }
 
 void game_shutdown(void)

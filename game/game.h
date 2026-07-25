@@ -3,7 +3,6 @@
 
 #include <stdlib.h>
 #include <time.h>
-#include <stdio.h>
 
 #define MAP_HEIGHT 48
 #define MAP_WIDTH 64
@@ -13,10 +12,11 @@
 void game_initialize(void);
 void game_update(void);
 void game_shutdown(void);
+void game_reset(void);
 
 typedef enum
 {
-	nothing = 0, apple, snake
+	OBJECT_NOTHING = 0, OBJECT_APPLE, OBJECT_SNAKE
 }object;
 
 typedef struct snake_node
@@ -29,17 +29,17 @@ typedef struct snake_node
 
 typedef enum
 {
-	none = 0, left, right, up, down, start
+	INPUT_TYPE_NOTHING = 0, INPUT_TYPE_LEFT, INPUT_TYPE_RIGHT, INPUT_TYPE_UP, INPUT_TYPE_DOWN, INPUT_TYPE_START, INPUT_TYPE_COUNT
 }input_type;
 
 typedef enum
 {
-	title = 0, game, gameover
+	MODE_TITLE = 0, MODE_GAME, MODE_GAMEOVER
 }mode;
 
 typedef enum
 {
-	slow = 1, medium, fast
+	SPEED_SLOW = 1, SPEED_MEDIUM, SPEED_FAST
 }speed;
 
 #endif

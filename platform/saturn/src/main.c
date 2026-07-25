@@ -95,11 +95,30 @@ void platform_adjust_speed(speed gameSpeed, mode gameMode)
 }
 
 // retrieve the input type from the user
-input_type platform_get_input_type()
+input_type platform_get_input_type(mode gameMode)
 {
-    input_type inputType = none;
+    input_type inputType = INPUT_TYPE_NOTHING;
     // todo - implement this
     return inputType;
+}
+
+// track all current and previous input states so we can check on input presses
+void platform_update_input_states()
+{
+    // todo - implement this
+}
+
+// check if input was newly pressed
+bool platform_input_pressed(input_type candidateInput)
+{
+    // todo - implement this
+    return false;
+}
+
+// platform specific game reset logic
+void platform_reset()
+{
+    // todo - implement this
 }
 
 void platform_update_platform_state()
