@@ -107,10 +107,48 @@ void platform_adjust_speed(speed gameSpeed, mode gameMode)
 // retrieve the input type from the user
 input_type platform_get_input_type(mode gameMode)
 {
-    input_type inputType = INPUT_TYPE_NOTHING;
-    // todo - implement this
-    (void)gameMode; // avoid compiler warnings
-    return inputType;
+    input_type currentInput = INPUT_TYPE_NOTHING;
+    if (jo_is_input_available(0))
+    {
+        switch(gameMode)
+        {
+            case MODE_TITLE:
+                if (jo_is_input_key_pressed(0, JO_KEY_START)) currentInput = INPUT_TYPE_START;    
+                else
+                {
+                    switch (jo_get_input_direction_pressed(0))
+                    {
+                        case DOWN: 
+                        case DOWN_LEFT:
+                        case DOWN_RIGHT:
+                            currentInput = INPUT_TYPE_DOWN;
+                            break;
+
+                        case UP:
+                        case UP_LEFT:
+                        case UP_RIGHT:
+                            currentInput = INPUT_TYPE_UP;
+                            break;
+
+                        default:
+                            break;
+                    }
+                }
+
+                break;
+
+            default:
+                // if (key[KEY_LEFT]) currentInput = INPUT_TYPE_LEFT;
+                // else if (key[KEY_RIGHT]) currentInput = INPUT_TYPE_RIGHT;
+                // else if (key[KEY_DOWN]) currentInput = INPUT_TYPE_DOWN;
+                // else if (key[KEY_UP]) currentInput = INPUT_TYPE_UP;
+                // else if (key[KEY_ENTER]) currentInput = INPUT_TYPE_START;
+
+                break;
+        }
+    }
+
+    return currentInput;
 }
 
 // platform specific game reset logic
