@@ -8,9 +8,10 @@
 */
 
 static int objMap[MAP_HEIGHT][MAP_WIDTH];//This will contain all the objects. will use it to keep track of collisions
-static int gamespeed; //this is a value between 1 and 3
+static speed gameSpeed;
 static int score;//score for the game
 static struct snake_node* player;
+static mode gameMode;
 
 // display game over message
 static void game_over()
@@ -51,14 +52,58 @@ static snake_node* move_body(snake_node* currentNode, int tempx, int tempy)
 
 }
 
+static void title_screen_read_input()
+{
+    //this contains the array of flags which tell which button has been pressed. It must be cleared before every input.
+    input_type inputType = platform_get_input_type();
+    if (inputType == start)
+    {
+        gameMode = game;
+    }
+    else if (inputType == down) 
+    {
+        switch (gameSpeed)
+        {
+            case slow:
+                gameSpeed = medium;
+                break;
+
+            case medium:
+                gameSpeed = fast;
+                break;
+
+            default:
+                gameSpeed = slow;
+                break;
+        }
+    }
+    else if (inputType == up) 
+    {
+        switch (gameSpeed)
+        {
+            case slow:
+                gameSpeed = fast;
+                break;
+
+            case medium:
+                gameSpeed = slow;
+                break;
+
+            default:
+                gameSpeed = medium;
+                break;
+        }
+    }
+}
+
 static void move()
 {
     //this contains the array of flags which tell which button has been pressed. It must be cleared before every input.
-    direction inputDirection = platform_get_input_direction();
-    if (inputDirection == left)	 player->dir = left;
-    if (inputDirection == right) player->dir = right;
-    if (inputDirection == down) player->dir = down;
-    if (inputDirection == up) player->dir = up;
+    input_type inputType = platform_get_input_type();
+    if (inputType == left)	 player->dir = left;
+    if (inputType == right) player->dir = right;
+    if (inputType == down) player->dir = down;
+    if (inputType == up) player->dir = up;
 
     int tempx = player->x, tempy = player->y;
 
@@ -148,12 +193,25 @@ static void move()
 
 void game_update(void)
 {
-        move();
-        platform_draw_game_screen(objMap, score);
+    switch (gameMode)   
+    {
+        case title:
+            title_screen_read_input();
+            platform_draw_title_screen(gameSpeed);
+            platform_adjust_speed(gameSpeed, gameMode);
+            break;
+        
+        case gameover:
+            break;
 
-        platform_update_platform_state();
+        default:
+            move();
+            platform_draw_game_screen(objMap, score);
+            platform_update_platform_state();
+            platform_adjust_speed(gameSpeed, gameMode);
+            break;
+    }
 
-        platform_adjust_speed(gamespeed);
 }
 
 // platform agnostic primary game logic
@@ -161,7 +219,10 @@ void game_initialize(void)
 {
     
     //basic info from user about game speed.
-    platform_draw_title_screen(&gamespeed);
+    gameMode = title;
+    gameSpeed = slow;
+    // todo - title refactor
+    //platform_draw_title_screen(&gameSpeed);
     score = 0;
     
     platform_initialize();

@@ -29,7 +29,17 @@ typedef struct snake_node
 
 typedef enum
 {
-	none = 0, left, right, up, down
-}direction;
+	none = 0, left, right, up, down, start
+}input_type;
+
+typedef enum
+{
+	title = 0, game, gameover
+}mode;
+
+typedef enum
+{
+	slow = 1, medium, fast
+}speed;
 
 #endif

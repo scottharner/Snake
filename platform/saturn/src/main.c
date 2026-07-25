@@ -50,10 +50,10 @@ void platform_draw_game_over_screen(int score)
 }
 
 // display a title screen
-void platform_draw_title_screen(int *gamespeed)
+void platform_draw_title_screen(speed gameSpeed)
 {
     // todo - implement this
-    (void)gamespeed;
+    (void)gameSpeed;
 }
 
 // platform specific setting of random generator seed
@@ -87,18 +87,19 @@ void platform_quit()
 }
 
 // any logic for making certain that graphics finish rendering at an appropriate speed
-void platform_adjust_speed(int gamespeed)
+void platform_adjust_speed(speed gameSpeed, mode gameMode)
 {
     // we dont need to adjust the speed for this platform
-    (void)gamespeed; // avoid compiler warnings
+    (void)gameSpeed; // avoid compiler warnings
+    (void)gameMode; // avoid compiler warnings
 }
 
-// retrieve the input direction from the user
-direction platform_get_input_direction()
+// retrieve the input type from the user
+input_type platform_get_input_type()
 {
-    direction inputDirection = none;
+    input_type inputType = none;
     // todo - implement this
-    return inputDirection;
+    return inputType;
 }
 
 void platform_update_platform_state()

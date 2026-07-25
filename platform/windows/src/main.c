@@ -65,11 +65,30 @@ void platform_draw_game_over_screen(int score)
     printf("\ngame over. score = %d\n",score);
 }
 
-// display a title screen
-void platform_draw_title_screen(int *gamespeed)
+// calculate the color to display for a menu option
+static int getOptionColor(speed selectedSpeed, speed optionSpeed)
 {
-    printf("\nSet your game speed (1,2,3): \n");
-    scanf("%d",gamespeed);
+    int selectedColor = makecol(255,255,0);
+    int defaultColor = makecol(255,255,255);
+    return selectedSpeed == optionSpeed ? selectedColor : defaultColor;
+}
+
+// display a title screen
+void platform_draw_title_screen(speed gameSpeed)
+{
+    //printf("\nSet your game speed (1,2,3): \n");
+    //scanf("%d",gameSpeed);
+
+    clear_to_color(buffer, makecol(0, 0, 0));
+    textout_ex(buffer, font, "SNAKE", 50, 10, makecol(255,255,255), -1);
+    
+    textout_ex(buffer, font, "Slow", 50, 50, getOptionColor(gameSpeed, slow), -1);
+    textout_ex(buffer, font, "Medium", 50, 70, getOptionColor(gameSpeed, medium), -1);
+    textout_ex(buffer, font, "Fast", 50, 90, getOptionColor(gameSpeed, fast), -1);
+
+    blit(buffer, screen, 0, 0, 0, 0, SCREEN_W, SCREEN_H);
+
+    rest(10);
 }
 
 // platform specific setting of random generator seed
@@ -104,14 +123,29 @@ void platform_quit()
 }
 
 // any logic for making certain that graphics finish rendering at an appropriate speed
-void platform_adjust_speed(int gamespeed)
+void platform_adjust_speed(speed gameSpeed, mode gameMode)
 {
     //slow the game down
-    resting=0;
+    //the rest callback formula is hacked together. This number is the one which determines how slow the game is. The
+    //higher the number the longer we wait. So higher gameSpeed means a lower wait.
+    switch(gameMode)
+    {
+        case title:
+            resting=0;
 
-    //this formula is hacked together. This number is the one which determines how slow the game is. The
-    //higher the number the longer we wait. So higher gamespeed means a lower wait.
-    rest_callback(100-gamespeed * 30, rest1);
+            rest_callback(100-slow * 30, rest1);
+            break;
+
+        case gameover:
+            break;
+
+        default:
+            resting=0;
+
+            rest_callback(100-gameSpeed * 30, rest1);
+
+            break;
+    }
 }
 
 // check if the game is still running
@@ -120,18 +154,19 @@ static bool is_running()
     return !key[KEY_ESC];
 }
 
-// retrieve the input direction from the user
-direction platform_get_input_direction()
+// retrieve the input type from the user
+input_type platform_get_input_type()
 {
-    direction inputDirection = none;
+    input_type inputType = none;
     clear_keybuf();
 
-    if (key[KEY_LEFT]) inputDirection = left;
-    else if (key[KEY_RIGHT]) inputDirection = right;
-    else if (key[KEY_DOWN]) inputDirection = down;
-    else if (key[KEY_UP]) inputDirection = up;
+    if (key[KEY_LEFT]) inputType = left;
+    else if (key[KEY_RIGHT]) inputType = right;
+    else if (key[KEY_DOWN]) inputType = down;
+    else if (key[KEY_UP]) inputType = up;
+    else if (key[KEY_ENTER]) inputType = start;
 
-    return inputDirection;
+    return inputType;
 }
 
 void platform_update_platform_state()
