@@ -5,10 +5,9 @@
 #include <time.h>
 #include <stdbool.h>
 
-#define MAP_HEIGHT 48
-#define MAP_WIDTH 64
-#define TILE_SIZE 10
-//32x24 tiles, 20 px in size
+#define MAP_HEIGHT 24
+#define MAP_WIDTH 32
+#define TILE_SIZE 8
 
 typedef enum
 {
@@ -30,7 +29,7 @@ typedef enum
 
 typedef enum
 {
-	MODE_TITLE = 0, MODE_GAME, MODE_GAMEOVER
+	MODE_NONE = 0, MODE_TITLE, MODE_GAME, MODE_GAMEOVER
 }mode;
 
 typedef enum

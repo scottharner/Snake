@@ -13,6 +13,7 @@ static speed gameSpeed = SPEED_SLOW;
 static int score;//score for the game
 static struct snake_node* player;
 static mode gameMode;
+static mode previousGameMode;
 
 // track key changes for better title menu input handling
 static bool current_inputstates[INPUT_TYPE_COUNT];
@@ -98,7 +99,7 @@ static void move()
 {
     //this contains the array of flags which tell which button has been pressed. It must be cleared before every input.
     input_type inputType = platform_get_input_type(MODE_GAME, current_inputstates);
-    if (inputType == INPUT_TYPE_LEFT)	 player->dir = INPUT_TYPE_LEFT;
+    if (inputType == INPUT_TYPE_LEFT) player->dir = INPUT_TYPE_LEFT;
     if (inputType == INPUT_TYPE_RIGHT) player->dir = INPUT_TYPE_RIGHT;
     if (inputType == INPUT_TYPE_DOWN) player->dir = INPUT_TYPE_DOWN;
     if (inputType == INPUT_TYPE_UP) player->dir = INPUT_TYPE_UP;
@@ -159,7 +160,8 @@ static void move()
     } 
     else 
     {
-        platform_quit();
+        gameMode = MODE_GAMEOVER;
+        return;
     }
 
     if (objMap[tempy][tempx] == OBJECT_APPLE) //the snake has run into an apple and another node is created
@@ -206,23 +208,32 @@ void game_reset_input_states()
 
 void game_update(void)
 {
+    bool didModeChange = false;
+    bool game_over_timed_out = false;
+    if (previousGameMode != gameMode)
+        didModeChange = true;
+
+    previousGameMode = gameMode;
+
     switch (gameMode)   
     {
         case MODE_TITLE:
             title_screen_read_input();
-            platform_draw_title_screen(gameSpeed);
+            platform_draw_title_screen(gameSpeed, didModeChange);
             platform_adjust_speed(gameSpeed, MODE_TITLE);
             break;
         
         case MODE_GAMEOVER:
-            platform_draw_game_over_screen(score);
+            game_over_timed_out = platform_draw_game_over_screen(score, didModeChange);
             platform_adjust_speed(gameSpeed, MODE_GAMEOVER);
-            game_reset(); // reset the game after showing game over
+            if (game_over_timed_out)
+                game_reset(); // reset the game after showing game over
+                
             break;
 
         default:
             move();
-            platform_draw_game_screen(objMap, score);
+            platform_draw_game_screen(objMap, score, didModeChange);
             platform_update_platform_state();
             platform_adjust_speed(gameSpeed, MODE_GAME);
             break;
@@ -233,7 +244,7 @@ void game_update(void)
 // platform agnostic primary game logic
 void game_initialize()
 {
-    
+    previousGameMode = MODE_NONE;
     platform_initialize();
     player = platform_memory_allocate(sizeof(snake_node));
 

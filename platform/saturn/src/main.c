@@ -35,17 +35,44 @@
 *   Author: Scott Harner
 */
 
+#define OBJECT_ZINDEX 10
+#define BORDER_ZINDEX 400
+#define JO_GRID_WIDTH (JO_TV_WIDTH / 8)
+#define JO_GRID_HEIGHT (JO_TV_HEIGHT / 8)
+#define GAME_OVER_TIMEOUT 120
+
+static int green_sprite_id;
+static int red_sprite_id;
+static int game_over_ticks;
+
 // Saturn implementation of platform initialization
 void platform_initialize()
 {
     jo_core_init(JO_COLOR_Black);
+    green_sprite_id = jo_sprite_add_tga("TEX", "GREEN.TGA", JO_COLOR_Transparent);
+    red_sprite_id = jo_sprite_add_tga("TEX", "RED.TGA", JO_COLOR_Transparent);
+    game_over_ticks = 0;
 }
 
 // display a game over screen
-void platform_draw_game_over_screen(int score)
+// returns flag indicating whether time is up for displaying game over
+bool platform_draw_game_over_screen(int score, bool didModeChange)
 {
-    // todo - implement this
-    (void)score;
+    bool timed_out = false;
+    if (didModeChange)
+        jo_clear_screen();
+
+    jo_printf_with_color(5, 5, JO_COLOR_INDEX_White, "Game Over");
+    jo_printf_with_color(5, 7, JO_COLOR_INDEX_White, "Score: %d", score);
+    game_over_ticks++;
+
+    if (game_over_ticks > GAME_OVER_TIMEOUT)
+    {
+        timed_out = true;
+        game_over_ticks = 0;
+    }
+
+    return timed_out;
 }
 
 // calculate the color to display for a menu option
@@ -57,8 +84,11 @@ static int getOptionColor(speed selectedSpeed, speed optionSpeed)
 }
 
 // display a title screen
-void platform_draw_title_screen(speed gameSpeed)
+void platform_draw_title_screen(speed gameSpeed, bool didModeChange)
 {
+    if (didModeChange)
+        jo_clear_screen();
+
     jo_printf_with_color(0, 1, JO_COLOR_INDEX_White, "SNAKE");
 
     jo_printf_with_color(0, 5, getOptionColor(gameSpeed, SPEED_SLOW), "Slow");
@@ -87,13 +117,7 @@ void * platform_memory_allocate(unsigned int size)
 // steps to prepare to exit the game
 void platform_shutdown()
 {
-
-}
-
-// end the game immediately
-void platform_quit()
-{
-    // todo - implement this
+    // we dont have any shutdown steps to perform on this platform
 }
 
 // any logic for making certain that graphics finish rendering at an appropriate speed
@@ -134,11 +158,11 @@ input_type platform_get_input_type(mode gameMode, bool current_inputstates[INPUT
                 break;
 
             default:
-                // if (key[KEY_LEFT]) currentInput = INPUT_TYPE_LEFT;
-                // else if (key[KEY_RIGHT]) currentInput = INPUT_TYPE_RIGHT;
-                // else if (key[KEY_DOWN]) currentInput = INPUT_TYPE_DOWN;
-                // else if (key[KEY_UP]) currentInput = INPUT_TYPE_UP;
-                // else if (key[KEY_ENTER]) currentInput = INPUT_TYPE_START;
+                if (jo_is_pad1_key_pressed(JO_KEY_LEFT)) currentInput = INPUT_TYPE_LEFT;
+                else if (jo_is_pad1_key_pressed(JO_KEY_RIGHT)) currentInput = INPUT_TYPE_RIGHT;
+                else if (jo_is_pad1_key_pressed(JO_KEY_DOWN)) currentInput = INPUT_TYPE_DOWN;
+                else if (jo_is_pad1_key_pressed(JO_KEY_UP)) currentInput = INPUT_TYPE_UP;
+                else if (jo_is_pad1_key_pressed(JO_KEY_START)) currentInput = INPUT_TYPE_START;
 
                 break;
         }
@@ -156,11 +180,78 @@ void platform_update_platform_state()
     // we dont have any updates to make on this platform
 }
 
-void platform_draw_game_screen(int objMap[MAP_HEIGHT][MAP_WIDTH], int score)
+void draw_tile(int x, int y, int width, int height, int sprite_id)
 {
-    // todo - implement this
-    (void)objMap; // avoid compiler warnings
-    (void)score; // avoid compiler warnings
+    // jo engine uses a center origin coordinate system so we have to recalculate from the provided upper left coords
+    int jo_x = x - JO_TV_WIDTH_2;
+    int jo_y = y - JO_TV_HEIGHT_2;
+    jo_x += (width/2);
+    jo_y += (height/2);
+
+    jo_sprite_draw3D2(sprite_id, jo_x, jo_y, OBJECT_ZINDEX);
+}
+
+// static void draw_border()
+// {
+//     //draw an outline of the game map (single pixel blue border)
+//     int left_edge = -JO_TV_WIDTH_2;
+//     int right_edge = JO_TV_WIDTH_2 - 1;
+//     int top_edge = JO_TV_WIDTH_2;
+//     int bottom_edge = JO_TV_HEIGHT_2 - 1;
+    
+//     // top
+//     jo_sprite_change_sprite_scale_xy((float)JO_TV_WIDTH, (float)1);
+//     jo_sprite_draw3D(tile_sprite_id, 0, top_edge, BORDER_ZINDEX);
+    
+//     // bottom
+//     jo_sprite_change_sprite_scale_xy((float)JO_TV_WIDTH, (float)1);
+//     jo_sprite_draw3D(tile_sprite_id, 0, bottom_edge, BORDER_ZINDEX);
+    
+//     // left
+//     jo_sprite_change_sprite_scale_xy((float)1, (float)JO_TV_HEIGHT);
+//     jo_sprite_draw3D(tile_sprite_id, left_edge, 0, BORDER_ZINDEX);
+    
+//     // right
+//     jo_sprite_change_sprite_scale_xy((float)1, (float)JO_TV_HEIGHT);
+//     jo_sprite_draw3D(tile_sprite_id, right_edge, 0, BORDER_ZINDEX);
+    
+//     jo_sprite_change_sprite_scale(1.0f);
+// }
+
+void platform_draw_game_screen(int objMap[MAP_HEIGHT][MAP_WIDTH], int score, bool didModeChange)
+{
+    if (didModeChange)
+        jo_clear_screen();
+
+    int i,j;
+    //O(N^2) runtime for this, 24^2 is pretty big.. so we may change this
+    //but for now, we draw every tile every frame!
+    for (i = 0; i < MAP_HEIGHT; i++)
+    {
+        for (j = 0; j < MAP_WIDTH; j++)
+        {
+            int sprite_id;
+            if (objMap[i][j] == OBJECT_APPLE)
+            {
+                sprite_id = red_sprite_id;
+            }
+            else if (objMap[i][j] == OBJECT_SNAKE)
+            {
+                sprite_id = green_sprite_id;
+            }
+            else
+            {
+                continue;
+            }
+
+            draw_tile(TILE_SIZE*j, TILE_SIZE*i, TILE_SIZE, TILE_SIZE, sprite_id);
+        }
+    }
+
+    //draw the score
+    jo_printf_with_color(JO_GRID_WIDTH-10, 0, JO_COLOR_INDEX_White, "score: %d", score);
+
+    //draw_border();
 }
 
 void jo_main(void)

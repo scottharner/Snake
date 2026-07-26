@@ -61,7 +61,8 @@ void platform_initialize()
 }
 
 // display a game over screen
-void platform_draw_game_over_screen(int score)
+// returns flag indicating whether time is up for displaying game over
+bool platform_draw_game_over_screen(int score, bool didModeChange)
 {
     clear_to_color(buffer, makecol(0, 0, 0));
     
@@ -69,6 +70,8 @@ void platform_draw_game_over_screen(int score)
     textprintf_ex(buffer, font, 50, 70, makecol(255,255,255), -1, "Score: %d", score);
 
     blit(buffer, screen, 0, 0, 0, 0, SCREEN_W, SCREEN_H);
+
+    return true; // we pause after this for windows so can return true immediately
 }
 
 // calculate the color to display for a menu option
@@ -80,7 +83,7 @@ static int getOptionColor(speed selectedSpeed, speed optionSpeed)
 }
 
 // display a title screen
-void platform_draw_title_screen(speed gameSpeed)
+void platform_draw_title_screen(speed gameSpeed, bool didModeChange)
 {
     clear_to_color(buffer, makecol(0, 0, 0));
     textout_ex(buffer, font, "SNAKE", 50, 10, makecol(255,255,255), -1);
@@ -115,12 +118,6 @@ void * platform_memory_allocate(unsigned int size)
 void platform_shutdown()
 {
 
-}
-
-// end the game immediately
-void platform_quit()
-{
-    exit(0);
 }
 
 // any logic for making certain that graphics finish rendering at an appropriate speed
@@ -203,7 +200,7 @@ void platform_update_platform_state()
     ticks++;
 }
 
-void platform_draw_game_screen(int objMap[MAP_HEIGHT][MAP_WIDTH], int score)
+void platform_draw_game_screen(int objMap[MAP_HEIGHT][MAP_WIDTH], int score, bool didModeChange)
 {
     int i,j;
     acquire_screen();	//O(N^2) runtime for this, 24^2 is pretty big.. so we may change this

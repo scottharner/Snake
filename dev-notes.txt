@@ -31,3 +31,5 @@ todo
 - add pause functionality
 - track a high score
 - port to a third platform (pc engine? megadrive?)
+- make naming conventions consistent
+- move assets to separate folder
