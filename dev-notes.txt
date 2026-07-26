@@ -14,6 +14,8 @@ saturn
 	- you cant use compression when saving a graphic as tga
 - what is the default resolution with jo engine?
 	- 320x240
+- what is the difference between jo_sprite_draw3D and jo_sprite_draw3D2?
+	- first one uses center aligned coords and the second uses top left coords
 
 general
 -------

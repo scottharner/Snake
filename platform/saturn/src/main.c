@@ -35,15 +35,14 @@
 *   Author: Scott Harner
 */
 
-#define OBJECT_ZINDEX 10
-#define BORDER_ZINDEX 400
+#define OBJECT_ZINDEX 450
+#define BORDER_ZINDEX 500
 #define JO_GRID_WIDTH (JO_TV_WIDTH / 8)
 #define JO_GRID_HEIGHT (JO_TV_HEIGHT / 8)
-#define GAME_OVER_TIMEOUT 120
 
 static int green_sprite_id;
 static int red_sprite_id;
-static int game_over_ticks;
+static bool show_debug_info;
 
 // Saturn implementation of platform initialization
 void platform_initialize()
@@ -51,28 +50,18 @@ void platform_initialize()
     jo_core_init(JO_COLOR_Black);
     green_sprite_id = jo_sprite_add_tga("TEX", "GREEN.TGA", JO_COLOR_Transparent);
     red_sprite_id = jo_sprite_add_tga("TEX", "RED.TGA", JO_COLOR_Transparent);
-    game_over_ticks = 0;
+    show_debug_info = false;
 }
 
 // display a game over screen
 // returns flag indicating whether time is up for displaying game over
-bool platform_draw_game_over_screen(int score, bool didModeChange)
+void platform_draw_game_over_screen(int score, bool didModeChange)
 {
-    bool timed_out = false;
     if (didModeChange)
         jo_clear_screen();
 
     jo_printf_with_color(5, 5, JO_COLOR_INDEX_White, "Game Over");
     jo_printf_with_color(5, 7, JO_COLOR_INDEX_White, "Score: %d", score);
-    game_over_ticks++;
-
-    if (game_over_ticks > GAME_OVER_TIMEOUT)
-    {
-        timed_out = true;
-        game_over_ticks = 0;
-    }
-
-    return timed_out;
 }
 
 // calculate the color to display for a menu option
@@ -118,14 +107,6 @@ void * platform_memory_allocate(unsigned int size)
 void platform_shutdown()
 {
     // we dont have any shutdown steps to perform on this platform
-}
-
-// any logic for making certain that graphics finish rendering at an appropriate speed
-void platform_adjust_speed(speed gameSpeed, mode gameMode)
-{
-    // we dont need to adjust the speed for this platform
-    (void)gameSpeed; // avoid compiler warnings
-    (void)gameMode; // avoid compiler warnings
 }
 
 // track all current and previous input states so we can check on input presses
@@ -188,7 +169,13 @@ void draw_tile(int x, int y, int width, int height, int sprite_id)
     jo_x += (width/2);
     jo_y += (height/2);
 
-    jo_sprite_draw3D2(sprite_id, jo_x, jo_y, OBJECT_ZINDEX);
+    jo_sprite_draw3D2(sprite_id, x, y, OBJECT_ZINDEX);
+
+    if (show_debug_info)
+    {
+        jo_printf_with_color(0, 0, JO_COLOR_INDEX_White, "tile x: %d", x);
+        jo_printf_with_color(0, 1, JO_COLOR_INDEX_White, "tile y: %d", y);
+    }
 }
 
 // static void draw_border()
@@ -251,6 +238,7 @@ void platform_draw_game_screen(int objMap[MAP_HEIGHT][MAP_WIDTH], int score, boo
     //draw the score
     jo_printf_with_color(JO_GRID_WIDTH-10, 0, JO_COLOR_INDEX_White, "score: %d", score);
 
+    // todo - fix border
     //draw_border();
 }
 

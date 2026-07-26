@@ -10,8 +10,6 @@
 *   Author: Scott Harner
 */
 
-#define MAX_GAME_OVER_CYCLES 30
-
 //timer variables
 //it seems like framerate and some other variables my have no useful purpose
 //since our goal is primarily porting we will leave that be for now
@@ -20,15 +18,7 @@ volatile int ticks;
 volatile int framerate;
 volatile int resting, rested;
 
-static int game_over_cycles;
-
 BITMAP *buffer;//This will be our temporary bitmap for double buffering 
-
-//do something while resting (?)
-static void rest1(void)
-{
-    resting++;
-}
 
 //calculate framerate every second
 static void timer1(void)
@@ -59,32 +49,21 @@ void platform_initialize()
     LOCK_VARIABLE(resting);
     LOCK_VARIABLE(rested);
     LOCK_FUNCTION(timer1);
-    LOCK_FUNCTION(rest1);
-
+    
     install_int(timer1, 1000);
-    game_over_cycles = 0;
 }
 
 // display a game over screen
 // returns flag indicating whether time is up for displaying game over
-bool platform_draw_game_over_screen(int score, bool didModeChange)
+void platform_draw_game_over_screen(int score, bool didModeChange)
 {
-    bool timed_out = false;
+    (void)didModeChange; // avoid compiler warning
     clear_to_color(buffer, makecol(0, 0, 0));
     
     textout_ex(buffer, font, "Game Over", 50, 50, makecol(255,255,255), -1);
     textprintf_ex(buffer, font, 50, 70, makecol(255,255,255), -1, "Score: %d", score);
 
     blit(buffer, screen, 0, 0, 0, 0, SCREEN_W, SCREEN_H);
-    game_over_cycles++;
-
-    if (game_over_cycles > MAX_GAME_OVER_CYCLES)
-    {
-        timed_out = true;
-        game_over_cycles = 0;
-    }
-
-    return timed_out;
 }
 
 // calculate the color to display for a menu option
@@ -98,6 +77,7 @@ static int getOptionColor(speed selectedSpeed, speed optionSpeed)
 // display a title screen
 void platform_draw_title_screen(speed gameSpeed, bool didModeChange)
 {
+    (void)didModeChange; // avoid compiler warning
     clear_to_color(buffer, makecol(0, 0, 0));
     textout_ex(buffer, font, "SNAKE", 50, 10, makecol(255,255,255), -1);
     
@@ -131,33 +111,6 @@ void * platform_memory_allocate(unsigned int size)
 void platform_shutdown()
 {
 
-}
-
-// any logic for making certain that graphics finish rendering at an appropriate speed
-void platform_adjust_speed(speed gameSpeed, mode gameMode)
-{
-    //slow the game down
-    //the rest callback formula is hacked together. This number is the one which determines how slow the game is. The
-    //higher the number the longer we wait. So higher gameSpeed means a lower wait.
-    switch(gameMode)
-    {
-        case MODE_TITLE:
-            resting=0;
-
-            rest_callback(100-SPEED_SLOW * 30, rest1);
-            break;
-
-        case MODE_GAMEOVER:
-            rest(100); // 100 ms per cycle allowing processing of key press in between
-            break;
-
-        default:
-            resting=0;
-
-            rest_callback(100-gameSpeed * 30, rest1);
-
-            break;
-    }
 }
 
 // check if the game is still running
@@ -215,6 +168,7 @@ void platform_update_platform_state()
 
 void platform_draw_game_screen(int objMap[MAP_HEIGHT][MAP_WIDTH], int score, bool didModeChange)
 {
+    (void)didModeChange; // avoid compiler warning
     int i,j;
     acquire_screen();	//O(N^2) runtime for this, 24^2 is pretty big.. so we may change this
                         //but for now, we draw every tile every frame!
@@ -248,6 +202,12 @@ void platform_draw_game_screen(int objMap[MAP_HEIGHT][MAP_WIDTH], int score, boo
     release_screen();
 }
 
+static void wait_for_next_frame()
+{
+    // 16ms is supposed to be about 60fps but 8ms seems to match closest to what we see on other platforms
+    rest(8); 
+}
+
 int main(void)
 {
     game_initialize();
@@ -255,6 +215,7 @@ int main(void)
     while (is_running())
     {
         game_update();
+        wait_for_next_frame();
     }
 
     game_shutdown();

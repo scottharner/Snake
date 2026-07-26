@@ -14,6 +14,7 @@ static int score;//score for the game
 static struct snake_node* player;
 static mode gameMode;
 static mode previousGameMode;
+static int action_cycles;
 
 // track key changes for better title menu input handling
 static bool current_inputstates[INPUT_TYPE_COUNT];
@@ -206,10 +207,28 @@ void game_reset_input_states()
 
 }
 
+// calculate the max movement cycles based upon the current speed
+static int get_move_max_cycles()
+{
+    switch (gameSpeed)
+    {
+        case SPEED_FAST:
+            return FAST_SPEED_MAX_CYCLES;
+            break;
+        case SPEED_MEDIUM:
+            return MEDIUM_SPEED_MAX_CYCLES;
+            break;
+        default:
+            return SLOw_SPEED_MAX_CYCLES;
+            break;
+
+    }
+}
+
 void game_update(void)
 {
+    action_cycles++;
     bool didModeChange = false;
-    bool game_over_timed_out = false;
     if (previousGameMode != gameMode)
         didModeChange = true;
 
@@ -220,22 +239,25 @@ void game_update(void)
         case MODE_TITLE:
             title_screen_read_input();
             platform_draw_title_screen(gameSpeed, didModeChange);
-            platform_adjust_speed(gameSpeed, MODE_TITLE);
+            action_cycles = 0; // always reset for title screen as were not timing anything
             break;
         
         case MODE_GAMEOVER:
-            game_over_timed_out = platform_draw_game_over_screen(score, didModeChange);
-            platform_adjust_speed(gameSpeed, MODE_GAMEOVER);
-            if (game_over_timed_out)
+            platform_draw_game_over_screen(score, didModeChange);
+            if (action_cycles > GAME_OVER_MAX_CYCLES)
                 game_reset(); // reset the game after showing game over
                 
             break;
 
         default:
-            move();
+            if (action_cycles > get_move_max_cycles())    
+            {
+                move();
+                action_cycles = 0;
+            }
+        
             platform_draw_game_screen(objMap, score, didModeChange);
             platform_update_platform_state();
-            platform_adjust_speed(gameSpeed, MODE_GAME);
             break;
     }
 
@@ -268,6 +290,7 @@ void game_reset()
 {
     gameMode = MODE_TITLE;
     score = 0;
+    action_cycles = 0;
     
     player->dir =  INPUT_TYPE_LEFT; //init direction
     player->x = MAP_WIDTH/2;
