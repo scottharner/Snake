@@ -10,10 +10,6 @@
 *   Author: Scott Harner
 */
 
-// track key changes for better title menu input handling
-static bool current_keystates[INPUT_TYPE_COUNT];
-static bool previous_keystates[INPUT_TYPE_COUNT];
-
 //timer variables
 //it seems like framerate and some other variables my have no useful purpose
 //since our goal is primarily porting we will leave that be for now
@@ -161,29 +157,20 @@ static bool is_running()
 }
 
 // track all current and previous input states so we can check on input presses
-static void update_key_states()
+static void update_input_states(bool current_inputstates[INPUT_TYPE_COUNT])
 {
-    // save previous state
-    for (int i = 0; i < INPUT_TYPE_COUNT; i++)
-        previous_keystates[i] = current_keystates[i];
+    game_save_previous_inputstates();
 
     // read current state
-    current_keystates[INPUT_TYPE_UP] = key[KEY_UP];
-    current_keystates[INPUT_TYPE_DOWN] = key[KEY_DOWN];
-    current_keystates[INPUT_TYPE_LEFT] = key[KEY_LEFT];
-    current_keystates[INPUT_TYPE_RIGHT] = key[KEY_RIGHT];
-    current_keystates[INPUT_TYPE_START] = key[KEY_ENTER];    
+    current_inputstates[INPUT_TYPE_UP] = key[KEY_UP];
+    current_inputstates[INPUT_TYPE_DOWN] = key[KEY_DOWN];
+    current_inputstates[INPUT_TYPE_LEFT] = key[KEY_LEFT];
+    current_inputstates[INPUT_TYPE_RIGHT] = key[KEY_RIGHT];
+    current_inputstates[INPUT_TYPE_START] = key[KEY_ENTER];    
 }
-
-// check if input was newly pressed
-static bool key_pressed(input_type candidateInput)
-{
-    return current_keystates[candidateInput] && !previous_keystates[candidateInput];
-}
-
 
 // retrieve the input type from the user
-input_type platform_get_input_type(mode gameMode)
+input_type platform_get_input_type(mode gameMode, bool current_inputstates[INPUT_TYPE_COUNT])
 {
     input_type currentInput = INPUT_TYPE_NOTHING;
     clear_keybuf();
@@ -191,10 +178,10 @@ input_type platform_get_input_type(mode gameMode)
     switch(gameMode)
     {
         case MODE_TITLE:
-            update_key_states();
-            if (key_pressed(INPUT_TYPE_START)) currentInput = INPUT_TYPE_START;
-            else if (key_pressed(INPUT_TYPE_DOWN)) currentInput = INPUT_TYPE_DOWN;
-            else if (key_pressed(INPUT_TYPE_UP)) currentInput = INPUT_TYPE_UP;
+            update_input_states(current_inputstates);
+            if (game_input_pressed(INPUT_TYPE_START)) currentInput = INPUT_TYPE_START;
+            else if (game_input_pressed(INPUT_TYPE_DOWN)) currentInput = INPUT_TYPE_DOWN;
+            else if (game_input_pressed(INPUT_TYPE_UP)) currentInput = INPUT_TYPE_UP;
             break;
 
         default:
@@ -208,16 +195,6 @@ input_type platform_get_input_type(mode gameMode)
     }
 
     return currentInput;
-}
-
-// platform specific game reset logic
-void platform_reset()
-{
-    for (int i = 0; i < INPUT_TYPE_COUNT; i++)
-    {
-        previous_keystates[i] = false;
-        current_keystates[i] = false;
-    }
 }
 
 void platform_update_platform_state()

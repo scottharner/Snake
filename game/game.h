@@ -3,16 +3,12 @@
 
 #include <stdlib.h>
 #include <time.h>
+#include <stdbool.h>
 
 #define MAP_HEIGHT 48
 #define MAP_WIDTH 64
 #define TILE_SIZE 10
 //32x24 tiles, 20 px in size
-
-void game_initialize(void);
-void game_update(void);
-void game_shutdown(void);
-void game_reset(void);
 
 typedef enum
 {
@@ -41,5 +37,13 @@ typedef enum
 {
 	SPEED_SLOW = 1, SPEED_MEDIUM, SPEED_FAST
 }speed;
+
+void game_initialize();
+void game_update();
+void game_shutdown();
+void game_reset();
+bool game_input_pressed(input_type);
+void game_save_previous_inputstates();
+void game_reset_input_states();
 
 #endif

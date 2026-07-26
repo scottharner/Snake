@@ -104,36 +104,32 @@ void platform_adjust_speed(speed gameSpeed, mode gameMode)
     (void)gameMode; // avoid compiler warnings
 }
 
+// track all current and previous input states so we can check on input presses
+static void update_input_states(bool current_inputstates[INPUT_TYPE_COUNT])
+{
+    game_save_previous_inputstates();
+
+    // read current state
+    current_inputstates[INPUT_TYPE_UP] = jo_is_pad1_key_pressed(JO_KEY_UP);
+    current_inputstates[INPUT_TYPE_DOWN] = jo_is_pad1_key_pressed(JO_KEY_DOWN);
+    current_inputstates[INPUT_TYPE_LEFT] = jo_is_pad1_key_pressed(JO_KEY_LEFT);
+    current_inputstates[INPUT_TYPE_RIGHT] = jo_is_pad1_key_pressed(JO_KEY_RIGHT);
+    current_inputstates[INPUT_TYPE_START] = jo_is_pad1_key_pressed(JO_KEY_START);    
+}
+
 // retrieve the input type from the user
-input_type platform_get_input_type(mode gameMode)
+input_type platform_get_input_type(mode gameMode, bool current_inputstates[INPUT_TYPE_COUNT])
 {
     input_type currentInput = INPUT_TYPE_NOTHING;
-    if (jo_is_input_available(0))
+    if (jo_is_pad1_available())
     {
         switch(gameMode)
         {
             case MODE_TITLE:
-                if (jo_is_input_key_pressed(0, JO_KEY_START)) currentInput = INPUT_TYPE_START;    
-                else
-                {
-                    switch (jo_get_input_direction_pressed(0))
-                    {
-                        case DOWN: 
-                        case DOWN_LEFT:
-                        case DOWN_RIGHT:
-                            currentInput = INPUT_TYPE_DOWN;
-                            break;
-
-                        case UP:
-                        case UP_LEFT:
-                        case UP_RIGHT:
-                            currentInput = INPUT_TYPE_UP;
-                            break;
-
-                        default:
-                            break;
-                    }
-                }
+                update_input_states(current_inputstates);
+                if (game_input_pressed(INPUT_TYPE_START)) currentInput = INPUT_TYPE_START;    
+                else if (game_input_pressed(INPUT_TYPE_DOWN)) currentInput = INPUT_TYPE_DOWN;
+                else if (game_input_pressed(INPUT_TYPE_UP)) currentInput = INPUT_TYPE_UP;
 
                 break;
 
@@ -147,14 +143,12 @@ input_type platform_get_input_type(mode gameMode)
                 break;
         }
     }
+    else
+    {
+        game_reset_input_states();
+    }
 
     return currentInput;
-}
-
-// platform specific game reset logic
-void platform_reset()
-{
-    // todo - implement this
 }
 
 void platform_update_platform_state()

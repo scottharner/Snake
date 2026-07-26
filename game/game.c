@@ -1,3 +1,4 @@
+#include <stdbool.h>
 #include "game.h"
 #include "../platform/platform.h"
 
@@ -12,6 +13,10 @@ static speed gameSpeed = SPEED_SLOW;
 static int score;//score for the game
 static struct snake_node* player;
 static mode gameMode;
+
+// track key changes for better title menu input handling
+static bool current_inputstates[INPUT_TYPE_COUNT];
+static bool previous_inputstates[INPUT_TYPE_COUNT];
 
 // finds a random location to place the next apple
 static void generate_new_apple()
@@ -48,7 +53,7 @@ static snake_node* move_body(snake_node* currentNode, int tempx, int tempy)
 static void title_screen_read_input()
 {
     //this contains the array of flags which tell which button has been pressed. It must be cleared before every input.
-    input_type inputType = platform_get_input_type(MODE_TITLE);
+    input_type inputType = platform_get_input_type(MODE_TITLE, current_inputstates);
     if (inputType == INPUT_TYPE_START)
     {
         gameMode = MODE_GAME;
@@ -92,7 +97,7 @@ static void title_screen_read_input()
 static void move()
 {
     //this contains the array of flags which tell which button has been pressed. It must be cleared before every input.
-    input_type inputType = platform_get_input_type(MODE_GAME);
+    input_type inputType = platform_get_input_type(MODE_GAME, current_inputstates);
     if (inputType == INPUT_TYPE_LEFT)	 player->dir = INPUT_TYPE_LEFT;
     if (inputType == INPUT_TYPE_RIGHT) player->dir = INPUT_TYPE_RIGHT;
     if (inputType == INPUT_TYPE_DOWN) player->dir = INPUT_TYPE_DOWN;
@@ -189,6 +194,16 @@ static void move()
     objMap[tempy][tempx] = OBJECT_SNAKE; //update the object map to the new snake head position
 }
 
+void game_reset_input_states()
+{
+    for (int i = 0; i < INPUT_TYPE_COUNT; i++)
+    {
+        previous_inputstates[i] = false;
+        current_inputstates[i] = false;
+    }
+
+}
+
 void game_update(void)
 {
     switch (gameMode)   
@@ -225,6 +240,19 @@ void game_initialize()
     game_reset();
 }
 
+// check if input was newly pressed
+bool game_input_pressed(input_type candidateInput)
+{
+    return current_inputstates[candidateInput] && !previous_inputstates[candidateInput];
+}
+
+void game_save_previous_inputstates()
+{
+    // save previous state
+    for (int i = 0; i < INPUT_TYPE_COUNT; i++)
+        previous_inputstates[i] = current_inputstates[i];
+}
+
 void game_reset()
 {
     gameMode = MODE_TITLE;
@@ -247,7 +275,7 @@ void game_reset()
     //srand(time(NULL));
     platform_set_random_seed(time(NULL));
     generate_new_apple();
-    platform_reset();
+    game_reset_input_states();
 }
 
 void game_shutdown(void)
