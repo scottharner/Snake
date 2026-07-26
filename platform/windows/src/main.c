@@ -10,6 +10,8 @@
 *   Author: Scott Harner
 */
 
+#define MAX_GAME_OVER_CYCLES 30
+
 //timer variables
 //it seems like framerate and some other variables my have no useful purpose
 //since our goal is primarily porting we will leave that be for now
@@ -17,6 +19,8 @@ volatile int counter;
 volatile int ticks;
 volatile int framerate;
 volatile int resting, rested;
+
+static int game_over_cycles;
 
 BITMAP *buffer;//This will be our temporary bitmap for double buffering 
 
@@ -58,20 +62,29 @@ void platform_initialize()
     LOCK_FUNCTION(rest1);
 
     install_int(timer1, 1000);
+    game_over_cycles = 0;
 }
 
 // display a game over screen
 // returns flag indicating whether time is up for displaying game over
 bool platform_draw_game_over_screen(int score, bool didModeChange)
 {
+    bool timed_out = false;
     clear_to_color(buffer, makecol(0, 0, 0));
     
     textout_ex(buffer, font, "Game Over", 50, 50, makecol(255,255,255), -1);
     textprintf_ex(buffer, font, 50, 70, makecol(255,255,255), -1, "Score: %d", score);
 
     blit(buffer, screen, 0, 0, 0, 0, SCREEN_W, SCREEN_H);
+    game_over_cycles++;
 
-    return true; // we pause after this for windows so can return true immediately
+    if (game_over_cycles > MAX_GAME_OVER_CYCLES)
+    {
+        timed_out = true;
+        game_over_cycles = 0;
+    }
+
+    return timed_out;
 }
 
 // calculate the color to display for a menu option
@@ -135,7 +148,7 @@ void platform_adjust_speed(speed gameSpeed, mode gameMode)
             break;
 
         case MODE_GAMEOVER:
-            rest(3000);
+            rest(100); // 100 ms per cycle allowing processing of key press in between
             break;
 
         default:
