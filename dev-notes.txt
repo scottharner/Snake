@@ -43,3 +43,9 @@ todo
 	- add music
 	- create release
 	- post console releases somewhere
+	- game win mode
+	- migrate todos to issues
+- saturn
+	-0.bin source control handling
+	-last block edge handling
+	-draw border
