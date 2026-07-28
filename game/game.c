@@ -8,7 +8,8 @@
 *   Author: Scott Harner
 */
 
-static int objMap[MAP_HEIGHT][MAP_WIDTH];//This will contain all the objects. will use it to keep track of collisions
+static struct game_config* config;
+static int objMap[MAX_MAP_HEIGHT][MAX_MAP_WIDTH];//This will contain all the objects. will use it to keep track of collisions
 static speed gameSpeed = SPEED_SLOW;
 static int score;//score for the game
 static struct snake_node* player;
@@ -26,8 +27,8 @@ static void generate_new_apple()
 	int randy, randx;
 
     do{
-		randy = (int)(platform_get_random(MAP_HEIGHT/2));
-		randx = (int)(platform_get_random(MAP_WIDTH/2));
+		randy = (int)(platform_get_random(config->map_height/2));
+		randx = (int)(platform_get_random(config->map_width/2));
 	}while (objMap[randy][randx] != OBJECT_NOTHING); //while we generate a spot that's taken, keep going;
 	objMap[randy][randx] = OBJECT_APPLE;
 }
@@ -124,7 +125,7 @@ static void move()
     else if (player->dir == INPUT_TYPE_RIGHT)
     {
 
-        if (player->x < MAP_WIDTH - 1)
+        if (player->x < config->map_width - 1)
         {
                 tempx = player->x + 1;
         }
@@ -150,7 +151,7 @@ static void move()
     else if (player->dir == INPUT_TYPE_DOWN)
     {
 
-        if (player->y < MAP_HEIGHT - 1)
+        if (player->y < config->map_height - 1)
     	{
         	tempy = player->y + 1;
         }
@@ -256,7 +257,7 @@ void game_update(void)
                 action_cycles = 0;
             }
         
-            platform_draw_game_screen(objMap, score, didModeChange);
+            platform_draw_game_screen(objMap, score, didModeChange, config);
             platform_update_platform_state();
             break;
     }
@@ -264,11 +265,15 @@ void game_update(void)
 }
 
 // platform agnostic primary game logic
-void game_initialize()
+void game_initialize(int map_height, int map_width, int tile_size)
 {
-    previousGameMode = MODE_NONE;
     platform_initialize();
+    previousGameMode = MODE_NONE;
     player = platform_memory_allocate(sizeof(snake_node));
+    config = platform_memory_allocate(sizeof(game_config));
+    config->map_height = map_height;
+    config->map_width = map_width;
+    config->tile_size = tile_size;
 
     game_reset();
 }
@@ -293,14 +298,14 @@ void game_reset()
     action_cycles = 0;
     
     player->dir =  INPUT_TYPE_LEFT; //init direction
-    player->x = MAP_WIDTH/2;
-    player->y = MAP_HEIGHT/2;
+    player->x = (config->map_width)/2;
+    player->y = (config->map_height)/2;
     player->next = NULL;
 
     int i, j; //this is so we don't get errors because the object map references nothing.
-    for (i = 0; i < MAP_HEIGHT; i++)
+    for (i = 0; i < config->map_height; i++)
     {
-        for (j = 0; j < MAP_WIDTH; j++)
+        for (j = 0; j < config->map_width; j++)
         {
             objMap[i][j] = OBJECT_NOTHING;
         }

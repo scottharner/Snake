@@ -39,6 +39,9 @@
 #define BORDER_ZINDEX 500
 #define JO_GRID_WIDTH (JO_TV_WIDTH / 8)
 #define JO_GRID_HEIGHT (JO_TV_HEIGHT / 8)
+#define MAP_HEIGHT 24
+#define MAP_WIDTH 32
+#define TILE_SIZE 8
 
 static int green_sprite_id;
 static int red_sprite_id;
@@ -205,7 +208,7 @@ void draw_tile(int x, int y, int width, int height, int sprite_id)
 //     jo_sprite_change_sprite_scale(1.0f);
 // }
 
-void platform_draw_game_screen(int objMap[MAP_HEIGHT][MAP_WIDTH], int score, bool didModeChange)
+void platform_draw_game_screen(int objMap[MAX_MAP_HEIGHT][MAX_MAP_WIDTH], int score, bool didModeChange, game_config *config)
 {
     if (didModeChange)
         jo_clear_screen();
@@ -213,9 +216,10 @@ void platform_draw_game_screen(int objMap[MAP_HEIGHT][MAP_WIDTH], int score, boo
     int i,j;
     //O(N^2) runtime for this, 24^2 is pretty big.. so we may change this
     //but for now, we draw every tile every frame!
-    for (i = 0; i < MAP_HEIGHT; i++)
+            jo_printf_with_color(0, 5, JO_COLOR_INDEX_White, "ht: %d", config->map_height);
+    for (i = 0; i < config->map_height; i++)
     {
-        for (j = 0; j < MAP_WIDTH; j++)
+        for (j = 0; j < config->map_width; j++)
         {
             int sprite_id;
             if (objMap[i][j] == OBJECT_APPLE)
@@ -231,7 +235,7 @@ void platform_draw_game_screen(int objMap[MAP_HEIGHT][MAP_WIDTH], int score, boo
                 continue;
             }
 
-            draw_tile(TILE_SIZE*j, TILE_SIZE*i, TILE_SIZE, TILE_SIZE, sprite_id);
+            draw_tile(config->tile_size*j, config->tile_size*i, config->tile_size, config->tile_size, sprite_id);
         }
     }
 
@@ -244,7 +248,7 @@ void platform_draw_game_screen(int objMap[MAP_HEIGHT][MAP_WIDTH], int score, boo
 
 void jo_main(void)
 {
-    game_initialize();
+    game_initialize(MAP_HEIGHT, MAP_WIDTH, TILE_SIZE);
     jo_core_add_callback(game_update);
     jo_core_run();
 }

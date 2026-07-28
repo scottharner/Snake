@@ -36,8 +36,8 @@ void platform_initialize()
     install_keyboard();
 
     set_color_depth(16); //graphics
-    set_gfx_mode( GFX_GDI, MAP_WIDTH * TILE_SIZE, MAP_HEIGHT * TILE_SIZE, 0, 0);
-    buffer = create_bitmap( MAP_WIDTH * TILE_SIZE, MAP_HEIGHT * TILE_SIZE);
+    set_gfx_mode( GFX_GDI, MAX_MAP_WIDTH * MAX_TILE_SIZE, MAX_MAP_HEIGHT * MAX_TILE_SIZE, 0, 0);
+    buffer = create_bitmap( MAX_MAP_WIDTH * MAX_TILE_SIZE, MAX_MAP_HEIGHT * MAX_TILE_SIZE);
 
     install_timer();
 
@@ -166,15 +166,15 @@ void platform_update_platform_state()
     ticks++;
 }
 
-void platform_draw_game_screen(int objMap[MAP_HEIGHT][MAP_WIDTH], int score, bool didModeChange)
+void platform_draw_game_screen(int objMap[MAX_MAP_HEIGHT][MAX_MAP_WIDTH], int score, bool didModeChange, game_config *config)
 {
     (void)didModeChange; // avoid compiler warning
     int i,j;
     acquire_screen();	//O(N^2) runtime for this, 24^2 is pretty big.. so we may change this
                         //but for now, we draw every tile every frame!
-    for (i = 0; i < MAP_HEIGHT; i++)
+    for (i = 0; i < config->map_height; i++)
     {
-        for (j = 0; j < MAP_WIDTH; j++)
+        for (j = 0; j < config->map_width; j++)
         {
             int c; //color to draw
             if (objMap[i][j] == OBJECT_NOTHING){
@@ -186,17 +186,17 @@ void platform_draw_game_screen(int objMap[MAP_HEIGHT][MAP_WIDTH], int score, boo
                 c = makecol(0,255,0);
             }
 
-            rectfill ( buffer, TILE_SIZE*j, TILE_SIZE*i, TILE_SIZE*(j+1),TILE_SIZE*(i+1), c);
+            rectfill ( buffer, config->tile_size*j, config->tile_size*i, config->tile_size*(j+1),config->tile_size*(i+1), c);
         }
     }
 
     //draw the score
     char scoretxt[10];
     sprintf(scoretxt,"score: %d",score);
-    textout_ex(buffer, font, scoretxt, TILE_SIZE*(MAP_WIDTH)*3/4, TILE_SIZE, makecol(255,255,255), makecol(0,0,0));
+    textout_ex(buffer, font, scoretxt, config->tile_size*(config->map_width)*3/4, config->tile_size, makecol(255,255,255), makecol(0,0,0));
 
     //draw an outline of the game map
-    rect( buffer, 0, 0, TILE_SIZE*MAP_WIDTH-1, TILE_SIZE*MAP_HEIGHT-1, makecol( 0, 0, 255));
+    rect( buffer, 0, 0, config->tile_size*config->map_width-1, config->tile_size*config->map_height-1, makecol( 0, 0, 255));
 
     draw_sprite( screen, buffer, 0, 0); //draw buffer image on screen every time we draw.
     release_screen();
@@ -210,7 +210,7 @@ static void wait_for_next_frame()
 
 int main(void)
 {
-    game_initialize();
+    game_initialize(MAX_MAP_HEIGHT, MAX_MAP_WIDTH, MAX_TILE_SIZE);
     
     while (is_running())
     {

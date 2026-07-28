@@ -16,6 +16,8 @@ saturn
 	- 320x240
 - what is the difference between jo_sprite_draw3D and jo_sprite_draw3D2?
 	- first one uses center aligned coords and the second uses top left coords
+- jo_core_init must occur before other jo calls
+	- i was mistakenly calling jo_malloc first and then my work was getting clobbered with the subsequent call to jo_core_init
 
 general
 -------
@@ -27,7 +29,7 @@ general
 todo
 ----
 - malloc cleanup, especially on reset?
-- allow windows version to close windows
+- allow windows version to close window
 - clean up title screen
 - clean up game over screen
 - add pause functionality
@@ -35,3 +37,6 @@ todo
 - port to a third platform (pc engine? megadrive?)
 - make naming conventions consistent
 - move assets to separate folder
+- fix saturn game border
+- use pointers for objMap so it can take up less memory on consoles
+- fix saturn premature screen end

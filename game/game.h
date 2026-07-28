@@ -5,9 +5,9 @@
 #include <time.h>
 #include <stdbool.h>
 
-#define MAP_HEIGHT 24
-#define MAP_WIDTH 32
-#define TILE_SIZE 8
+#define MAX_MAP_HEIGHT 48
+#define MAX_MAP_WIDTH 64
+#define MAX_TILE_SIZE 10
 
 #define GAME_OVER_MAX_CYCLES 180
 #define SLOw_SPEED_MAX_CYCLES 3
@@ -27,6 +27,14 @@ typedef struct snake_node
 	struct snake_node *next;
 }snake_node;
 
+typedef struct game_config
+{
+	int map_height;
+	int map_width;
+	int tile_size;
+}game_config;
+
+
 typedef enum
 {
 	INPUT_TYPE_NOTHING = 0, INPUT_TYPE_LEFT, INPUT_TYPE_RIGHT, INPUT_TYPE_UP, INPUT_TYPE_DOWN, INPUT_TYPE_START, INPUT_TYPE_COUNT
@@ -42,7 +50,7 @@ typedef enum
 	SPEED_SLOW = 1, SPEED_MEDIUM, SPEED_FAST
 }speed;
 
-void game_initialize();
+void game_initialize(int, int, int);
 void game_update();
 void game_shutdown();
 void game_reset();
