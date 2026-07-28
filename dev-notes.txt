@@ -39,4 +39,3 @@ todo
 - move assets to separate folder
 - fix saturn game border
 - use pointers for objMap so it can take up less memory on consoles
-- fix saturn premature screen end

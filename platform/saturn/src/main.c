@@ -39,8 +39,8 @@
 #define BORDER_ZINDEX 500
 #define JO_GRID_WIDTH (JO_TV_WIDTH / 8)
 #define JO_GRID_HEIGHT (JO_TV_HEIGHT / 8)
-#define MAP_HEIGHT 24
-#define MAP_WIDTH 32
+#define MAP_HEIGHT 30
+#define MAP_WIDTH 40
 #define TILE_SIZE 8
 
 static int green_sprite_id;
