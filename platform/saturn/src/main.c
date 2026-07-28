@@ -181,33 +181,6 @@ void draw_tile(int x, int y, int width, int height, int sprite_id)
     }
 }
 
-// static void draw_border()
-// {
-//     //draw an outline of the game map (single pixel blue border)
-//     int left_edge = -JO_TV_WIDTH_2;
-//     int right_edge = JO_TV_WIDTH_2 - 1;
-//     int top_edge = JO_TV_WIDTH_2;
-//     int bottom_edge = JO_TV_HEIGHT_2 - 1;
-    
-//     // top
-//     jo_sprite_change_sprite_scale_xy((float)JO_TV_WIDTH, (float)1);
-//     jo_sprite_draw3D(tile_sprite_id, 0, top_edge, BORDER_ZINDEX);
-    
-//     // bottom
-//     jo_sprite_change_sprite_scale_xy((float)JO_TV_WIDTH, (float)1);
-//     jo_sprite_draw3D(tile_sprite_id, 0, bottom_edge, BORDER_ZINDEX);
-    
-//     // left
-//     jo_sprite_change_sprite_scale_xy((float)1, (float)JO_TV_HEIGHT);
-//     jo_sprite_draw3D(tile_sprite_id, left_edge, 0, BORDER_ZINDEX);
-    
-//     // right
-//     jo_sprite_change_sprite_scale_xy((float)1, (float)JO_TV_HEIGHT);
-//     jo_sprite_draw3D(tile_sprite_id, right_edge, 0, BORDER_ZINDEX);
-    
-//     jo_sprite_change_sprite_scale(1.0f);
-// }
-
 void platform_draw_game_screen(int objMap[MAX_MAP_HEIGHT][MAX_MAP_WIDTH], int score, bool didModeChange, game_config *config)
 {
     if (didModeChange)
@@ -240,9 +213,6 @@ void platform_draw_game_screen(int objMap[MAX_MAP_HEIGHT][MAX_MAP_WIDTH], int sc
 
     //draw the score
     jo_printf_with_color(JO_GRID_WIDTH-10, 0, JO_COLOR_INDEX_White, "score: %d", score);
-
-    // todo - fix border
-    //draw_border();
 }
 
 void jo_main(void)

@@ -28,14 +28,15 @@ general
 
 todo
 ----
-- malloc cleanup, especially on reset?
-- allow windows version to close window
-- clean up title screen
-- clean up game over screen
-- add pause functionality
-- track a high score
-- port to a third platform (pc engine? megadrive?)
-- make naming conventions consistent
-- move assets to separate folder
-- fix saturn game border
-- use pointers for objMap so it can take up less memory on consoles
+- general
+	- malloc cleanup, especially on reset?
+	- allow windows version to close window
+	- clean up title screen
+	- clean up game over screen
+	- add pause functionality
+	- track a high score
+	- port to a third platform (pc engine? megadrive?)
+	- make naming conventions consistent
+	- use pointers for objMap so it can take up less memory on consoles
+- saturn
+	- move assets to separate folder
