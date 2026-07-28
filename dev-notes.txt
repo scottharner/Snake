@@ -38,5 +38,3 @@ todo
 	- port to a third platform (pc engine? megadrive?)
 	- make naming conventions consistent
 	- use pointers for objMap so it can take up less memory on consoles
-- saturn
-	- move assets to separate folder
