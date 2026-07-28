@@ -216,7 +216,6 @@ void platform_draw_game_screen(int objMap[MAX_MAP_HEIGHT][MAX_MAP_WIDTH], int sc
     int i,j;
     //O(N^2) runtime for this, 24^2 is pretty big.. so we may change this
     //but for now, we draw every tile every frame!
-            jo_printf_with_color(0, 5, JO_COLOR_INDEX_White, "ht: %d", config->map_height);
     for (i = 0; i < config->map_height; i++)
     {
         for (j = 0; j < config->map_width; j++)
