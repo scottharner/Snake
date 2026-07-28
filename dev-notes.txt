@@ -46,6 +46,5 @@ todo
 	- game win mode
 	- migrate todos to issues
 - saturn
-	-0.bin source control handling
 	-last block edge handling
 	-draw border

@@ -36,13 +36,15 @@ include $(COMPILER_DIR)/COMMON/jo_engine_makefile
 MKISOFS = "D:/joengine/Compiler/WINDOWS/Other Utilities/mkisofs.exe"
 CUE_MAKER = "D:\joengine\Compiler\WINDOWS\Other Utilities\JoEngineCueMaker.exe"
 
-$(TARGET2): prepare_assets
+$(TARGET2): prepare_cd
 
 # Rule to clean up compiled files and start fresh
 clean:
 	rm -rf cd/TEX
+	rm -rf cd/0.bin
 	rm -f $(OBJS) $(TARGET) 2>/dev/null || true
 
-prepare_assets:
+prepare_cd:
+	touch cd/0.bin
 	mkdir -p cd/TEX
 	cp ../assets/tex/* cd/TEX/

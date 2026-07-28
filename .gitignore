@@ -60,3 +60,4 @@ game.raw
 
 # cd build files
 /platform/saturn/build/cd/tex/
+/platform/saturn/build/cd/0.bin
