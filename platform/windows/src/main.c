@@ -1,0 +1,224 @@
+#include <allegro.h>
+#include <stdbool.h>
+#include <stdlib.h>
+#include <stdio.h>
+#include "../../platform.h"
+
+/*
+*   Snake: Windows implementation of snake using allegro framework.
+*   Last Update: Jul 19, 2026
+*   Author: Scott Harner
+*/
+
+//timer variables
+//it seems like framerate and some other variables my have no useful purpose
+//since our goal is primarily porting we will leave that be for now
+volatile int counter;
+volatile int ticks;
+volatile int framerate;
+volatile int resting, rested;
+
+BITMAP *buffer;//This will be our temporary bitmap for double buffering 
+
+//calculate framerate every second
+static void timer1(void)
+{
+    counter++;
+    framerate = ticks;
+    ticks=0;
+    rested=resting;
+}
+
+//Windows implementation of platform initialization
+void platform_initialize()
+{
+    allegro_init();
+    install_keyboard();
+
+    set_color_depth(16); //graphics
+    set_gfx_mode( GFX_GDI, MAX_MAP_WIDTH * MAX_TILE_SIZE, MAX_MAP_HEIGHT * MAX_TILE_SIZE, 0, 0);
+    buffer = create_bitmap( MAX_MAP_WIDTH * MAX_TILE_SIZE, MAX_MAP_HEIGHT * MAX_TILE_SIZE);
+
+    install_timer();
+
+    //lock interrupt variables
+
+    LOCK_VARIABLE(counter);
+    LOCK_VARIABLE(framerate);
+    LOCK_VARIABLE(ticks);
+    LOCK_VARIABLE(resting);
+    LOCK_VARIABLE(rested);
+    LOCK_FUNCTION(timer1);
+    
+    install_int(timer1, 1000);
+}
+
+// display a game over screen
+// returns flag indicating whether time is up for displaying game over
+void platform_draw_game_over_screen(int score, bool didModeChange)
+{
+    (void)didModeChange; // avoid compiler warning
+    clear_to_color(buffer, makecol(0, 0, 0));
+    
+    textout_ex(buffer, font, "Game Over", 50, 50, makecol(255,255,255), -1);
+    textprintf_ex(buffer, font, 50, 70, makecol(255,255,255), -1, "Score: %d", score);
+
+    blit(buffer, screen, 0, 0, 0, 0, SCREEN_W, SCREEN_H);
+}
+
+// calculate the color to display for a menu option
+static int getOptionColor(speed selectedSpeed, speed optionSpeed)
+{
+    int selectedColor = makecol(255,255,0);
+    int defaultColor = makecol(255,255,255);
+    return selectedSpeed == optionSpeed ? selectedColor : defaultColor;
+}
+
+// display a title screen
+void platform_draw_title_screen(speed gameSpeed, bool didModeChange)
+{
+    (void)didModeChange; // avoid compiler warning
+    clear_to_color(buffer, makecol(0, 0, 0));
+    textout_ex(buffer, font, "SNAKE", 50, 10, makecol(255,255,255), -1);
+    
+    textout_ex(buffer, font, "Slow", 50, 50, getOptionColor(gameSpeed, SPEED_SLOW), -1);
+    textout_ex(buffer, font, "Medium", 50, 70, getOptionColor(gameSpeed, SPEED_MEDIUM), -1);
+    textout_ex(buffer, font, "Fast", 50, 90, getOptionColor(gameSpeed, SPEED_FAST), -1);
+
+    blit(buffer, screen, 0, 0, 0, 0, SCREEN_W, SCREEN_H);
+}
+
+// platform specific setting of random generator seed
+void platform_set_random_seed(unsigned int seed)
+{
+    srand(seed);
+}
+
+// platform specific random number generation
+int platform_get_random(int max)
+{
+    if (max <= 0) return 0;
+    return rand() % max;
+}
+
+// platform specific memory allocation
+void * platform_memory_allocate(unsigned int size)
+{
+    return malloc(size);
+}
+
+// steps to prepare to exit the game
+void platform_shutdown()
+{
+
+}
+
+// check if the game is still running
+static bool is_running()
+{
+    return !key[KEY_ESC];
+}
+
+// track all current and previous input states so we can check on input presses
+static void update_input_states(bool current_inputstates[INPUT_TYPE_COUNT])
+{
+    game_save_previous_inputstates();
+
+    // read current state
+    current_inputstates[INPUT_TYPE_UP] = key[KEY_UP];
+    current_inputstates[INPUT_TYPE_DOWN] = key[KEY_DOWN];
+    current_inputstates[INPUT_TYPE_LEFT] = key[KEY_LEFT];
+    current_inputstates[INPUT_TYPE_RIGHT] = key[KEY_RIGHT];
+    current_inputstates[INPUT_TYPE_START] = key[KEY_ENTER];    
+}
+
+// retrieve the input type from the user
+input_type platform_get_input_type(mode gameMode, bool current_inputstates[INPUT_TYPE_COUNT])
+{
+    input_type currentInput = INPUT_TYPE_NOTHING;
+    clear_keybuf();
+
+    switch(gameMode)
+    {
+        case MODE_TITLE:
+            update_input_states(current_inputstates);
+            if (game_input_pressed(INPUT_TYPE_START)) currentInput = INPUT_TYPE_START;
+            else if (game_input_pressed(INPUT_TYPE_DOWN)) currentInput = INPUT_TYPE_DOWN;
+            else if (game_input_pressed(INPUT_TYPE_UP)) currentInput = INPUT_TYPE_UP;
+            break;
+
+        default:
+            if (key[KEY_LEFT]) currentInput = INPUT_TYPE_LEFT;
+            else if (key[KEY_RIGHT]) currentInput = INPUT_TYPE_RIGHT;
+            else if (key[KEY_DOWN]) currentInput = INPUT_TYPE_DOWN;
+            else if (key[KEY_UP]) currentInput = INPUT_TYPE_UP;
+            else if (key[KEY_ENTER]) currentInput = INPUT_TYPE_START;
+
+            break;
+    }
+
+    return currentInput;
+}
+
+void platform_update_platform_state()
+{
+    //update ticks
+    ticks++;
+}
+
+void platform_draw_game_screen(int objMap[MAX_MAP_HEIGHT][MAX_MAP_WIDTH], int score, bool didModeChange, game_config *config)
+{
+    (void)didModeChange; // avoid compiler warning
+    int i,j;
+    acquire_screen();	//O(N^2) runtime for this, 24^2 is pretty big.. so we may change this
+                        //but for now, we draw every tile every frame!
+    for (i = 0; i < config->map_height; i++)
+    {
+        for (j = 0; j < config->map_width; j++)
+        {
+            int c; //color to draw
+            if (objMap[i][j] == OBJECT_NOTHING){
+                c = makecol(0,0,0);
+            }else if (objMap[i][j] == OBJECT_APPLE){
+                c = makecol(255,0,0);
+            }
+            else if (objMap[i][j] == OBJECT_SNAKE){
+                c = makecol(0,255,0);
+            }
+
+            rectfill ( buffer, config->tile_size*j, config->tile_size*i, config->tile_size*(j+1),config->tile_size*(i+1), c);
+        }
+    }
+
+    //draw the score
+    char scoretxt[10];
+    sprintf(scoretxt,"score: %d",score);
+    textout_ex(buffer, font, scoretxt, config->tile_size*(config->map_width)*3/4, config->tile_size, makecol(255,255,255), makecol(0,0,0));
+
+    //draw an outline of the game map
+    rect( buffer, 0, 0, config->tile_size*config->map_width-1, config->tile_size*config->map_height-1, makecol( 0, 0, 255));
+
+    draw_sprite( screen, buffer, 0, 0); //draw buffer image on screen every time we draw.
+    release_screen();
+}
+
+static void wait_for_next_frame()
+{
+    // 16ms is supposed to be about 60fps but 8ms seems to match closest to what we see on other platforms
+    rest(8); 
+}
+
+int main(void)
+{
+    game_initialize(MAX_MAP_HEIGHT, MAX_MAP_WIDTH, MAX_TILE_SIZE);
+    
+    while (is_running())
+    {
+        game_update();
+        wait_for_next_frame();
+    }
+
+    game_shutdown();
+    return 0;
+}
+END_OF_MAIN();

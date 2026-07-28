@@ -1,0 +1,48 @@
+#
+# Jo Engine options
+#
+
+JO_COMPILE_WITH_VIDEO_MODULE = 0
+JO_COMPILE_WITH_BACKUP_MODULE = 0
+JO_COMPILE_WITH_TGA_MODULE = 1
+JO_COMPILE_WITH_AUDIO_MODULE = 0
+JO_COMPILE_WITH_3D_MODULE = 0
+JO_COMPILE_WITH_PSEUDO_MODE7_MODULE = 0
+JO_COMPILE_WITH_EFFECTS_MODULE = 0
+JO_PSEUDO_SATURN_KAI_SUPPORT = 1
+JO_COMPILE_WITH_DUAL_CPU_MODULE = 0
+
+JO_DEBUG = 1
+JO_NTSC = 0
+JO_COMPILE_USING_SGL = 1
+
+#
+# Source files
+#
+
+SRCS = \
+    ../src/main.c \
+    ../../../game/game.c
+
+#
+# Adjust these paths for your installation
+#
+
+JO_ENGINE_SRC_DIR = D:/joengine/jo_engine
+COMPILER_DIR = D:/joengine/Compiler
+
+include $(COMPILER_DIR)/COMMON/jo_engine_makefile
+
+MKISOFS = "D:/joengine/Compiler/WINDOWS/Other Utilities/mkisofs.exe"
+CUE_MAKER = "D:\joengine\Compiler\WINDOWS\Other Utilities\JoEngineCueMaker.exe"
+
+$(TARGET2): prepare_assets
+
+# Rule to clean up compiled files and start fresh
+clean:
+	rm -rf cd/TEX
+	rm -f $(OBJS) $(TARGET) 2>/dev/null || true
+
+prepare_assets:
+	mkdir -p cd/TEX
+	cp ../assets/tex/* cd/TEX/

@@ -1,5 +1,5 @@
-snake
------
+windows
+-------
 - had to use gfx_gdi with set_gfx_mode to get the video working for the game on win 10
 	- set_gfx_mode( GFX_GDI, MAP_WIDTH * TILE_SIZE, MAP_HEIGHT * TILE_SIZE, 0, 0);
 - had to do the following cmd line to build from mingw32
@@ -7,12 +7,36 @@ snake
 	- as we add files we have to list each individual c file so i have instead moved to using a Makefile and running make
 - used allegro-mingw-4.2.2 to get this to build (uncertain of original version but this is best guess based on date)
 - had to copy alleg42.dll to application directory
-- we have one make file per platform now, so we need a different make command
-  - make -f Makefile.windows
 
-saturn dev faqs
----------------
+saturn
+------
 - why does my tile show garbled when using jo engine and map editor?
 	- you cant use compression when saving a graphic as tga
 - what is the default resolution with jo engine?
 	- 320x240
+- what is the difference between jo_sprite_draw3D and jo_sprite_draw3D2?
+	- first one uses center aligned coords and the second uses top left coords
+- jo_core_init must occur before other jo calls
+	- i was mistakenly calling jo_malloc first and then my work was getting clobbered with the subsequent call to jo_core_init
+
+general
+-------
+- we have one make file per platform now, so to make we need to
+  - cd into the platform specific build directory
+  - run make clean (optional)
+  - run make
+
+todo
+----
+- general
+	- malloc cleanup, especially on reset?
+	- allow windows version to close window
+	- clean up title screen
+	- clean up game over screen
+	- add pause functionality
+	- track a high score
+	- port to a third platform (pc engine? megadrive?)
+	- make naming conventions consistent
+	- use pointers for objMap so it can take up less memory on consoles
+- saturn
+	- move assets to separate folder

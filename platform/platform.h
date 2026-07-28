@@ -6,10 +6,13 @@
 
 void platform_initialize();
 void platform_shutdown();
-bool platform_is_running();
-direction platform_get_input_direction();
-void platform_adjust_speed(int);
-void platform_update_game_state();
-void platform_draw_game_screen(int[MAP_HEIGHT][MAP_WIDTH], int);
+input_type platform_get_input_type(mode, bool[INPUT_TYPE_COUNT]);
+void * platform_memory_allocate(unsigned int);
+int platform_get_random(int);
+void platform_set_random_seed(unsigned int);
+void platform_update_platform_state();
+void platform_draw_game_screen(int[MAX_MAP_HEIGHT][MAX_MAP_WIDTH], int, bool, game_config *);
+void platform_draw_game_over_screen(int, bool);
+void platform_draw_title_screen(speed, bool);
 
 #endif

@@ -2,8 +2,8 @@
 TARGET = snake.exe
 
 # 2. List the C files you want to include (add new ones here separated by spaces or backslashes)
-SRCS = platform/windows/main.c \
-       game/game.c 
+SRCS = ../src/main.c \
+       ../../../game/game.c 
 
 # 3. Compiler and flags (including Allegro paths and inline rule)
 CC = gcc
