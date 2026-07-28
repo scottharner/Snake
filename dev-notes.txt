@@ -38,3 +38,8 @@ todo
 	- port to a third platform (pc engine? megadrive?)
 	- make naming conventions consistent
 	- use pointers for objMap so it can take up less memory on consoles
+	- update readme
+	- add sound effects
+	- add music
+	- create release
+	- post console releases somewhere
