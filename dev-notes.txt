@@ -46,3 +46,5 @@ todo
 	- game win mode
 	- migrate todos to issues
 	- apple in same spot
+	- game over reasoning text
+	- build flags support
