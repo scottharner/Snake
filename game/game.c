@@ -9,89 +9,89 @@
 */
 
 static struct game_config* config;
-static int objMap[MAX_MAP_HEIGHT][MAX_MAP_WIDTH];//This will contain all the objects. will use it to keep track of collisions
-static speed gameSpeed = SPEED_SLOW;
+static int object_map[MAX_MAP_HEIGHT][MAX_MAP_WIDTH];//This will contain all the objects. will use it to keep track of collisions
+static speed game_speed = SPEED_SLOW;
 static int score;//score for the game
 static struct snake_node* player;
-static mode gameMode;
-static mode previousGameMode;
+static mode game_mode;
+static mode previous_game_mode;
 static int action_cycles;
 
 // track key changes for better title menu input handling
-static bool current_inputstates[INPUT_TYPE_COUNT];
-static bool previous_inputstates[INPUT_TYPE_COUNT];
+static bool current_input_states[INPUT_TYPE_COUNT];
+static bool previous_input_states[INPUT_TYPE_COUNT];
 
 // finds a random location to place the next apple
 static void generate_new_apple()
 {
-	int randy, randx;
+	int rand_y, rand_x;
 
     do{
-		randy = (int)(platform_get_random(config->map_height/2));
-		randx = (int)(platform_get_random(config->map_width/2));
-	}while (objMap[randy][randx] != OBJECT_NOTHING); //while we generate a spot that's taken, keep going;
-	objMap[randy][randx] = OBJECT_APPLE;
+		rand_y = (int)(platform_get_random(config->map_height/2));
+		rand_x = (int)(platform_get_random(config->map_width/2));
+	}while (object_map[rand_y][rand_x] != OBJECT_NOTHING); //while we generate a spot that's taken, keep going;
+	object_map[rand_y][rand_x] = OBJECT_APPLE;
 }
 
 /*
 *  This function recursively moves the snake. It goes all the way to the last node of the snake, changes its coordinates,
 *  and then changes its coordinates, all the way up.
 */
-static snake_node* move_body(snake_node* currentNode, int tempx, int tempy)
+static snake_node* move_body(snake_node* current_node, int temp_x, int temp_y)
 {
-	if (currentNode->next == NULL) //we've reached the end of the snake's body
+	if (current_node->next == NULL) //we've reached the end of the snake's body
 	{
-		objMap[currentNode->y][currentNode->x] = OBJECT_NOTHING; //reset the object map at this position
+		object_map[current_node->y][current_node->x] = OBJECT_NOTHING; //reset the object map at this position
 	}
 	else //we need to keep traversing
 	{
-		currentNode->next = move_body(currentNode->next,currentNode->x,currentNode->y);
+		current_node->next = move_body(current_node->next,current_node->x,current_node->y);
 	}
-	currentNode->x = tempx;
-	currentNode->y = tempy;
-    return currentNode;
+	current_node->x = temp_x;
+	current_node->y = temp_y;
+    return current_node;
 
 }
 
 static void title_screen_read_input()
 {
     //this contains the array of flags which tell which button has been pressed. It must be cleared before every input.
-    input_type inputType = platform_get_input_type(MODE_TITLE, current_inputstates);
-    if (inputType == INPUT_TYPE_START)
+    input_type current_input = platform_get_input_type(MODE_TITLE, current_input_states);
+    if (current_input == INPUT_TYPE_START)
     {
-        gameMode = MODE_GAME;
+        game_mode = MODE_GAME;
     }
-    else if (inputType == INPUT_TYPE_DOWN) 
+    else if (current_input == INPUT_TYPE_DOWN) 
     {
-        switch (gameSpeed)
+        switch (game_speed)
         {
             case SPEED_SLOW:
-                gameSpeed = SPEED_MEDIUM;
+                game_speed = SPEED_MEDIUM;
                 break;
 
             case SPEED_MEDIUM:
-                gameSpeed = SPEED_FAST;
+                game_speed = SPEED_FAST;
                 break;
 
             default:
-                gameSpeed = SPEED_SLOW;
+                game_speed = SPEED_SLOW;
                 break;
         }
     }
-    else if (inputType == INPUT_TYPE_UP) 
+    else if (current_input == INPUT_TYPE_UP) 
     {
-        switch (gameSpeed)
+        switch (game_speed)
         {
             case SPEED_SLOW:
-                gameSpeed = SPEED_FAST;
+                game_speed = SPEED_FAST;
                 break;
 
             case SPEED_MEDIUM:
-                gameSpeed = SPEED_SLOW;
+                game_speed = SPEED_SLOW;
                 break;
 
             default:
-                gameSpeed = SPEED_MEDIUM;
+                game_speed = SPEED_MEDIUM;
                 break;
         }
     }
@@ -100,24 +100,24 @@ static void title_screen_read_input()
 static void move()
 {
     //this contains the array of flags which tell which button has been pressed. It must be cleared before every input.
-    input_type inputType = platform_get_input_type(MODE_GAME, current_inputstates);
-    if (inputType == INPUT_TYPE_LEFT) player->dir = INPUT_TYPE_LEFT;
-    if (inputType == INPUT_TYPE_RIGHT) player->dir = INPUT_TYPE_RIGHT;
-    if (inputType == INPUT_TYPE_DOWN) player->dir = INPUT_TYPE_DOWN;
-    if (inputType == INPUT_TYPE_UP) player->dir = INPUT_TYPE_UP;
+    input_type current_input = platform_get_input_type(MODE_GAME, current_input_states);
+    if (current_input == INPUT_TYPE_LEFT) player->dir = INPUT_TYPE_LEFT;
+    if (current_input == INPUT_TYPE_RIGHT) player->dir = INPUT_TYPE_RIGHT;
+    if (current_input == INPUT_TYPE_DOWN) player->dir = INPUT_TYPE_DOWN;
+    if (current_input == INPUT_TYPE_UP) player->dir = INPUT_TYPE_UP;
 
-    int tempx = player->x, tempy = player->y;
+    int temp_x = player->x, temp_y = player->y;
 
     if (player->dir == INPUT_TYPE_LEFT)
     {
 
         if (player->x > 0)
         {
-            tempx = player->x - 1;
+            temp_x = player->x - 1;
         }
         else
         { //allow for wrap around
-            gameMode = MODE_GAMEOVER;
+            game_mode = MODE_GAMEOVER;
             return;
         }
 
@@ -127,11 +127,11 @@ static void move()
 
         if (player->x < config->map_width - 1)
         {
-                tempx = player->x + 1;
+                temp_x = player->x + 1;
         }
         else
         {
-            gameMode = MODE_GAMEOVER;
+            game_mode = MODE_GAMEOVER;
             return;
         }
     } 
@@ -139,11 +139,11 @@ static void move()
     {
         if (player->y > 0)
         {
-            tempy = player->y - 1;
+            temp_y = player->y - 1;
         }
         else
         {
-            gameMode = MODE_GAMEOVER;
+            game_mode = MODE_GAMEOVER;
             return;
         }
 
@@ -153,20 +153,20 @@ static void move()
 
         if (player->y < config->map_height - 1)
     	{
-        	tempy = player->y + 1;
+        	temp_y = player->y + 1;
         }
         else{
-            gameMode = MODE_GAMEOVER;
+            game_mode = MODE_GAMEOVER;
             return;
         }
     } 
     else 
     {
-        gameMode = MODE_GAMEOVER;
+        game_mode = MODE_GAMEOVER;
         return;
     }
 
-    if (objMap[tempy][tempx] == OBJECT_APPLE) //the snake has run into an apple and another node is created
+    if (object_map[temp_y][temp_x] == OBJECT_APPLE) //the snake has run into an apple and another node is created
     {
 	    score++;
         snake_node* temp = player;
@@ -174,36 +174,36 @@ static void move()
         {
             temp = temp->next;
         }
-        int newNodex = temp->x; //when we reach the final node, we store its location with two variables
-        int newNodey = temp->y;
-        player = move_body(player, tempx,tempy);
-        snake_node* newNode = platform_memory_allocate(sizeof(snake_node)); //after we move the whole body we make a new node line( screen, 130, 130, 150, 150, makecol( 255, 0, 0));
-        newNode->x = newNodex;
-        newNode->y = newNodey; //we set this new node's location variables
-        newNode->dir = temp->dir;
-        newNode->next = NULL;
-        temp->next = newNode; //we set the temp node (the previous tail)'s next node to our new tail!
+        int new_node_x = temp->x; //when we reach the final node, we store its location with two variables
+        int new_node_y = temp->y;
+        player = move_body(player, temp_x,temp_y);
+        snake_node* new_node = platform_memory_allocate(sizeof(snake_node)); //after we move the whole body we make a new node line( screen, 130, 130, 150, 150, makecol( 255, 0, 0));
+        new_node->x = new_node_x;
+        new_node->y = new_node_y; //we set this new node's location variables
+        new_node->dir = temp->dir;
+        new_node->next = NULL;
+        temp->next = new_node; //we set the temp node (the previous tail)'s next node to our new tail!
         generate_new_apple();
     }
-    else if (objMap[tempy][tempx] == OBJECT_SNAKE)
+    else if (object_map[temp_y][temp_x] == OBJECT_SNAKE)
     {
-    	gameMode = MODE_GAMEOVER;
+    	game_mode = MODE_GAMEOVER;
         return;
     }
     else
     {
- 	    player = move_body(player,tempx,tempy);
+ 	    player = move_body(player,temp_x,temp_y);
     }
 
-    objMap[tempy][tempx] = OBJECT_SNAKE; //update the object map to the new snake head position
+    object_map[temp_y][temp_x] = OBJECT_SNAKE; //update the object map to the new snake head position
 }
 
 void game_reset_input_states()
 {
     for (int i = 0; i < INPUT_TYPE_COUNT; i++)
     {
-        previous_inputstates[i] = false;
-        current_inputstates[i] = false;
+        previous_input_states[i] = false;
+        current_input_states[i] = false;
     }
 
 }
@@ -211,7 +211,7 @@ void game_reset_input_states()
 // calculate the max movement cycles based upon the current speed
 static int get_move_max_cycles()
 {
-    switch (gameSpeed)
+    switch (game_speed)
     {
         case SPEED_FAST:
             return FAST_SPEED_MAX_CYCLES;
@@ -229,22 +229,22 @@ static int get_move_max_cycles()
 void game_update(void)
 {
     action_cycles++;
-    bool didModeChange = false;
-    if (previousGameMode != gameMode)
-        didModeChange = true;
+    bool did_mode_change = false;
+    if (previous_game_mode != game_mode)
+        did_mode_change = true;
 
-    previousGameMode = gameMode;
+    previous_game_mode = game_mode;
 
-    switch (gameMode)   
+    switch (game_mode)   
     {
         case MODE_TITLE:
             title_screen_read_input();
-            platform_draw_title_screen(gameSpeed, didModeChange);
+            platform_draw_title_screen(game_speed, did_mode_change);
             action_cycles = 0; // always reset for title screen as were not timing anything
             break;
         
         case MODE_GAMEOVER:
-            platform_draw_game_over_screen(score, didModeChange);
+            platform_draw_game_over_screen(score, did_mode_change);
             if (action_cycles > GAME_OVER_MAX_CYCLES)
                 game_reset(); // reset the game after showing game over
                 
@@ -257,7 +257,7 @@ void game_update(void)
                 action_cycles = 0;
             }
         
-            platform_draw_game_screen(objMap, score, didModeChange, config);
+            platform_draw_game_screen(object_map, score, did_mode_change, config);
             platform_update_platform_state();
             break;
     }
@@ -268,7 +268,7 @@ void game_update(void)
 void game_initialize(int map_height, int map_width, int tile_size)
 {
     platform_initialize();
-    previousGameMode = MODE_NONE;
+    previous_game_mode = MODE_NONE;
     player = platform_memory_allocate(sizeof(snake_node));
     player->next = NULL;
     config = platform_memory_allocate(sizeof(game_config));
@@ -280,16 +280,16 @@ void game_initialize(int map_height, int map_width, int tile_size)
 }
 
 // check if input was newly pressed
-bool game_input_pressed(input_type candidateInput)
+bool game_input_pressed(input_type candidate_input)
 {
-    return current_inputstates[candidateInput] && !previous_inputstates[candidateInput];
+    return current_input_states[candidate_input] && !previous_input_states[candidate_input];
 }
 
 void game_save_previous_inputstates()
 {
     // save previous state
     for (int i = 0; i < INPUT_TYPE_COUNT; i++)
-        previous_inputstates[i] = current_inputstates[i];
+        previous_input_states[i] = current_input_states[i];
 }
 
 static void free_snake()
@@ -308,7 +308,7 @@ static void free_snake()
 
 void game_reset()
 {
-    gameMode = MODE_TITLE;
+    game_mode = MODE_TITLE;
     score = 0;
     action_cycles = 0;
     
@@ -324,7 +324,7 @@ void game_reset()
     {
         for (j = 0; j < config->map_width; j++)
         {
-            objMap[i][j] = OBJECT_NOTHING;
+            object_map[i][j] = OBJECT_NOTHING;
         }
     }
     // we need to seed our rand() and generate our first random object

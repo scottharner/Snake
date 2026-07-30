@@ -55,9 +55,9 @@ void platform_initialize()
 
 // display a game over screen
 // returns flag indicating whether time is up for displaying game over
-void platform_draw_game_over_screen(int score, bool didModeChange)
+void platform_draw_game_over_screen(int score, bool did_mode_change)
 {
-    (void)didModeChange; // avoid compiler warning
+    (void)did_mode_change; // avoid compiler warning
     clear_to_color(buffer, makecol(0, 0, 0));
     
     textout_ex(buffer, font, "Game Over", 50, 50, makecol(255,255,255), -1);
@@ -67,23 +67,23 @@ void platform_draw_game_over_screen(int score, bool didModeChange)
 }
 
 // calculate the color to display for a menu option
-static int getOptionColor(speed selectedSpeed, speed optionSpeed)
+static int getOptionColor(speed selected_speed, speed option_speed)
 {
-    int selectedColor = makecol(255,255,0);
-    int defaultColor = makecol(255,255,255);
-    return selectedSpeed == optionSpeed ? selectedColor : defaultColor;
+    int selected_color = makecol(255,255,0);
+    int default_color = makecol(255,255,255);
+    return selected_speed == option_speed ? selected_color : default_color;
 }
 
 // display a title screen
-void platform_draw_title_screen(speed gameSpeed, bool didModeChange)
+void platform_draw_title_screen(speed game_speed, bool did_mode_change)
 {
-    (void)didModeChange; // avoid compiler warning
+    (void)did_mode_change; // avoid compiler warning
     clear_to_color(buffer, makecol(0, 0, 0));
     textout_ex(buffer, font, "SNAKE", 50, 10, makecol(255,255,255), -1);
     
-    textout_ex(buffer, font, "Slow", 50, 50, getOptionColor(gameSpeed, SPEED_SLOW), -1);
-    textout_ex(buffer, font, "Medium", 50, 70, getOptionColor(gameSpeed, SPEED_MEDIUM), -1);
-    textout_ex(buffer, font, "Fast", 50, 90, getOptionColor(gameSpeed, SPEED_FAST), -1);
+    textout_ex(buffer, font, "Slow", 50, 50, getOptionColor(game_speed, SPEED_SLOW), -1);
+    textout_ex(buffer, font, "Medium", 50, 70, getOptionColor(game_speed, SPEED_MEDIUM), -1);
+    textout_ex(buffer, font, "Fast", 50, 90, getOptionColor(game_speed, SPEED_FAST), -1);
 
     blit(buffer, screen, 0, 0, 0, 0, SCREEN_W, SCREEN_H);
 }
@@ -126,44 +126,44 @@ static bool is_running()
 }
 
 // track all current and previous input states so we can check on input presses
-static void update_input_states(bool current_inputstates[INPUT_TYPE_COUNT])
+static void update_input_states(bool current_input_states[INPUT_TYPE_COUNT])
 {
     game_save_previous_inputstates();
 
     // read current state
-    current_inputstates[INPUT_TYPE_UP] = key[KEY_UP];
-    current_inputstates[INPUT_TYPE_DOWN] = key[KEY_DOWN];
-    current_inputstates[INPUT_TYPE_LEFT] = key[KEY_LEFT];
-    current_inputstates[INPUT_TYPE_RIGHT] = key[KEY_RIGHT];
-    current_inputstates[INPUT_TYPE_START] = key[KEY_ENTER];    
+    current_input_states[INPUT_TYPE_UP] = key[KEY_UP];
+    current_input_states[INPUT_TYPE_DOWN] = key[KEY_DOWN];
+    current_input_states[INPUT_TYPE_LEFT] = key[KEY_LEFT];
+    current_input_states[INPUT_TYPE_RIGHT] = key[KEY_RIGHT];
+    current_input_states[INPUT_TYPE_START] = key[KEY_ENTER];    
 }
 
 // retrieve the input type from the user
-input_type platform_get_input_type(mode gameMode, bool current_inputstates[INPUT_TYPE_COUNT])
+input_type platform_get_input_type(mode game_mode, bool current_input_states[INPUT_TYPE_COUNT])
 {
-    input_type currentInput = INPUT_TYPE_NOTHING;
+    input_type current_input = INPUT_TYPE_NOTHING;
     clear_keybuf();
 
-    switch(gameMode)
+    switch(game_mode)
     {
         case MODE_TITLE:
-            update_input_states(current_inputstates);
-            if (game_input_pressed(INPUT_TYPE_START)) currentInput = INPUT_TYPE_START;
-            else if (game_input_pressed(INPUT_TYPE_DOWN)) currentInput = INPUT_TYPE_DOWN;
-            else if (game_input_pressed(INPUT_TYPE_UP)) currentInput = INPUT_TYPE_UP;
+            update_input_states(current_input_states);
+            if (game_input_pressed(INPUT_TYPE_START)) current_input = INPUT_TYPE_START;
+            else if (game_input_pressed(INPUT_TYPE_DOWN)) current_input = INPUT_TYPE_DOWN;
+            else if (game_input_pressed(INPUT_TYPE_UP)) current_input = INPUT_TYPE_UP;
             break;
 
         default:
-            if (key[KEY_LEFT]) currentInput = INPUT_TYPE_LEFT;
-            else if (key[KEY_RIGHT]) currentInput = INPUT_TYPE_RIGHT;
-            else if (key[KEY_DOWN]) currentInput = INPUT_TYPE_DOWN;
-            else if (key[KEY_UP]) currentInput = INPUT_TYPE_UP;
-            else if (key[KEY_ENTER]) currentInput = INPUT_TYPE_START;
+            if (key[KEY_LEFT]) current_input = INPUT_TYPE_LEFT;
+            else if (key[KEY_RIGHT]) current_input = INPUT_TYPE_RIGHT;
+            else if (key[KEY_DOWN]) current_input = INPUT_TYPE_DOWN;
+            else if (key[KEY_UP]) current_input = INPUT_TYPE_UP;
+            else if (key[KEY_ENTER]) current_input = INPUT_TYPE_START;
 
             break;
     }
 
-    return currentInput;
+    return current_input;
 }
 
 void platform_update_platform_state()
@@ -172,9 +172,9 @@ void platform_update_platform_state()
     ticks++;
 }
 
-void platform_draw_game_screen(int objMap[MAX_MAP_HEIGHT][MAX_MAP_WIDTH], int score, bool didModeChange, game_config *config)
+void platform_draw_game_screen(int object_map[MAX_MAP_HEIGHT][MAX_MAP_WIDTH], int score, bool did_mode_change, game_config *config)
 {
-    (void)didModeChange; // avoid compiler warning
+    (void)did_mode_change; // avoid compiler warning
     int i,j;
     acquire_screen();	//O(N^2) runtime for this, 24^2 is pretty big.. so we may change this
                         //but for now, we draw every tile every frame!
@@ -183,12 +183,12 @@ void platform_draw_game_screen(int objMap[MAX_MAP_HEIGHT][MAX_MAP_WIDTH], int sc
         for (j = 0; j < config->map_width; j++)
         {
             int c; //color to draw
-            if (objMap[i][j] == OBJECT_NOTHING){
+            if (object_map[i][j] == OBJECT_NOTHING){
                 c = makecol(0,0,0);
-            }else if (objMap[i][j] == OBJECT_APPLE){
+            }else if (object_map[i][j] == OBJECT_APPLE){
                 c = makecol(255,0,0);
             }
-            else if (objMap[i][j] == OBJECT_SNAKE){
+            else if (object_map[i][j] == OBJECT_SNAKE){
                 c = makecol(0,255,0);
             }
 
@@ -197,9 +197,9 @@ void platform_draw_game_screen(int objMap[MAX_MAP_HEIGHT][MAX_MAP_WIDTH], int sc
     }
 
     //draw the score
-    char scoretxt[10];
-    sprintf(scoretxt,"score: %d",score);
-    textout_ex(buffer, font, scoretxt, config->tile_size*(config->map_width)*3/4, config->tile_size, makecol(255,255,255), makecol(0,0,0));
+    char score_text[10];
+    sprintf(score_text,"score: %d",score);
+    textout_ex(buffer, font, score_text, config->tile_size*(config->map_width)*3/4, config->tile_size, makecol(255,255,255), makecol(0,0,0));
 
     //draw an outline of the game map
     rect( buffer, 0, 0, config->tile_size*config->map_width-1, config->tile_size*config->map_height-1, makecol( 0, 0, 255));

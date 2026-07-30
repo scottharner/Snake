@@ -64,9 +64,9 @@ void platform_initialize()
 
 // display a game over screen
 // returns flag indicating whether time is up for displaying game over
-void platform_draw_game_over_screen(int score, bool didModeChange)
+void platform_draw_game_over_screen(int score, bool did_mode_change)
 {
-    if (didModeChange)
+    if (did_mode_change)
         jo_clear_screen();
 
     jo_printf_with_color(5, 5, JO_COLOR_INDEX_White, "Game Over");
@@ -74,24 +74,24 @@ void platform_draw_game_over_screen(int score, bool didModeChange)
 }
 
 // calculate the color to display for a menu option
-static int getOptionColor(speed selectedSpeed, speed optionSpeed)
+static int getOptionColor(speed selected_speed, speed option_speed)
 {
-    int selectedColor = JO_COLOR_INDEX_Yellow;
-    int defaultColor = JO_COLOR_INDEX_White;
-    return selectedSpeed == optionSpeed ? selectedColor : defaultColor;
+    int selected_color = JO_COLOR_INDEX_Yellow;
+    int default_color = JO_COLOR_INDEX_White;
+    return selected_speed == option_speed ? selected_color : default_color;
 }
 
 // display a title screen
-void platform_draw_title_screen(speed gameSpeed, bool didModeChange)
+void platform_draw_title_screen(speed game_speed, bool did_mode_change)
 {
-    if (didModeChange)
+    if (did_mode_change)
         jo_clear_screen();
 
     jo_printf_with_color(0, 1, JO_COLOR_INDEX_White, "SNAKE");
 
-    jo_printf_with_color(0, 5, getOptionColor(gameSpeed, SPEED_SLOW), "Slow");
-    jo_printf_with_color(0, 7, getOptionColor(gameSpeed, SPEED_MEDIUM), "Medium");
-    jo_printf_with_color(0, 9, getOptionColor(gameSpeed, SPEED_FAST), "Fast");
+    jo_printf_with_color(0, 5, getOptionColor(game_speed, SPEED_SLOW), "Slow");
+    jo_printf_with_color(0, 7, getOptionColor(game_speed, SPEED_MEDIUM), "Medium");
+    jo_printf_with_color(0, 9, getOptionColor(game_speed, SPEED_FAST), "Fast");
 }
 
 // platform specific setting of random generator seed
@@ -125,40 +125,40 @@ void platform_shutdown()
 }
 
 // track all current and previous input states so we can check on input presses
-static void update_input_states(bool current_inputstates[INPUT_TYPE_COUNT])
+static void update_input_states(bool current_input_states[INPUT_TYPE_COUNT])
 {
     game_save_previous_inputstates();
 
     // read current state
-    current_inputstates[INPUT_TYPE_UP] = jo_is_pad1_key_pressed(JO_KEY_UP);
-    current_inputstates[INPUT_TYPE_DOWN] = jo_is_pad1_key_pressed(JO_KEY_DOWN);
-    current_inputstates[INPUT_TYPE_LEFT] = jo_is_pad1_key_pressed(JO_KEY_LEFT);
-    current_inputstates[INPUT_TYPE_RIGHT] = jo_is_pad1_key_pressed(JO_KEY_RIGHT);
-    current_inputstates[INPUT_TYPE_START] = jo_is_pad1_key_pressed(JO_KEY_START);    
+    current_input_states[INPUT_TYPE_UP] = jo_is_pad1_key_pressed(JO_KEY_UP);
+    current_input_states[INPUT_TYPE_DOWN] = jo_is_pad1_key_pressed(JO_KEY_DOWN);
+    current_input_states[INPUT_TYPE_LEFT] = jo_is_pad1_key_pressed(JO_KEY_LEFT);
+    current_input_states[INPUT_TYPE_RIGHT] = jo_is_pad1_key_pressed(JO_KEY_RIGHT);
+    current_input_states[INPUT_TYPE_START] = jo_is_pad1_key_pressed(JO_KEY_START);    
 }
 
 // retrieve the input type from the user
-input_type platform_get_input_type(mode gameMode, bool current_inputstates[INPUT_TYPE_COUNT])
+input_type platform_get_input_type(mode game_mode, bool current_input_states[INPUT_TYPE_COUNT])
 {
-    input_type currentInput = INPUT_TYPE_NOTHING;
+    input_type current_input = INPUT_TYPE_NOTHING;
     if (jo_is_pad1_available())
     {
-        switch(gameMode)
+        switch(game_mode)
         {
             case MODE_TITLE:
-                update_input_states(current_inputstates);
-                if (game_input_pressed(INPUT_TYPE_START)) currentInput = INPUT_TYPE_START;    
-                else if (game_input_pressed(INPUT_TYPE_DOWN)) currentInput = INPUT_TYPE_DOWN;
-                else if (game_input_pressed(INPUT_TYPE_UP)) currentInput = INPUT_TYPE_UP;
+                update_input_states(current_input_states);
+                if (game_input_pressed(INPUT_TYPE_START)) current_input = INPUT_TYPE_START;    
+                else if (game_input_pressed(INPUT_TYPE_DOWN)) current_input = INPUT_TYPE_DOWN;
+                else if (game_input_pressed(INPUT_TYPE_UP)) current_input = INPUT_TYPE_UP;
 
                 break;
 
             default:
-                if (jo_is_pad1_key_pressed(JO_KEY_LEFT)) currentInput = INPUT_TYPE_LEFT;
-                else if (jo_is_pad1_key_pressed(JO_KEY_RIGHT)) currentInput = INPUT_TYPE_RIGHT;
-                else if (jo_is_pad1_key_pressed(JO_KEY_DOWN)) currentInput = INPUT_TYPE_DOWN;
-                else if (jo_is_pad1_key_pressed(JO_KEY_UP)) currentInput = INPUT_TYPE_UP;
-                else if (jo_is_pad1_key_pressed(JO_KEY_START)) currentInput = INPUT_TYPE_START;
+                if (jo_is_pad1_key_pressed(JO_KEY_LEFT)) current_input = INPUT_TYPE_LEFT;
+                else if (jo_is_pad1_key_pressed(JO_KEY_RIGHT)) current_input = INPUT_TYPE_RIGHT;
+                else if (jo_is_pad1_key_pressed(JO_KEY_DOWN)) current_input = INPUT_TYPE_DOWN;
+                else if (jo_is_pad1_key_pressed(JO_KEY_UP)) current_input = INPUT_TYPE_UP;
+                else if (jo_is_pad1_key_pressed(JO_KEY_START)) current_input = INPUT_TYPE_START;
 
                 break;
         }
@@ -168,7 +168,7 @@ input_type platform_get_input_type(mode gameMode, bool current_inputstates[INPUT
         game_reset_input_states();
     }
 
-    return currentInput;
+    return current_input;
 }
 
 void platform_update_platform_state()
@@ -245,9 +245,9 @@ static void draw_border(game_config *config)
     jo_sprite_disable_vertical_flip();
 }
 
-void platform_draw_game_screen(int objMap[MAX_MAP_HEIGHT][MAX_MAP_WIDTH], int score, bool didModeChange, game_config *config)
+void platform_draw_game_screen(int object_map[MAX_MAP_HEIGHT][MAX_MAP_WIDTH], int score, bool did_mode_change, game_config *config)
 {
-    if (didModeChange)
+    if (did_mode_change)
         jo_clear_screen();
 
     int i,j;
@@ -258,11 +258,11 @@ void platform_draw_game_screen(int objMap[MAX_MAP_HEIGHT][MAX_MAP_WIDTH], int sc
         for (j = 0; j < config->map_width; j++)
         {
             int sprite_id;
-            if (objMap[i][j] == OBJECT_APPLE)
+            if (object_map[i][j] == OBJECT_APPLE)
             {
                 sprite_id = apple_sprite_id;
             }
-            else if (objMap[i][j] == OBJECT_SNAKE)
+            else if (object_map[i][j] == OBJECT_SNAKE)
             {
                 sprite_id = snake_sprite_id;
             }
