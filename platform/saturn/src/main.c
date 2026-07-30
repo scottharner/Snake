@@ -39,20 +39,26 @@
 #define BORDER_ZINDEX 500
 #define JO_GRID_WIDTH (JO_TV_WIDTH / 8)
 #define JO_GRID_HEIGHT (JO_TV_HEIGHT / 8)
-#define MAP_HEIGHT 30
+#define MAP_HEIGHT 28
 #define MAP_WIDTH 40
 #define TILE_SIZE 8
 
-static int green_sprite_id;
-static int red_sprite_id;
+static int snake_sprite_id;
+static int apple_sprite_id;
+static int border_top_sprite_id;
+static int border_left_sprite_id;
+static int border_corner_sprite_id;
 static bool show_debug_info;
 
 // Saturn implementation of platform initialization
 void platform_initialize()
 {
     jo_core_init(JO_COLOR_Black);
-    green_sprite_id = jo_sprite_add_tga("TEX", "GREEN.TGA", JO_COLOR_Transparent);
-    red_sprite_id = jo_sprite_add_tga("TEX", "RED.TGA", JO_COLOR_Transparent);
+    snake_sprite_id = jo_sprite_add_tga("TEX", "SNAKE.TGA", JO_COLOR_Transparent);
+    apple_sprite_id = jo_sprite_add_tga("TEX", "APPLE.TGA", JO_COLOR_Transparent);
+    border_top_sprite_id = jo_sprite_add_tga("TEX", "BORDERT.TGA", JO_COLOR_Transparent);
+    border_left_sprite_id = jo_sprite_add_tga("TEX", "BORDERL.TGA", JO_COLOR_Transparent);
+    border_corner_sprite_id = jo_sprite_add_tga("TEX", "BORDERC.TGA", JO_COLOR_Transparent);
     show_debug_info = false;
 }
 
@@ -164,7 +170,7 @@ void platform_update_platform_state()
     // we dont have any updates to make on this platform
 }
 
-void draw_tile(int x, int y, int width, int height, int sprite_id)
+void draw_tile(int x, int y, int width, int height, int sprite_id, int z, int angle)
 {
     // jo engine uses a center origin coordinate system so we have to recalculate from the provided upper left coords
     int jo_x = x - JO_TV_WIDTH_2;
@@ -172,13 +178,65 @@ void draw_tile(int x, int y, int width, int height, int sprite_id)
     jo_x += (width/2);
     jo_y += (height/2);
 
-    jo_sprite_draw3D2(sprite_id, x, y, OBJECT_ZINDEX);
+    if (angle == 0)
+        jo_sprite_draw3D2(sprite_id, x, y, z);
+    else
+        jo_sprite_draw3D_and_rotate2(sprite_id, x, y, z, angle);
 
     if (show_debug_info)
     {
         jo_printf_with_color(0, 0, JO_COLOR_INDEX_White, "tile x: %d", x);
         jo_printf_with_color(0, 1, JO_COLOR_INDEX_White, "tile y: %d", y);
     }
+}
+
+static void draw_border(game_config *config)
+{
+    for (int i = 1; i < config->map_width-1; i++)
+    {
+        // top
+        draw_tile(i * config->tile_size, 0, config->tile_size, config->tile_size, border_top_sprite_id, BORDER_ZINDEX, 0);
+    }
+
+    jo_sprite_enable_vertical_flip();
+    for (int i = 1; i < config->map_width-1; i++)
+    {
+        // bottom
+        draw_tile(i * config->tile_size, (MAP_HEIGHT*config->tile_size)-config->tile_size-1, config->tile_size, config->tile_size, border_top_sprite_id, BORDER_ZINDEX, 0);
+    }
+    jo_sprite_disable_vertical_flip();
+
+    for (int i = 1; i < config->map_height-1; i++)
+    {
+        // left
+        draw_tile(0, i * config->tile_size, config->tile_size, config->tile_size, border_left_sprite_id, BORDER_ZINDEX, 0);
+    }
+
+    jo_sprite_enable_horizontal_flip();
+    for (int i = 1; i < config->map_height-1; i++)
+    {
+        // right
+        draw_tile((MAP_WIDTH*config->tile_size)-config->tile_size-1, i * config->tile_size, config->tile_size, config->tile_size, border_left_sprite_id, BORDER_ZINDEX, 0);
+    }
+    jo_sprite_disable_horizontal_flip();
+
+    // upper left
+    draw_tile(0, 0, config->tile_size, config->tile_size, border_corner_sprite_id, BORDER_ZINDEX, 0);
+    
+    // upper right
+    jo_sprite_enable_horizontal_flip();
+    draw_tile((MAP_WIDTH*config->tile_size)-config->tile_size-1, 0, config->tile_size, config->tile_size, border_corner_sprite_id, BORDER_ZINDEX, 0);
+    jo_sprite_disable_horizontal_flip();
+
+    // lower left
+    jo_sprite_enable_vertical_flip();
+    draw_tile(0, (MAP_HEIGHT*config->tile_size)-config->tile_size-1, config->tile_size, config->tile_size, border_corner_sprite_id, BORDER_ZINDEX, 0);
+
+    // lower right
+    jo_sprite_enable_horizontal_flip();
+    draw_tile((MAP_WIDTH*config->tile_size)-config->tile_size-1, (MAP_HEIGHT*config->tile_size)-config->tile_size-1, config->tile_size, config->tile_size, border_corner_sprite_id, BORDER_ZINDEX, 0);
+    jo_sprite_disable_horizontal_flip();
+    jo_sprite_disable_vertical_flip();
 }
 
 void platform_draw_game_screen(int objMap[MAX_MAP_HEIGHT][MAX_MAP_WIDTH], int score, bool didModeChange, game_config *config)
@@ -196,23 +254,25 @@ void platform_draw_game_screen(int objMap[MAX_MAP_HEIGHT][MAX_MAP_WIDTH], int sc
             int sprite_id;
             if (objMap[i][j] == OBJECT_APPLE)
             {
-                sprite_id = red_sprite_id;
+                sprite_id = apple_sprite_id;
             }
             else if (objMap[i][j] == OBJECT_SNAKE)
             {
-                sprite_id = green_sprite_id;
+                sprite_id = snake_sprite_id;
             }
             else
             {
                 continue;
             }
 
-            draw_tile(config->tile_size*j, config->tile_size*i, config->tile_size, config->tile_size, sprite_id);
+            draw_tile(config->tile_size*j, config->tile_size*i, config->tile_size, config->tile_size, sprite_id, OBJECT_ZINDEX, 0);
         }
     }
 
     //draw the score
-    jo_printf_with_color(JO_GRID_WIDTH-10, 0, JO_COLOR_INDEX_White, "score: %d", score);
+    jo_printf_with_color(JO_GRID_WIDTH-10, 1, JO_COLOR_INDEX_White, "Score: %d", score);
+
+    draw_border(config);
 }
 
 void jo_main(void)
