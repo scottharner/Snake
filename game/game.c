@@ -270,6 +270,7 @@ void game_initialize(int map_height, int map_width, int tile_size)
     platform_initialize();
     previousGameMode = MODE_NONE;
     player = platform_memory_allocate(sizeof(snake_node));
+    player->next = NULL;
     config = platform_memory_allocate(sizeof(game_config));
     config->map_height = map_height;
     config->map_width = map_width;
@@ -291,16 +292,32 @@ void game_save_previous_inputstates()
         previous_inputstates[i] = current_inputstates[i];
 }
 
+static void free_snake()
+{
+    snake_node *current = player->next;
+
+    while (current != NULL)
+    {
+        snake_node *next = current->next;
+        platform_memory_free(current);
+        current = next;
+    }
+
+    player->next = NULL;
+}
+
 void game_reset()
 {
     gameMode = MODE_TITLE;
     score = 0;
     action_cycles = 0;
     
+     if (player->next != NULL)
+         free_snake();
+
     player->dir =  INPUT_TYPE_LEFT; //init direction
     player->x = (config->map_width)/2;
     player->y = (config->map_height)/2;
-    player->next = NULL;
 
     int i, j; //this is so we don't get errors because the object map references nothing.
     for (i = 0; i < config->map_height; i++)
@@ -319,5 +336,18 @@ void game_reset()
 
 void game_shutdown(void)
 {
+    free_snake();
+    if (player != NULL)
+    {
+        platform_memory_free(player);
+        player = NULL;
+    }
+
+    if (config != NULL)
+    {
+        platform_memory_free(config);
+        config = NULL;
+    }
+
     platform_shutdown();
 }

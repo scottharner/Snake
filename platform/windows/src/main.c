@@ -107,6 +107,12 @@ void * platform_memory_allocate(unsigned int size)
     return malloc(size);
 }
 
+// platform specific memory free
+void platform_memory_free(void *pointer)
+{
+    free(pointer);
+}
+
 // steps to prepare to exit the game
 void platform_shutdown()
 {

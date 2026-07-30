@@ -8,6 +8,7 @@ void platform_initialize();
 void platform_shutdown();
 input_type platform_get_input_type(mode, bool[INPUT_TYPE_COUNT]);
 void * platform_memory_allocate(unsigned int);
+void platform_memory_free(void *);
 int platform_get_random(int);
 void platform_set_random_seed(unsigned int);
 void platform_update_platform_state();

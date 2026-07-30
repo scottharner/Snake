@@ -30,7 +30,6 @@ general
 todo
 ----
 - general
-	- malloc cleanup, especially on reset?
 	- allow windows version to close window
 	- clean up title screen
 	- clean up game over screen
@@ -46,3 +45,4 @@ todo
 	- post console releases somewhere
 	- game win mode
 	- migrate todos to issues
+	- apple in same spot
