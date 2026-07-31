@@ -20,6 +20,16 @@ saturn
 - jo_core_init must occur before other jo calls
 	- i was mistakenly calling jo_malloc first and then my work was getting clobbered with the subsequent call to jo_core_init
 - it looks like tga names might have to be 8 or under and not sure if they can have dashes
+- how do i get true random numbers with jo engine?
+	- i guess there is no clock for saturn so calling time is useless when trying to seed the random number generator
+	- i ended up setting up a counter to increment every draw of the title screen and use that counter to seed once the user pressed start
+	- you have to set the seed using jo_random_seed
+- what does JO_COMPILE_USING_SGL do?
+	- this makes jo engine be a wrapper around SGL
+	- if you disable it puts you into an experimental version of jo engine that may be buggy
+- are there any other documentation sources other than the official jo engine website
+	- https://emeraldnova.com/shrec/joengine000.php
+	- example of what could be done: https://github.com/jae686/srl-tutorials/tree/main 
 
 general
 -------
@@ -42,10 +52,12 @@ todo
 	- add pause functionality
 	- track a high score
 	- port to a third platform (pc engine? megadrive?)
-	- update readme
 	- add sound effects
 	- add music
 	- create release
 	- post console releases somewhere
 	- game win mode
 	- migrate todos to issues
+
+- saturn
+	- jo engine public wiki
