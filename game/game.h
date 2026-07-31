@@ -2,7 +2,6 @@
 #define GAME_H
 
 #include <stdlib.h>
-#include <time.h>
 #include <stdbool.h>
 
 #define MAX_MAP_HEIGHT 48

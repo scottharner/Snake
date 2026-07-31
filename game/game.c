@@ -16,6 +16,8 @@ static struct snake_node* player;
 static mode game_mode;
 static mode previous_game_mode;
 static int action_cycles;
+static unsigned int frame_counter = 0;
+static bool game_started = false;
 
 // track key changes for better title menu input handling
 static bool current_input_states[INPUT_TYPE_COUNT];
@@ -60,6 +62,11 @@ static void title_screen_read_input()
     if (current_input == INPUT_TYPE_START)
     {
         game_mode = MODE_GAME;
+
+        if (!game_started)
+            platform_set_random_seed(frame_counter); // use frames to seed since some platforms dont have clock
+
+        generate_new_apple();
     }
     else if (current_input == INPUT_TYPE_DOWN) 
     {
@@ -229,6 +236,7 @@ static int get_move_max_cycles()
 void game_update(void)
 {
     action_cycles++;
+    frame_counter++;
     bool did_mode_change = false;
     if (previous_game_mode != game_mode)
         did_mode_change = true;
@@ -327,10 +335,7 @@ void game_reset()
             object_map[i][j] = OBJECT_NOTHING;
         }
     }
-    // we need to seed our rand() and generate our first random object
-    //srand(time(NULL));
-    platform_set_random_seed(time(NULL));
-    generate_new_apple();
+
     game_reset_input_states();
 }
 
