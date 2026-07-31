@@ -243,7 +243,7 @@ static void draw_border(game_config *config)
     jo_sprite_disable_vertical_flip();
 }
 
-void platform_draw_game_screen(int object_map[MAX_MAP_HEIGHT][MAX_MAP_WIDTH], int score, bool did_mode_change, game_config *config)
+void platform_draw_game_screen(int *object_map, int score, bool did_mode_change, game_config *config)
 {
     if (did_mode_change)
         jo_clear_screen();
@@ -256,11 +256,12 @@ void platform_draw_game_screen(int object_map[MAX_MAP_HEIGHT][MAX_MAP_WIDTH], in
         for (j = 0; j < config->map_width; j++)
         {
             int sprite_id;
-            if (object_map[i][j] == OBJECT_APPLE)
+            int tile_index = i * config->map_width + j;
+            if (object_map[tile_index] == OBJECT_APPLE)
             {
                 sprite_id = apple_sprite_id;
             }
-            else if (object_map[i][j] == OBJECT_SNAKE)
+            else if (object_map[tile_index] == OBJECT_SNAKE)
             {
                 sprite_id = snake_sprite_id;
             }

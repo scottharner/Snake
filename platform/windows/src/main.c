@@ -173,7 +173,7 @@ void platform_update_platform_state()
     ticks++;
 }
 
-void platform_draw_game_screen(int object_map[MAX_MAP_HEIGHT][MAX_MAP_WIDTH], int score, bool did_mode_change, game_config *config)
+void platform_draw_game_screen(int *object_map, int score, bool did_mode_change, game_config *config)
 {
     (void)did_mode_change; // avoid compiler warning
     int i,j;
@@ -184,12 +184,13 @@ void platform_draw_game_screen(int object_map[MAX_MAP_HEIGHT][MAX_MAP_WIDTH], in
         for (j = 0; j < config->map_width; j++)
         {
             int c; //color to draw
-            if (object_map[i][j] == OBJECT_NOTHING){
+            int tile_index = i * config->map_width + j;
+            if (object_map[tile_index] == OBJECT_NOTHING){
                 c = makecol(0,0,0);
-            }else if (object_map[i][j] == OBJECT_APPLE){
+            }else if (object_map[tile_index] == OBJECT_APPLE){
                 c = makecol(255,0,0);
             }
-            else if (object_map[i][j] == OBJECT_SNAKE){
+            else if (object_map[tile_index] == OBJECT_SNAKE){
                 c = makecol(0,255,0);
             }
 

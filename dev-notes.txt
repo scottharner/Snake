@@ -27,6 +27,10 @@ general
   - run make clean (optional)
   - run make
 - we will use a consistent naming convention: snake_case everything except MACRO and ENUMERATION_CONSTANTS
+- we use a pointer to store object map so that we only have to allocate the memory that we need for the platform
+	- initialize = int *array = (int *)malloc(rows * cols * sizeof(int));
+	- access = array[2 * cols + 3] = 42; // row 2, column 3
+	
 
 todo
 ----
@@ -37,7 +41,6 @@ todo
 	- add pause functionality
 	- track a high score
 	- port to a third platform (pc engine? megadrive?)
-	- use pointers for objMap so it can take up less memory on consoles
 	- update readme
 	- add sound effects
 	- add music

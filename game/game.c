@@ -9,7 +9,7 @@
 */
 
 static struct game_config* config;
-static int object_map[MAX_MAP_HEIGHT][MAX_MAP_WIDTH];//This will contain all the objects. will use it to keep track of collisions
+static int *object_map;//This will contain all the objects. will use it to keep track of collisions
 static speed game_speed = SPEED_SLOW;
 static int score;//score for the game
 static struct snake_node* player;
@@ -32,8 +32,8 @@ static void generate_new_apple()
     do{
 		rand_y = (int)(platform_get_random(config->map_height/2));
 		rand_x = (int)(platform_get_random(config->map_width/2));
-	}while (object_map[rand_y][rand_x] != OBJECT_NOTHING); //while we generate a spot that's taken, keep going;
-	object_map[rand_y][rand_x] = OBJECT_APPLE;
+	}while (object_map[rand_y * config->map_width + rand_x] != OBJECT_NOTHING); //while we generate a spot that's taken, keep going;
+	object_map[rand_y * config->map_width + rand_x] = OBJECT_APPLE;
 }
 
 /*
@@ -44,7 +44,7 @@ static snake_node* move_body(snake_node* current_node, int temp_x, int temp_y)
 {
 	if (current_node->next == NULL) //we've reached the end of the snake's body
 	{
-		object_map[current_node->y][current_node->x] = OBJECT_NOTHING; //reset the object map at this position
+		object_map[current_node->y * config->map_width + current_node->x] = OBJECT_NOTHING; //reset the object map at this position
 	}
 	else //we need to keep traversing
 	{
@@ -179,7 +179,7 @@ static void move()
         return;
     }
 
-    if (object_map[temp_y][temp_x] == OBJECT_APPLE) //the snake has run into an apple and another node is created
+    if (object_map[temp_y * config->map_width + temp_x] == OBJECT_APPLE) //the snake has run into an apple and another node is created
     {
 	    score++;
         snake_node* temp = player;
@@ -198,7 +198,7 @@ static void move()
         temp->next = new_node; //we set the temp node (the previous tail)'s next node to our new tail!
         generate_new_apple();
     }
-    else if (object_map[temp_y][temp_x] == OBJECT_SNAKE)
+    else if (object_map[temp_y * config->map_width + temp_x] == OBJECT_SNAKE)
     {
     	game_mode = MODE_GAME_OVER;
         current_loss_type = LOSS_TYPE_SELF;
@@ -209,7 +209,7 @@ static void move()
  	    player = move_body(player,temp_x,temp_y);
     }
 
-    object_map[temp_y][temp_x] = OBJECT_SNAKE; //update the object map to the new snake head position
+    object_map[temp_y * config->map_width + temp_x] = OBJECT_SNAKE; //update the object map to the new snake head position
 }
 
 void game_reset_input_states()
@@ -290,6 +290,7 @@ void game_initialize(int map_height, int map_width, int tile_size)
     config->map_height = map_height;
     config->map_width = map_width;
     config->tile_size = tile_size;
+    object_map = platform_memory_allocate(config->map_height * config->map_width * sizeof(int));
 
     game_reset();
 }
@@ -339,7 +340,7 @@ void game_reset()
     {
         for (j = 0; j < config->map_width; j++)
         {
-            object_map[i][j] = OBJECT_NOTHING;
+            object_map[i * config->map_width + j] = OBJECT_NOTHING;
         }
     }
 
@@ -359,6 +360,12 @@ void game_shutdown(void)
     {
         platform_memory_free(config);
         config = NULL;
+    }
+
+    if (object_map != NULL)
+    {
+        platform_memory_free(object_map);
+        object_map = NULL;
     }
 
     platform_shutdown();
