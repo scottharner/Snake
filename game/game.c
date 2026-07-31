@@ -19,6 +19,7 @@ static int action_cycles;
 static unsigned int frame_counter = 0;
 static bool game_started = false;
 static loss_type current_loss_type = LOSS_TYPE_SELF;
+static int snake_length;
 
 // track key changes for better title menu input handling
 static bool current_input_states[INPUT_TYPE_COUNT];
@@ -196,7 +197,11 @@ static void move()
         new_node->dir = temp->dir;
         new_node->next = NULL;
         temp->next = new_node; //we set the temp node (the previous tail)'s next node to our new tail!
-        generate_new_apple();
+        snake_length++;
+        if (snake_length == (config->map_height * config->map_width))
+            game_mode = MODE_WIN; // the player wins if the snake can no longer grow
+        else
+            generate_new_apple();
     }
     else if (object_map[temp_y * config->map_width + temp_x] == OBJECT_SNAKE)
     {
@@ -265,6 +270,13 @@ void game_update(void)
                 
             break;
 
+        case MODE_WIN:
+            platform_draw_win_screen(score, did_mode_change);
+            if (action_cycles > WIN_MAX_CYCLES)
+                game_reset(); // reset the game after showing win screen
+                
+            break;
+
         default:
             if (action_cycles > get_move_max_cycles())    
             {
@@ -327,6 +339,7 @@ void game_reset()
     game_mode = MODE_TITLE;
     score = 0;
     action_cycles = 0;
+    snake_length = 1;
     
      if (player->next != NULL)
          free_snake();

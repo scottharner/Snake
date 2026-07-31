@@ -54,7 +54,6 @@ void platform_initialize()
 }
 
 // display a game over screen
-// returns flag indicating whether time is up for displaying game over
 void platform_draw_game_over_screen(int score, bool did_mode_change, loss_type current_loss_type)
 {
     (void)did_mode_change; // avoid compiler warning
@@ -63,6 +62,18 @@ void platform_draw_game_over_screen(int score, bool did_mode_change, loss_type c
     textout_ex(buffer, font, "Game Over", 50, 50, makecol(255,255,255), -1);
     textprintf_ex(buffer, font, 50, 70, makecol(255,255,255), -1, "Score: %d", score);
     textprintf_ex(buffer, font, 50, 90, makecol(255,255,255), -1, "Reason: %s", current_loss_type == LOSS_TYPE_SELF ? "Self Collision" : "Wall Collision");
+
+    blit(buffer, screen, 0, 0, 0, 0, SCREEN_W, SCREEN_H);
+}
+
+// display a win screen
+void platform_draw_win_screen(int score, bool did_mode_change)
+{
+    (void)did_mode_change; // avoid compiler warning
+    clear_to_color(buffer, makecol(0, 0, 0));
+    
+    textout_ex(buffer, font, "You Win!", 50, 50, makecol(255,255,255), -1);
+    textprintf_ex(buffer, font, 50, 70, makecol(255,255,255), -1, "Score: %d", score);
 
     blit(buffer, screen, 0, 0, 0, 0, SCREEN_W, SCREEN_H);
 }

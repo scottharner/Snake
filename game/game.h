@@ -9,6 +9,7 @@
 #define MAX_TILE_SIZE 10
 
 #define GAME_OVER_MAX_CYCLES 120
+#define WIN_MAX_CYCLES 120
 #define SLOw_SPEED_MAX_CYCLES 3
 #define MEDIUM_SPEED_MAX_CYCLES 2
 #define FAST_SPEED_MAX_CYCLES 1
@@ -41,7 +42,7 @@ typedef enum
 
 typedef enum
 {
-	MODE_NONE = 0, MODE_TITLE, MODE_GAME, MODE_GAME_OVER
+	MODE_NONE = 0, MODE_TITLE, MODE_GAME, MODE_GAME_OVER, MODE_WIN
 }mode;
 
 typedef enum
