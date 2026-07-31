@@ -1,7 +1,7 @@
 > **Note:** This is a fork of [rondorkerin/Snake](https://github.com/rondorkerin/Snake). 
-> Added Sega Saturn platform support (Snake SS).
-> Added title screen.
-> Added game over screen.
+> - Added Sega Saturn platform support (Snake SS).
+> - Added title screen.
+> - Added game over screen.
 
 ![Snake SS](documentation/screenshots/snake-ss.png)
 
