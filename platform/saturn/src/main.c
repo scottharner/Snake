@@ -39,7 +39,7 @@
 #define BORDER_ZINDEX 500
 #define JO_GRID_WIDTH (JO_TV_WIDTH / 8)
 #define JO_GRID_HEIGHT (JO_TV_HEIGHT / 8)
-#define MAP_HEIGHT 28
+#define MAP_HEIGHT 30
 #define MAP_WIDTH 40
 #define TILE_SIZE 8
 
@@ -48,7 +48,6 @@ static int apple_sprite_id;
 static int border_top_sprite_id;
 static int border_left_sprite_id;
 static int border_corner_sprite_id;
-static bool show_debug_info;
 
 // Saturn implementation of platform initialization
 void platform_initialize()
@@ -59,7 +58,6 @@ void platform_initialize()
     border_top_sprite_id = jo_sprite_add_tga("TEX", "BORDERT.TGA", JO_COLOR_Transparent);
     border_left_sprite_id = jo_sprite_add_tga("TEX", "BORDERL.TGA", JO_COLOR_Transparent);
     border_corner_sprite_id = jo_sprite_add_tga("TEX", "BORDERC.TGA", JO_COLOR_Transparent);
-    show_debug_info = false;
 }
 
 // display a game over screen
@@ -189,11 +187,10 @@ void draw_tile(int x, int y, int width, int height, int sprite_id, int z, int an
     else
         jo_sprite_draw3D_and_rotate2(sprite_id, x, y, z, angle);
 
-    if (show_debug_info)
-    {
-        jo_printf_with_color(0, 0, JO_COLOR_INDEX_White, "tile x: %d", x);
-        jo_printf_with_color(0, 1, JO_COLOR_INDEX_White, "tile y: %d", y);
-    }
+#if JO_DEBUG
+    jo_printf_with_color(0, 0, JO_COLOR_INDEX_White, "tile x: %d", x);
+    jo_printf_with_color(0, 1, JO_COLOR_INDEX_White, "tile y: %d", y);
+#endif
 }
 
 static void draw_border(game_config *config)

@@ -46,4 +46,3 @@ todo
 	- game win mode
 	- migrate todos to issues
 	- game over reasoning text
-	- build flags support
