@@ -55,19 +55,20 @@ void platform_initialize()
 
 // display a game over screen
 // returns flag indicating whether time is up for displaying game over
-void platform_draw_game_over_screen(int score, bool did_mode_change)
+void platform_draw_game_over_screen(int score, bool did_mode_change, loss_type current_loss_type)
 {
     (void)did_mode_change; // avoid compiler warning
     clear_to_color(buffer, makecol(0, 0, 0));
     
     textout_ex(buffer, font, "Game Over", 50, 50, makecol(255,255,255), -1);
     textprintf_ex(buffer, font, 50, 70, makecol(255,255,255), -1, "Score: %d", score);
+    textprintf_ex(buffer, font, 50, 90, makecol(255,255,255), -1, "Reason: %s", current_loss_type == LOSS_TYPE_SELF ? "Self Collision" : "Wall Collision");
 
     blit(buffer, screen, 0, 0, 0, 0, SCREEN_W, SCREEN_H);
 }
 
 // calculate the color to display for a menu option
-static int getOptionColor(speed selected_speed, speed option_speed)
+static int get_option_color(speed selected_speed, speed option_speed)
 {
     int selected_color = makecol(255,255,0);
     int default_color = makecol(255,255,255);
@@ -81,9 +82,9 @@ void platform_draw_title_screen(speed game_speed, bool did_mode_change)
     clear_to_color(buffer, makecol(0, 0, 0));
     textout_ex(buffer, font, "SNAKE", 50, 10, makecol(255,255,255), -1);
     
-    textout_ex(buffer, font, "Slow", 50, 50, getOptionColor(game_speed, SPEED_SLOW), -1);
-    textout_ex(buffer, font, "Medium", 50, 70, getOptionColor(game_speed, SPEED_MEDIUM), -1);
-    textout_ex(buffer, font, "Fast", 50, 90, getOptionColor(game_speed, SPEED_FAST), -1);
+    textout_ex(buffer, font, "Slow", 50, 50, get_option_color(game_speed, SPEED_SLOW), -1);
+    textout_ex(buffer, font, "Medium", 50, 70, get_option_color(game_speed, SPEED_MEDIUM), -1);
+    textout_ex(buffer, font, "Fast", 50, 90, get_option_color(game_speed, SPEED_FAST), -1);
 
     blit(buffer, screen, 0, 0, 0, 0, SCREEN_W, SCREEN_H);
 }

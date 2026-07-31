@@ -18,6 +18,7 @@ static mode previous_game_mode;
 static int action_cycles;
 static unsigned int frame_counter = 0;
 static bool game_started = false;
+static loss_type current_loss_type = LOSS_TYPE_SELF;
 
 // track key changes for better title menu input handling
 static bool current_input_states[INPUT_TYPE_COUNT];
@@ -124,7 +125,8 @@ static void move()
         }
         else
         { //allow for wrap around
-            game_mode = MODE_GAMEOVER;
+            game_mode = MODE_GAME_OVER;
+            current_loss_type = LOSS_TYPE_WALL;
             return;
         }
 
@@ -138,7 +140,8 @@ static void move()
         }
         else
         {
-            game_mode = MODE_GAMEOVER;
+            game_mode = MODE_GAME_OVER;
+            current_loss_type = LOSS_TYPE_WALL;
             return;
         }
     } 
@@ -150,7 +153,8 @@ static void move()
         }
         else
         {
-            game_mode = MODE_GAMEOVER;
+            game_mode = MODE_GAME_OVER;
+            current_loss_type = LOSS_TYPE_WALL;
             return;
         }
 
@@ -163,13 +167,15 @@ static void move()
         	temp_y = player->y + 1;
         }
         else{
-            game_mode = MODE_GAMEOVER;
+            game_mode = MODE_GAME_OVER;
+            current_loss_type = LOSS_TYPE_WALL;
             return;
         }
     } 
     else 
     {
-        game_mode = MODE_GAMEOVER;
+        game_mode = MODE_GAME_OVER;
+        current_loss_type = LOSS_TYPE_WALL;
         return;
     }
 
@@ -194,7 +200,8 @@ static void move()
     }
     else if (object_map[temp_y][temp_x] == OBJECT_SNAKE)
     {
-    	game_mode = MODE_GAMEOVER;
+    	game_mode = MODE_GAME_OVER;
+        current_loss_type = LOSS_TYPE_SELF;
         return;
     }
     else
@@ -251,8 +258,8 @@ void game_update(void)
             action_cycles = 0; // always reset for title screen as were not timing anything
             break;
         
-        case MODE_GAMEOVER:
-            platform_draw_game_over_screen(score, did_mode_change);
+        case MODE_GAME_OVER:
+            platform_draw_game_over_screen(score, did_mode_change, current_loss_type);
             if (action_cycles > GAME_OVER_MAX_CYCLES)
                 game_reset(); // reset the game after showing game over
                 

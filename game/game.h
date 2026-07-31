@@ -41,13 +41,18 @@ typedef enum
 
 typedef enum
 {
-	MODE_NONE = 0, MODE_TITLE, MODE_GAME, MODE_GAMEOVER
+	MODE_NONE = 0, MODE_TITLE, MODE_GAME, MODE_GAME_OVER
 }mode;
 
 typedef enum
 {
 	SPEED_SLOW = 1, SPEED_MEDIUM, SPEED_FAST
 }speed;
+
+typedef enum
+{
+	LOSS_TYPE_WALL = 0, LOSS_TYPE_SELF
+}loss_type;
 
 void game_initialize(int, int, int);
 void game_update();
