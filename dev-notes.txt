@@ -13,7 +13,8 @@ saturn
 - why does my tile show garbled when using jo engine and map editor?
 	- you cant use compression when saving a graphic as tga
 - what is the default resolution with jo engine?
-	- 320x224 (getting 320x240 for tv dimensions but can only do sprite tiles 320x224)
+	- 320x240 when JO_NTSC=1
+	- 320x224 when JO_NTSC=0 (getting 320x240 for tv dimensions but can only do sprite tiles 320x224)
 - what is the difference between jo_sprite_draw3D and jo_sprite_draw3D2?
 	- first one uses center aligned coords and the second uses top left coords
 - jo_core_init must occur before other jo calls
