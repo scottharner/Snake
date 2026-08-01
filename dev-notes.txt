@@ -30,6 +30,22 @@ saturn
 - are there any other documentation sources other than the official jo engine website
 	- https://emeraldnova.com/shrec/joengine000.php
 	- example of what could be done: https://github.com/jae686/srl-tutorials/tree/main 
+- sound effects
+	- i had a surprisingly tough time playing sfx using jo engine
+	- with the sample demo i initially played my sound and it was garbled
+	- i finally got the settings right in converting from wav to pcm so that i could make out my sound but it still sounded based
+	- i ended up having better luck with the potone driver
+		- dont load the jo engine audio module when using this
+		- you have to be careful about memory usage as i saw it run out when adding just one sound to the demo
+		- you can unload sounds by calling pcm_reset
+		- if you run out of memory there is a silent failure and no sounds will played
+		- to convert with ffmpeg: ffmpeg -i "mySound.WAV" -f s8 -ac 1 -ar 15360 "mySound.PCM"
+		- to load the sound in code: mySoundId = load_8bit_pcm((Sint8 *)"PICKUP.PCM", 15360);
+		- to play the sound: pcm_play(mySoundId, PCM_PROTECTED, 6);
+		- to include posound:
+			- download the source from https://github.com/ponut64/SCSP_poneSound
+			- grab pcmsys.h and pcmsys.c from the jo_demo example and drop them in your project folder
+			- add an include statement in code for pcmsys.h
 
 general
 -------
