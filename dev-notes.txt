@@ -46,6 +46,11 @@ saturn
 			- download the source from https://github.com/ponut64/SCSP_poneSound
 			- grab pcmsys.h and pcmsys.c from the jo_demo example and drop them in your project folder
 			- add an include statement in code for pcmsys.h
+		- subfolder usage with ponesound requires calling sbl functions which is slow and not recommended so i'll avoid for now
+		- need sdrv.bin in cd folder
+		- have to add the following two calls in code:
+			- load_drv(ADX_MASTER_2304); (needed if not using adx???)
+			- jo_core_add_vblank_callback(sdrv_vblank_rq);
 
 general
 -------
@@ -68,7 +73,7 @@ todo
 	- add pause functionality
 	- track a high score
 	- port to a third platform (pc engine? megadrive?)
-	- add sound effects
+	- add sound effects (credit notes, windows support)
 	- add music
 	- create release
 	- post console releases somewhere

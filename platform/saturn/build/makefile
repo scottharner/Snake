@@ -22,6 +22,7 @@ JO_COMPILE_USING_SGL = 1
 
 SRCS = \
     ../src/main.c \
+	../src/pcmsys.c \
     ../../../game/game.c
 
 #
@@ -40,11 +41,11 @@ $(TARGET2): prepare_cd
 
 # Rule to clean up compiled files and start fresh
 clean:
-	rm -rf cd/TEX
-	rm -rf cd/0.bin
+	rm -rf cd/*
 	rm -f $(OBJS) $(TARGET) 2>/dev/null || true
 
 prepare_cd:
 	touch cd/0.bin
 	mkdir -p cd/TEX
-	cp ../assets/tex/* cd/TEX/
+	cp -r ../assets/* cd/
+	cp -r ../drivers/* cd/

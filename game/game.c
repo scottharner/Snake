@@ -183,6 +183,7 @@ static void move()
     if (object_map[temp_y * config->map_width + temp_x] == OBJECT_APPLE) //the snake has run into an apple and another node is created
     {
 	    score++;
+        platform_play_sound(SOUND_PICKUP);
         snake_node* temp = player;
         while (temp->next != NULL) //the snake is essentially a linked list and we're traversing it
         {

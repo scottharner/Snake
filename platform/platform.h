@@ -16,5 +16,6 @@ void platform_draw_game_screen(int *, int, bool, game_config *);
 void platform_draw_game_over_screen(int, bool, loss_type);
 void platform_draw_win_screen(int, bool);
 void platform_draw_title_screen(speed, bool);
+void platform_play_sound(sound_type);
 
 #endif

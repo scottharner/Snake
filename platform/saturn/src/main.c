@@ -28,6 +28,7 @@
 
 #include <jo/jo.h>
 #include "../../platform.h"
+#include "pcmsys.h"
 
 /*
 *   Snake: Sega Saturn implementation of snake using joengine framework.
@@ -48,16 +49,28 @@ static int apple_sprite_id;
 static int border_top_sprite_id;
 static int border_left_sprite_id;
 static int border_corner_sprite_id;
+static short pickup_sound_id;
 
 // Saturn implementation of platform initialization
 void platform_initialize()
 {
     jo_core_init(JO_COLOR_Black);
+    load_drv(ADX_MASTER_2304);
     snake_sprite_id = jo_sprite_add_tga("TEX", "SNAKE.TGA", JO_COLOR_Transparent);
     apple_sprite_id = jo_sprite_add_tga("TEX", "APPLE.TGA", JO_COLOR_Transparent);
     border_top_sprite_id = jo_sprite_add_tga("TEX", "BORDERT.TGA", JO_COLOR_Transparent);
     border_left_sprite_id = jo_sprite_add_tga("TEX", "BORDERL.TGA", JO_COLOR_Transparent);
     border_corner_sprite_id = jo_sprite_add_tga("TEX", "BORDERC.TGA", JO_COLOR_Transparent);
+    pickup_sound_id = load_8bit_pcm((Sint8 *)"PICKUP.PCM", 15360); // using ponetone due to issues with jo engine audio
+}
+
+// plays the requested sound effect
+void platform_play_sound(sound_type current_sound_type)
+{
+    if (current_sound_type == SOUND_PICKUP)
+    {
+        pcm_play(pickup_sound_id, PCM_PROTECTED, 6);
+    }
 }
 
 // display a game over screen
@@ -292,6 +305,7 @@ void platform_draw_game_screen(int *object_map, int score, bool did_mode_change,
 void jo_main(void)
 {
     game_initialize(MAP_HEIGHT, MAP_WIDTH, TILE_SIZE);
+	jo_core_add_vblank_callback(sdrv_vblank_rq);
     jo_core_add_callback(game_update);
     jo_core_run();
 }

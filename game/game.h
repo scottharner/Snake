@@ -55,6 +55,11 @@ typedef enum
 	LOSS_TYPE_WALL = 0, LOSS_TYPE_SELF
 }loss_type;
 
+typedef enum
+{
+	SOUND_PICKUP = 0, SOUND_LOSE
+}sound_type;
+
 void game_initialize(int, int, int);
 void game_update();
 void game_shutdown();

@@ -60,4 +60,5 @@ game.raw
 
 # cd build files
 /platform/saturn/build/cd/tex/
-/platform/saturn/build/cd/0.bin
+/platform/saturn/build/cd/*.PCM
+/platform/saturn/build/cd/*.bin

@@ -53,6 +53,13 @@ void platform_initialize()
     install_int(timer1, 1000);
 }
 
+// plays the requested sound effect
+void platform_play_sound(sound_type current_sound_type)
+{
+    (void)current_sound_type;
+    // todo - implement sound playback for windows
+}
+
 // display a game over screen
 void platform_draw_game_over_screen(int score, bool did_mode_change, loss_type current_loss_type)
 {
