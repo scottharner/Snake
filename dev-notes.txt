@@ -62,6 +62,9 @@ general
 - we use a pointer to store object map so that we only have to allocate the memory that we need for the platform
 	- initialize = int *array = (int *)malloc(rows * cols * sizeof(int));
 	- access = array[2 * cols + 3] = 42; // row 2, column 3
+- refresh vs studio after .gitignore update
+	- git rm -r --cached .
+	- git add .
 	
 
 todo

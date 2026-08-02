@@ -128,6 +128,7 @@ static void move()
         { //allow for wrap around
             game_mode = MODE_GAME_OVER;
             current_loss_type = LOSS_TYPE_WALL;
+            platform_play_sound(SOUND_LOSE);
             return;
         }
 
@@ -143,6 +144,7 @@ static void move()
         {
             game_mode = MODE_GAME_OVER;
             current_loss_type = LOSS_TYPE_WALL;
+            platform_play_sound(SOUND_LOSE);
             return;
         }
     } 
@@ -156,6 +158,7 @@ static void move()
         {
             game_mode = MODE_GAME_OVER;
             current_loss_type = LOSS_TYPE_WALL;
+            platform_play_sound(SOUND_LOSE);
             return;
         }
 
@@ -170,6 +173,7 @@ static void move()
         else{
             game_mode = MODE_GAME_OVER;
             current_loss_type = LOSS_TYPE_WALL;
+            platform_play_sound(SOUND_LOSE);
             return;
         }
     } 
@@ -177,6 +181,7 @@ static void move()
     {
         game_mode = MODE_GAME_OVER;
         current_loss_type = LOSS_TYPE_WALL;
+        platform_play_sound(SOUND_LOSE);
         return;
     }
 
@@ -208,6 +213,7 @@ static void move()
     {
     	game_mode = MODE_GAME_OVER;
         current_loss_type = LOSS_TYPE_SELF;
+        platform_play_sound(SOUND_LOSE);
         return;
     }
     else

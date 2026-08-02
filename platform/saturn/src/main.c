@@ -50,6 +50,7 @@ static int border_top_sprite_id;
 static int border_left_sprite_id;
 static int border_corner_sprite_id;
 static short pickup_sound_id;
+static short lose_sound_id;
 
 // Saturn implementation of platform initialization
 void platform_initialize()
@@ -62,6 +63,7 @@ void platform_initialize()
     border_left_sprite_id = jo_sprite_add_tga("TEX", "BORDERL.TGA", JO_COLOR_Transparent);
     border_corner_sprite_id = jo_sprite_add_tga("TEX", "BORDERC.TGA", JO_COLOR_Transparent);
     pickup_sound_id = load_8bit_pcm((Sint8 *)"PICKUP.PCM", 15360); // using ponetone due to issues with jo engine audio
+    lose_sound_id = load_8bit_pcm((Sint8 *)"LOSE.PCM", 15360);
 }
 
 // plays the requested sound effect
@@ -70,6 +72,10 @@ void platform_play_sound(sound_type current_sound_type)
     if (current_sound_type == SOUND_PICKUP)
     {
         pcm_play(pickup_sound_id, PCM_PROTECTED, 6);
+    }
+    else if (current_sound_type == SOUND_LOSE)
+    {
+        pcm_play(lose_sound_id, PCM_PROTECTED, 6);
     }
 }
 
