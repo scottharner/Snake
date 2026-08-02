@@ -3,6 +3,7 @@ Added Sega Saturn platform support (Snake SS).
 Added title screen.
 Added game over screen.
 Added game win screen.
+Added sound effects.
 
 #####################################################
 

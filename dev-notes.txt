@@ -76,7 +76,7 @@ todo
 	- add pause functionality
 	- track a high score
 	- port to a third platform (pc engine? megadrive?)
-	- add sound effects (credit notes, windows support)
+	- add sound effects (credit notes - potone/ponut, freesfx)
 	- add music
 	- create release
 	- post console releases somewhere

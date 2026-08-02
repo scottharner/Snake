@@ -20,6 +20,12 @@ volatile int resting, rested;
 
 BITMAP *buffer;//This will be our temporary bitmap for double buffering 
 
+static bool did_sound_install = false;
+static SAMPLE *pickup_sample;
+static bool did_pickup_load = false;
+static SAMPLE *lose_sample;
+static bool did_lose_load = false;
+
 //calculate framerate every second
 static void timer1(void)
 {
@@ -38,8 +44,17 @@ void platform_initialize()
     set_color_depth(16); //graphics
     set_gfx_mode( GFX_GDI, MAX_MAP_WIDTH * MAX_TILE_SIZE, MAX_MAP_HEIGHT * MAX_TILE_SIZE, 0, 0);
     buffer = create_bitmap( MAX_MAP_WIDTH * MAX_TILE_SIZE, MAX_MAP_HEIGHT * MAX_TILE_SIZE);
-
     install_timer();
+    int sound_load_result = install_sound(DIGI_AUTODETECT, MIDI_NONE, NULL);
+    if (sound_load_result == 0)
+    {
+        did_sound_install = true;
+        pickup_sample = load_sample("../assets/sfx/pickup.wav");
+        lose_sample = load_sample("../assets/sfx/lose.wav");
+        did_pickup_load = (bool)pickup_sample;
+        did_lose_load = (bool)lose_sample;
+    }
+
 
     //lock interrupt variables
 
@@ -56,8 +71,17 @@ void platform_initialize()
 // plays the requested sound effect
 void platform_play_sound(sound_type current_sound_type)
 {
-    (void)current_sound_type;
-    // todo - implement sound playback for windows
+    if (did_sound_install)
+    {
+        if (current_sound_type == SOUND_PICKUP && did_pickup_load)
+        {
+            play_sample(pickup_sample, 255, 128, 1000, 0);
+        }
+        else if (current_sound_type == SOUND_LOSE && did_lose_load)
+        {
+            play_sample(lose_sample, 255, 128, 1000, 0);
+        }
+    }
 }
 
 // display a game over screen
@@ -135,7 +159,8 @@ void platform_memory_free(void *pointer)
 // steps to prepare to exit the game
 void platform_shutdown()
 {
-
+    if (did_pickup_load) destroy_sample(pickup_sample);
+    if (did_pickup_load) destroy_sample(lose_sample);
 }
 
 // check if the game is still running
