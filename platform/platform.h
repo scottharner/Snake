@@ -1,7 +1,7 @@
 #ifndef PLATFORM_H
 #define PLATFORM_H
 
-#include <stdbool.h>
+#include "../common/types.h"
 #include "../game/game.h"
 
 void platform_initialize();

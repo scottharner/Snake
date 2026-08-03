@@ -62,3 +62,8 @@ game.raw
 /platform/saturn/build/cd/tex/
 /platform/saturn/build/cd/*.PCM
 /platform/saturn/build/cd/*.bin
+
+# sgdk out files
+/platform/genesis/out/*.*
+/platform/genesis/out/src/
+!platform/genesis/out/run_with_mednafen.bat
