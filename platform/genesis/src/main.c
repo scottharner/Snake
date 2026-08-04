@@ -22,10 +22,12 @@
 // static int border_corner_sprite_id;
 // static short pickup_sound_id;
 // static short lose_sound_id;
+static int frame_counter;
 
 // Saturn implementation of platform initialization
 void platform_initialize()
 {
+    JOY_init();
     // jo_core_init(JO_COLOR_Black);
     // load_drv(ADX_MASTER_2304);
     // snake_sprite_id = jo_sprite_add_tga("TEX", "SNAKE.TGA", JO_COLOR_Transparent);
@@ -155,48 +157,50 @@ void platform_shutdown()
 }
 
 // track all current and previous input states so we can check on input presses
-// static void update_input_states(bool current_input_states[INPUT_TYPE_COUNT])
-// {
-//     game_save_previous_inputstates();
+static void update_input_states(bool current_input_states[INPUT_TYPE_COUNT], u16 joy_read_value)
+{
+    game_save_previous_inputstates();
 
-//     // read current state
-//     current_input_states[INPUT_TYPE_UP] = jo_is_pad1_key_pressed(JO_KEY_UP);
-//     current_input_states[INPUT_TYPE_DOWN] = jo_is_pad1_key_pressed(JO_KEY_DOWN);
-//     current_input_states[INPUT_TYPE_LEFT] = jo_is_pad1_key_pressed(JO_KEY_LEFT);
-//     current_input_states[INPUT_TYPE_RIGHT] = jo_is_pad1_key_pressed(JO_KEY_RIGHT);
-//     current_input_states[INPUT_TYPE_START] = jo_is_pad1_key_pressed(JO_KEY_START);    
-// }
+    // read current state
+    current_input_states[INPUT_TYPE_UP] = (joy_read_value & BUTTON_UP);
+    current_input_states[INPUT_TYPE_DOWN] = (joy_read_value & BUTTON_DOWN);
+    current_input_states[INPUT_TYPE_LEFT] = (joy_read_value & BUTTON_LEFT);
+    current_input_states[INPUT_TYPE_RIGHT] = (joy_read_value & BUTTON_RIGHT);
+    current_input_states[INPUT_TYPE_START] = (joy_read_value & BUTTON_START);
+}
 
 // retrieve the input type from the user
 input_type platform_get_input_type(mode game_mode, bool current_input_states[INPUT_TYPE_COUNT])
 {
     input_type current_input = INPUT_TYPE_NOTHING;
-    // if (jo_is_pad1_available())
-    // {
-    //     switch(game_mode)
-    //     {
-    //         case MODE_TITLE:
-    //             update_input_states(current_input_states);
-    //             if (game_input_pressed(INPUT_TYPE_START)) current_input = INPUT_TYPE_START;    
-    //             else if (game_input_pressed(INPUT_TYPE_DOWN)) current_input = INPUT_TYPE_DOWN;
-    //             else if (game_input_pressed(INPUT_TYPE_UP)) current_input = INPUT_TYPE_UP;
+    u8 joy_type = JOY_getJoypadType(JOY_1);
+    if (joy_type == JOY_TYPE_PAD3 || joy_type == JOY_TYPE_PAD6)
+    {
+        u16 joy_read_value = JOY_readJoypad(JOY_1);
+        switch(game_mode)
+        {
+            case MODE_TITLE:
+                update_input_states(current_input_states, joy_read_value);
+                if (game_input_pressed(INPUT_TYPE_START)) current_input = INPUT_TYPE_START;    
+                else if (game_input_pressed(INPUT_TYPE_DOWN)) current_input = INPUT_TYPE_DOWN;
+                else if (game_input_pressed(INPUT_TYPE_UP)) current_input = INPUT_TYPE_UP;
 
-    //             break;
+                break;
 
-    //         default:
-    //             if (jo_is_pad1_key_pressed(JO_KEY_LEFT)) current_input = INPUT_TYPE_LEFT;
-    //             else if (jo_is_pad1_key_pressed(JO_KEY_RIGHT)) current_input = INPUT_TYPE_RIGHT;
-    //             else if (jo_is_pad1_key_pressed(JO_KEY_DOWN)) current_input = INPUT_TYPE_DOWN;
-    //             else if (jo_is_pad1_key_pressed(JO_KEY_UP)) current_input = INPUT_TYPE_UP;
-    //             else if (jo_is_pad1_key_pressed(JO_KEY_START)) current_input = INPUT_TYPE_START;
+            default:
+                if (joy_read_value & BUTTON_LEFT) current_input = INPUT_TYPE_LEFT;
+                else if (joy_read_value & BUTTON_RIGHT) current_input = INPUT_TYPE_RIGHT;
+                else if (joy_read_value & BUTTON_DOWN) current_input = INPUT_TYPE_DOWN;
+                else if (joy_read_value & BUTTON_UP) current_input = INPUT_TYPE_UP;
+                else if (joy_read_value & BUTTON_START) current_input = INPUT_TYPE_START;
 
-    //             break;
-    //     }
-    // }
-    // else
-    // {
-    //     game_reset_input_states();
-    // }
+                break;
+        }
+    }
+    else
+    {
+        game_reset_input_states();
+    }
 
     return current_input;
 }
@@ -317,6 +321,14 @@ int main(bool hardReset)
     
     while(TRUE)
     {
+        frame_counter++;
+        if (frame_counter >= 60)
+        {
+            // check on gamepad availability about once per second to see if it changed
+            frame_counter = 0;
+            JOY_reset();
+        }
+
         game_update();
         //wait_for_next_frame();
 
