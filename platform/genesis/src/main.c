@@ -11,9 +11,9 @@
 // #define BORDER_ZINDEX 500
 // #define JO_GRID_WIDTH (JO_TV_WIDTH / 8)
 // #define JO_GRID_HEIGHT (JO_TV_HEIGHT / 8)
-// #define MAP_HEIGHT 30
-// #define MAP_WIDTH 40
-// #define TILE_SIZE 8
+#define MAP_HEIGHT 28
+#define MAP_WIDTH 40
+#define MAP_TILE_SIZE 8
 
 // static int snake_sprite_id;
 // static int apple_sprite_id;
@@ -50,6 +50,14 @@ void platform_play_sound(sound_type current_sound_type)
     // }
 }
 
+static void clear_screen()
+{
+    PAL_fadeOutAll(20, FALSE);
+    VDP_init();
+    SPR_init();
+    // PAL_fadeInAll(game_palette, 20, FALSE);
+}
+
 // display a game over screen
 void platform_draw_game_over_screen(int score, bool did_mode_change, loss_type current_loss_type)
 {
@@ -72,24 +80,47 @@ void platform_draw_win_screen(int score, bool did_mode_change)
 }
 
 // calculate the color to display for a menu option
-// static int get_option_color(speed selected_speed, speed option_speed)
-// {
-//     int selected_color = JO_COLOR_INDEX_Yellow;
-//     int default_color = JO_COLOR_INDEX_White;
-//     return selected_speed == option_speed ? selected_color : default_color;
-// }
+static int get_option_color(speed selected_speed, speed option_speed)
+{
+    int selected_color = RGB24_TO_VDPCOLOR(0xFFFF00);
+    int default_color = RGB24_TO_VDPCOLOR(0xFFFFFF);
+    return selected_speed == option_speed ? selected_color : default_color;
+}
 
 // display a title screen
 void platform_draw_title_screen(speed game_speed, bool did_mode_change)
 {
-    // if (did_mode_change)
-    //     jo_clear_screen();
+    if (did_mode_change)
+        clear_screen();
 
-    // jo_printf_with_color(0, 1, JO_COLOR_INDEX_White, "SNAKE");
+    int white_color = RGB24_TO_VDPCOLOR(0xFFFFFF);
+    PAL_setColor(15, white_color); // setup white text
+    int yellow_color = RGB24_TO_VDPCOLOR(0xFFFF00);
+    PAL_setColor(31, yellow_color); // setup yellow text
+    
+    VDP_setTextPalette(PAL0);
+    VDP_drawText("SNAKE", 0, 1);
 
-    // jo_printf_with_color(0, 5, get_option_color(game_speed, SPEED_SLOW), "Slow");
-    // jo_printf_with_color(0, 7, get_option_color(game_speed, SPEED_MEDIUM), "Medium");
-    // jo_printf_with_color(0, 9, get_option_color(game_speed, SPEED_FAST), "Fast");
+    if (get_option_color(game_speed, SPEED_SLOW) == white_color)
+        VDP_setTextPalette(PAL0);
+    else
+        VDP_setTextPalette(PAL1);
+
+    VDP_drawText("Slow", 0, 5);
+
+    if (get_option_color(game_speed, SPEED_MEDIUM) == white_color)
+        VDP_setTextPalette(PAL0);
+    else
+        VDP_setTextPalette(PAL1);
+
+    VDP_drawText("Medium", 0, 7);
+
+    if (get_option_color(game_speed, SPEED_FAST) == white_color)
+        VDP_setTextPalette(PAL0);
+    else
+        VDP_setTextPalette(PAL1);
+
+    VDP_drawText("Fast", 0, 9);
 }
 
 // platform specific setting of random generator seed
@@ -109,7 +140,6 @@ int platform_get_random(int max)
 void * platform_memory_allocate(unsigned int size)
 {
     return malloc(size);
-    // return jo_malloc(size);
 }
 
 // platform specific memory free
@@ -283,17 +313,18 @@ void platform_draw_game_screen(int *object_map, int score, bool did_mode_change,
 
 int main(bool hardReset)
 {
-    VDP_drawText("Hello world !", 12, 12);
-
+    game_initialize(MAP_HEIGHT, MAP_WIDTH, MAP_TILE_SIZE);
+    
     while(TRUE)
     {
-        // nothing to do here
-        // ...
+        game_update();
+        //wait_for_next_frame();
 
         // always call this method at the end of the frame
         SYS_doVBlankProcess();
     }
 
+    game_shutdown();
     return 0;
 }
 

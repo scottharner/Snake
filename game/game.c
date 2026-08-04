@@ -1,4 +1,4 @@
-#include <stdbool.h>
+#include "types.h"
 #include "game.h"
 #include "../platform/platform.h"
 
