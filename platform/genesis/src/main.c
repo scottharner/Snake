@@ -81,22 +81,41 @@ static void clear_screen()
 // display a game over screen
 void platform_draw_game_over_screen(int score, bool did_mode_change, loss_type current_loss_type)
 {
-    // if (did_mode_change)
-    //     jo_clear_screen();
+    if (did_mode_change)
+        clear_screen();
 
-    // jo_printf_with_color(5, 5, JO_COLOR_INDEX_White, "Game Over");
-    // jo_printf_with_color(5, 7, JO_COLOR_INDEX_White, "Score: %d", score);
-    // jo_printf_with_color(5, 9, JO_COLOR_INDEX_White, "Reason: %s", current_loss_type == LOSS_TYPE_SELF ? "Self Collision" : "Wall Collision");
+    VDP_setTextPalette(PAL0);
+    VDP_drawText("Game Over", 5, 5);
+
+    char format_string[32];
+    char score_string[8];
+    intToStr(score, score_string, 6);
+    strcpy(format_string, "Score: ");
+    strcat(format_string, score_string);
+    VDP_drawText(format_string, 5, 7);
+
+    char reason_string[15];
+    strcpy(reason_string, current_loss_type == LOSS_TYPE_SELF ? "Self Collision" : "Wall Collision");
+    strcpy(format_string, "Reason: ");
+    strcat(format_string, reason_string);
+    VDP_drawText(format_string, 5, 9);
 }
 
 // display a win screen
 void platform_draw_win_screen(int score, bool did_mode_change)
 {
-    // if (did_mode_change)
-    //     jo_clear_screen();
+    if (did_mode_change)
+        clear_screen();
 
-    // jo_printf_with_color(5, 5, JO_COLOR_INDEX_White, "You Win!");
-    // jo_printf_with_color(5, 7, JO_COLOR_INDEX_White, "Score: %d", score);
+    VDP_setTextPalette(PAL0);
+    VDP_drawText("You Win!", 5, 5);
+
+    char format_string[32];
+    char score_string[8];
+    intToStr(score, score_string, 6);
+    strcpy(format_string, "Score: ");
+    strcat(format_string, score_string);
+    VDP_drawText(format_string, 5, 7);
 }
 
 // calculate the color to display for a menu option
