@@ -57,6 +57,15 @@ genesis
 - build is different
 	- we do "make" and "make clean" from the genesis folder due to the specific requirements of sgdk
 	- we run "run_with_mednafen.bat" from genesis/out (folder names are in required sgdk format)
+- we have to be concerned with palettes
+	- we have four palettes of 16 colors each (pal0, pal1, pal2, pal3)
+	- the last color of each palette is used for text display
+	- have to make sure we select the right palette when displaying text or an image
+	- mtpaint is useful for setting up your image palette
+		- you can save the palette in there and load it for other images
+		- have to set your images to 16 color (4 bit) indexed mode
+	- the first color in a palette is transparent
+	- vdp_init wipes all of the palettes so only do that at the very beginning
 
 general
 -------
