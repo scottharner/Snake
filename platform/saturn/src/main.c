@@ -205,12 +205,6 @@ void platform_update_platform_state()
 
 void draw_tile(int x, int y, int width, int height, int sprite_id, int z, int angle)
 {
-    // jo engine uses a center origin coordinate system so we have to recalculate from the provided upper left coords
-    int jo_x = x - JO_TV_WIDTH_2;
-    int jo_y = y - JO_TV_HEIGHT_2;
-    jo_x += (width/2);
-    jo_y += (height/2);
-
     if (angle == 0)
         jo_sprite_draw3D2(sprite_id, x, y, z);
     else

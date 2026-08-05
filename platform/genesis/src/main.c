@@ -1,4 +1,5 @@
 #include "genesis.h"
+#include "resources.h"
 #include "../../platform.h"
 
 /*
@@ -23,11 +24,18 @@
 // static short pickup_sound_id;
 // static short lose_sound_id;
 static int frame_counter;
+static u16 tile_index = TILE_USER_INDEX;
+static int old_score = -1;
 
 // Saturn implementation of platform initialization
 void platform_initialize()
 {
+    VDP_init();
     JOY_init();
+    SPR_init();
+    tile_index += apple.tileset->numTile;
+    tile_index += snake.tileset->numTile;
+    PAL_setPalette(PAL1, apple.palette->data, DMA); // setup foreground palette including a final index for yellow text
     // jo_core_init(JO_COLOR_Black);
     // load_drv(ADX_MASTER_2304);
     // snake_sprite_id = jo_sprite_add_tga("TEX", "SNAKE.TGA", JO_COLOR_Transparent);
@@ -54,10 +62,7 @@ void platform_play_sound(sound_type current_sound_type)
 
 static void clear_screen()
 {
-    PAL_fadeOutAll(20, FALSE);
-    VDP_init();
-    SPR_init();
-    // PAL_fadeInAll(game_palette, 20, FALSE);
+    VDP_clearPlane(BG_A, TRUE);
 }
 
 // display a game over screen
@@ -96,9 +101,6 @@ void platform_draw_title_screen(speed game_speed, bool did_mode_change)
         clear_screen();
 
     int white_color = RGB24_TO_VDPCOLOR(0xFFFFFF);
-    PAL_setColor(15, white_color); // setup white text
-    int yellow_color = RGB24_TO_VDPCOLOR(0xFFFF00);
-    PAL_setColor(31, yellow_color); // setup yellow text
     
     VDP_setTextPalette(PAL0);
     VDP_drawText("SNAKE", 0, 1);
@@ -128,26 +130,25 @@ void platform_draw_title_screen(speed game_speed, bool did_mode_change)
 // platform specific setting of random generator seed
 void platform_set_random_seed(unsigned int seed)
 {
-    // jo_random_seed = seed;
+    setRandomSeed(seed);
 }
 
 // platform specific random number generation
 int platform_get_random(int max)
 {
-    return max;
-    // return jo_random(max);
+    return random() % max;
 }
 
 // platform specific memory allocation
 void * platform_memory_allocate(unsigned int size)
 {
-    return malloc(size);
+    return MEM_alloc(size);
 }
 
 // platform specific memory free
 void platform_memory_free(void *pointer)
 {
-    // jo_free(pointer);
+    MEM_free(pointer);
 }
 
 // steps to prepare to exit the game
@@ -210,24 +211,10 @@ void platform_update_platform_state()
     // we dont have any updates to make on this platform
 }
 
-// void draw_tile(int x, int y, int width, int height, int sprite_id, int z, int angle)
-// {
-//     // jo engine uses a center origin coordinate system so we have to recalculate from the provided upper left coords
-//     int jo_x = x - JO_TV_WIDTH_2;
-//     int jo_y = y - JO_TV_HEIGHT_2;
-//     jo_x += (width/2);
-//     jo_y += (height/2);
-
-//     if (angle == 0)
-//         jo_sprite_draw3D2(sprite_id, x, y, z);
-//     else
-//         jo_sprite_draw3D_and_rotate2(sprite_id, x, y, z, angle);
-
-// #if JO_DEBUG
-//     jo_printf_with_color(0, 0, JO_COLOR_INDEX_White, "tile x: %d", x);
-//     jo_printf_with_color(0, 1, JO_COLOR_INDEX_White, "tile y: %d", y);
-// #endif
-// }
+void draw_tile(int x, int y, int width, int height, Image sprite, bool high_priority)
+{
+    VDP_drawImageEx(BG_A, &sprite, TILE_ATTR_FULL(PAL1, high_priority, FALSE, FALSE, tile_index), x, y, FALSE, TRUE);
+}
 
 // static void draw_border(game_config *config)
 // {
@@ -280,37 +267,50 @@ void platform_update_platform_state()
 
 void platform_draw_game_screen(int *object_map, int score, bool did_mode_change, game_config *config)
 {
-    // if (did_mode_change)
-    //     jo_clear_screen();
+    if (did_mode_change)
+    {
+        VDP_setTextPalette(PAL0);
+        clear_screen();
+    }
 
-    // int i,j;
-    // //O(N^2) runtime for this, 24^2 is pretty big.. so we may change this
-    // //but for now, we draw every tile every frame!
-    // for (i = 0; i < config->map_height; i++)
-    // {
-    //     for (j = 0; j < config->map_width; j++)
-    //     {
-    //         int sprite_id;
-    //         int tile_index = i * config->map_width + j;
-    //         if (object_map[tile_index] == OBJECT_APPLE)
-    //         {
-    //             sprite_id = apple_sprite_id;
-    //         }
-    //         else if (object_map[tile_index] == OBJECT_SNAKE)
-    //         {
-    //             sprite_id = snake_sprite_id;
-    //         }
-    //         else
-    //         {
-    //             continue;
-    //         }
+    int i,j;
+    //O(N^2) runtime for this, 24^2 is pretty big.. so we may change this
+    //but for now, we draw every tile every frame!
+    for (i = 0; i < config->map_height; i++)
+    {
+        for (j = 0; j < config->map_width; j++)
+        {
+            Image sprite;
+            int map_index = i * config->map_width + j;
+            if (object_map[map_index] == OBJECT_APPLE)
+            {
+                sprite = apple;
+            }
+            else if (object_map[map_index] == OBJECT_SNAKE)
+            {
+                sprite = snake;
+            }
+            else
+            {
+                continue;
+            }
 
-    //         draw_tile(config->tile_size*j, config->tile_size*i, config->tile_size, config->tile_size, sprite_id, OBJECT_ZINDEX, 0);
-    //     }
-    // }
+            draw_tile(j, i, config->tile_size, config->tile_size, sprite, TRUE);
+        }
+    }
 
-    // //draw the score
-    // jo_printf_with_color(JO_GRID_WIDTH-10, 1, JO_COLOR_INDEX_White, "Score: %d", score);
+    //draw the score
+    if (score != old_score)
+    {
+        char hud_string[32];
+        char score_string[8];
+        intToStr(score, score_string, 6);
+        strcpy(hud_string, "Score: ");
+        strcat(hud_string, score_string);
+        VDP_clearTextArea(MAP_WIDTH-14, 1, 12, 1);
+        VDP_drawText(hud_string, MAP_WIDTH-14, 1);
+        old_score = score;
+    }
 
     // draw_border(config);
 }
