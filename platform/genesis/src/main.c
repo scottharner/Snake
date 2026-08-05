@@ -26,6 +26,10 @@
 static int frame_counter;
 static u16 tile_index = TILE_USER_INDEX;
 static int old_score = -1;
+static int *previous_object_map;//second copy of object make to track previous vs current values
+static u16 APPLE_TILE_INDEX;
+static u16 SNAKE_TILE_INDEX;
+
 
 // Saturn implementation of platform initialization
 void platform_initialize()
@@ -33,9 +37,18 @@ void platform_initialize()
     VDP_init();
     JOY_init();
     SPR_init();
+    
+    VDP_loadTileSet(apple.tileset, tile_index, DMA);
+    APPLE_TILE_INDEX = tile_index;
     tile_index += apple.tileset->numTile;
+
+    VDP_loadTileSet(snake.tileset, tile_index, DMA);
+    SNAKE_TILE_INDEX = tile_index;
     tile_index += snake.tileset->numTile;
+    
     PAL_setPalette(PAL1, apple.palette->data, DMA); // setup foreground palette including a final index for yellow text
+    previous_object_map = platform_memory_allocate(MAP_HEIGHT * MAP_WIDTH * sizeof(int));
+
     // jo_core_init(JO_COLOR_Black);
     // load_drv(ADX_MASTER_2304);
     // snake_sprite_id = jo_sprite_add_tga("TEX", "SNAKE.TGA", JO_COLOR_Transparent);
@@ -154,7 +167,24 @@ void platform_memory_free(void *pointer)
 // steps to prepare to exit the game
 void platform_shutdown()
 {
-    // we dont have any shutdown steps to perform on this platform
+    if (previous_object_map != NULL)
+    {
+        platform_memory_free(previous_object_map);
+        previous_object_map = NULL;
+    }
+}
+
+// perform platform specific actions when the game resets
+void platform_reset(game_config *config)
+{
+    int i, j; //this is so we don't get errors because the object map references nothing.
+    for (i = 0; i < config->map_height; i++)
+    {
+        for (j = 0; j < config->map_width; j++)
+        {
+            previous_object_map[i * config->map_width + j] = OBJECT_NOTHING;
+        }
+    }
 }
 
 // track all current and previous input states so we can check on input presses
@@ -211,9 +241,14 @@ void platform_update_platform_state()
     // we dont have any updates to make on this platform
 }
 
-void draw_tile(int x, int y, int width, int height, Image sprite, bool high_priority)
+void draw_tile(int x, int y, u16 current_tile_index)
 {
-    VDP_drawImageEx(BG_A, &sprite, TILE_ATTR_FULL(PAL1, high_priority, FALSE, FALSE, tile_index), x, y, FALSE, TRUE);
+    VDP_setTileMapXY(BG_A, TILE_ATTR_FULL(PAL1, FALSE, FALSE, FALSE, current_tile_index), x, y);
+}
+
+void clear_tile(int x, int y)
+{
+    VDP_setTileMapXY(BG_A, 0, x, y);
 }
 
 // static void draw_border(game_config *config)
@@ -280,22 +315,23 @@ void platform_draw_game_screen(int *object_map, int score, bool did_mode_change,
     {
         for (j = 0; j < config->map_width; j++)
         {
-            Image sprite;
             int map_index = i * config->map_width + j;
-            if (object_map[map_index] == OBJECT_APPLE)
+            if (object_map[map_index] != previous_object_map[map_index])
             {
-                sprite = apple;
+                previous_object_map[map_index] = object_map[map_index];
+                if (object_map[map_index] == OBJECT_APPLE)
+                {
+                    draw_tile(j, i, APPLE_TILE_INDEX);
+                }
+                else if (object_map[map_index] == OBJECT_SNAKE)
+                {
+                    draw_tile(j, i, SNAKE_TILE_INDEX);
+                }
+                else
+                {
+                    clear_tile(j, i);
+                }
             }
-            else if (object_map[map_index] == OBJECT_SNAKE)
-            {
-                sprite = snake;
-            }
-            else
-            {
-                continue;
-            }
-
-            draw_tile(j, i, config->tile_size, config->tile_size, sprite, TRUE);
         }
     }
 

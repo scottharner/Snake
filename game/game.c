@@ -343,6 +343,8 @@ static void free_snake()
 
 void game_reset()
 {
+    platform_reset(config);
+
     game_mode = MODE_TITLE;
     score = 0;
     action_cycles = 0;

@@ -216,6 +216,12 @@ void draw_tile(int x, int y, int width, int height, int sprite_id, int z, int an
 #endif
 }
 
+// perform platform specific actions when the game resets
+void platform_reset(game_config *config)
+{
+    // no actions to perform on this platform
+}
+
 static void draw_border(game_config *config)
 {
     for (int i = 1; i < config->map_width-1; i++)
