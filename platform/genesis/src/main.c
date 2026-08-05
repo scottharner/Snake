@@ -332,9 +332,10 @@ void platform_draw_game_screen(int *object_map, int score, bool did_mode_change,
     //but for now, we draw every tile every frame!
     for (i = 0; i < config->map_height; i++)
     {
+        int row = i * config->map_width;
         for (j = 0; j < config->map_width; j++)
         {
-            int map_index = i * config->map_width + j;
+            int map_index = row + j;
             if (object_map[map_index] != previous_object_map[map_index])
             {
                 previous_object_map[map_index] = object_map[map_index];
