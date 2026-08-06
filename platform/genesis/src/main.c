@@ -49,6 +49,8 @@ void platform_initialize()
     PAL_setPalette(PAL1, apple.palette->data, DMA); // setup foreground palette including a final index for yellow text
     previous_object_map = platform_memory_allocate(MAP_HEIGHT * MAP_WIDTH * sizeof(int));
 
+    VDP_setTextPlane(BG_B); // draw text behind tiles
+
     // jo_core_init(JO_COLOR_Black);
     // load_drv(ADX_MASTER_2304);
     // snake_sprite_id = jo_sprite_add_tga("TEX", "SNAKE.TGA", JO_COLOR_Transparent);
@@ -76,6 +78,7 @@ void platform_play_sound(sound_type current_sound_type)
 static void clear_screen()
 {
     VDP_clearPlane(BG_A, TRUE);
+    VDP_clearPlane(BG_B, TRUE);
 }
 
 // display a game over screen
