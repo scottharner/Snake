@@ -3,3 +3,5 @@ IMAGE snake "Tiles/snake.png" BEST ALL
 IMAGE bordert "Tiles/bordert.png" BEST ALL
 IMAGE borderl "Tiles/borderl.png" BEST ALL
 IMAGE borderc "Tiles/borderc.png" BEST ALL
+WAV sfx_lose "Sfx/lose.wav" XGM
+WAV sfx_pickup "Sfx/pickup.wav" XGM

@@ -11,6 +11,8 @@
 #define MAP_HEIGHT 28
 #define MAP_WIDTH 40
 #define MAP_TILE_SIZE 8
+#define SFX_LOSE 64
+#define SFX_PICKUP 65
 
 static int frame_counter;
 static u16 tile_index = TILE_USER_INDEX;
@@ -54,19 +56,22 @@ void platform_initialize()
     previous_object_map = platform_memory_allocate(MAP_HEIGHT * MAP_WIDTH * sizeof(int));
 
     VDP_setTextPlane(BG_B); // draw text behind tiles
+
+    XGM_setPCM(SFX_LOSE, sfx_lose, sizeof(sfx_lose));
+    XGM_setPCM(SFX_PICKUP, sfx_pickup, sizeof(sfx_pickup));
 }
 
 // plays the requested sound effect
 void platform_play_sound(sound_type current_sound_type)
 {
-    // if (current_sound_type == SOUND_PICKUP)
-    // {
-    //     pcm_play(pickup_sound_id, PCM_PROTECTED, 6);
-    // }
-    // else if (current_sound_type == SOUND_LOSE)
-    // {
-    //     pcm_play(lose_sound_id, PCM_PROTECTED, 6);
-    // }
+    if (current_sound_type == SOUND_PICKUP)
+    {
+        XGM_startPlayPCM(SFX_PICKUP,1,SOUND_PCM_CH2);
+    }
+    else if (current_sound_type == SOUND_LOSE)
+    {
+        XGM_startPlayPCM(SFX_LOSE,1,SOUND_PCM_CH2);
+    }
 }
 
 static void clear_screen()
