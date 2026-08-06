@@ -104,3 +104,4 @@ todo
 - genesis
 	- single number score
 	- missing apple bug (only saw once!)
+	- play sounds

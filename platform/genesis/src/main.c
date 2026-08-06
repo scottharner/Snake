@@ -18,6 +18,9 @@ static int old_score = -1;
 static int *previous_object_map;//second copy of object make to track previous vs current values
 static u16 APPLE_TILE_INDEX;
 static u16 SNAKE_TILE_INDEX;
+static u16 BORDERC_TILE_INDEX;
+static u16 BORDERL_TILE_INDEX;
+static u16 BORDERT_TILE_INDEX;
 
 
 // Genesis implementation of platform initialization
@@ -34,6 +37,18 @@ void platform_initialize()
     VDP_loadTileSet(snake.tileset, tile_index, DMA);
     SNAKE_TILE_INDEX = tile_index;
     tile_index += snake.tileset->numTile;
+    
+    VDP_loadTileSet(borderc.tileset, tile_index, DMA);
+    BORDERC_TILE_INDEX = tile_index;
+    tile_index += borderc.tileset->numTile;
+    
+    VDP_loadTileSet(borderl.tileset, tile_index, DMA);
+    BORDERL_TILE_INDEX = tile_index;
+    tile_index += borderl.tileset->numTile;
+    
+    VDP_loadTileSet(bordert.tileset, tile_index, DMA);
+    BORDERT_TILE_INDEX = tile_index;
+    tile_index += bordert.tileset->numTile;
     
     PAL_setPalette(PAL1, apple.palette->data, DMA); // setup foreground palette including a final index for yellow text
     previous_object_map = platform_memory_allocate(MAP_HEIGHT * MAP_WIDTH * sizeof(int));
@@ -242,64 +257,54 @@ void platform_update_platform_state()
     // we dont have any updates to make on this platform
 }
 
-void draw_tile(int x, int y, u16 current_tile_index)
+void draw_tile(int x, int y, u16 current_tile_index, VDPPlane plane, bool flip_vertical, bool flip_horizontal)
 {
-    VDP_setTileMapXY(BG_A, TILE_ATTR_FULL(PAL1, FALSE, FALSE, FALSE, current_tile_index), x, y);
+    VDP_setTileMapXY(plane, TILE_ATTR_FULL(PAL1, FALSE, flip_vertical, flip_horizontal, current_tile_index), x, y);
 }
 
-void clear_tile(int x, int y)
+void clear_tile(int x, int y, VDPPlane plane)
 {
-    VDP_setTileMapXY(BG_A, 0, x, y);
+    VDP_setTileMapXY(plane, 0, x, y);
 }
 
-// static void draw_border(game_config *config)
-// {
-//     for (int i = 1; i < config->map_width-1; i++)
-//     {
-//         // top
-//         draw_tile(i * config->tile_size, 0, config->tile_size, config->tile_size, border_top_sprite_id, BORDER_ZINDEX, 0);
-//     }
+static void draw_border(game_config *config)
+{
+    for (int i = 1; i < config->map_width-1; i++)
+    {
+        // top
+        draw_tile(i, 0, BORDERT_TILE_INDEX, BG_B, false, false);
+    }
 
-//     jo_sprite_enable_vertical_flip();
-//     for (int i = 1; i < config->map_width-1; i++)
-//     {
-//         // bottom
-//         draw_tile(i * config->tile_size, (MAP_HEIGHT*config->tile_size)-config->tile_size-1, config->tile_size, config->tile_size, border_top_sprite_id, BORDER_ZINDEX, 0);
-//     }
-//     jo_sprite_disable_vertical_flip();
+    for (int i = 1; i < config->map_width-1; i++)
+    {
+        // bottom
+        draw_tile(i, config->map_height-1, BORDERT_TILE_INDEX, BG_B, true, false);
+    }
 
-//     for (int i = 1; i < config->map_height-1; i++)
-//     {
-//         // left
-//         draw_tile(0, i * config->tile_size, config->tile_size, config->tile_size, border_left_sprite_id, BORDER_ZINDEX, 0);
-//     }
+    for (int i = 1; i < config->map_height-1; i++)
+    {
+        // left
+        draw_tile(0, i, BORDERL_TILE_INDEX, BG_B, false, false);
+    }
 
-//     jo_sprite_enable_horizontal_flip();
-//     for (int i = 1; i < config->map_height-1; i++)
-//     {
-//         // right
-//         draw_tile((MAP_WIDTH*config->tile_size)-config->tile_size-1, i * config->tile_size, config->tile_size, config->tile_size, border_left_sprite_id, BORDER_ZINDEX, 0);
-//     }
-//     jo_sprite_disable_horizontal_flip();
+    for (int i = 1; i < config->map_height-1; i++)
+    {
+        // right
+        draw_tile(config->map_width-1, i, BORDERL_TILE_INDEX, BG_B, false, true);
+    }
 
-//     // upper left
-//     draw_tile(0, 0, config->tile_size, config->tile_size, border_corner_sprite_id, BORDER_ZINDEX, 0);
+    // upper left
+    draw_tile(0, 0, BORDERC_TILE_INDEX, BG_B, false, false);
     
-//     // upper right
-//     jo_sprite_enable_horizontal_flip();
-//     draw_tile((MAP_WIDTH*config->tile_size)-config->tile_size-1, 0, config->tile_size, config->tile_size, border_corner_sprite_id, BORDER_ZINDEX, 0);
-//     jo_sprite_disable_horizontal_flip();
+    // upper right
+    draw_tile(config->map_width-1, 0, BORDERC_TILE_INDEX, BG_B, false, true);
 
-//     // lower left
-//     jo_sprite_enable_vertical_flip();
-//     draw_tile(0, (MAP_HEIGHT*config->tile_size)-config->tile_size-1, config->tile_size, config->tile_size, border_corner_sprite_id, BORDER_ZINDEX, 0);
+    // lower left
+    draw_tile(0, config->map_height-1, BORDERC_TILE_INDEX, BG_B, true, false);
 
-//     // lower right
-//     jo_sprite_enable_horizontal_flip();
-//     draw_tile((MAP_WIDTH*config->tile_size)-config->tile_size-1, (MAP_HEIGHT*config->tile_size)-config->tile_size-1, config->tile_size, config->tile_size, border_corner_sprite_id, BORDER_ZINDEX, 0);
-//     jo_sprite_disable_horizontal_flip();
-//     jo_sprite_disable_vertical_flip();
-// }
+    // lower right
+    draw_tile(config->map_width-1, config->map_height-1, BORDERC_TILE_INDEX, BG_B, true, true);
+}
 
 void platform_draw_game_screen(int *object_map, int score, bool did_mode_change, game_config *config)
 {
@@ -307,6 +312,7 @@ void platform_draw_game_screen(int *object_map, int score, bool did_mode_change,
     {
         VDP_setTextPalette(PAL0);
         clear_screen();
+        draw_border(config);
     }
 
     int i,j;
@@ -322,15 +328,15 @@ void platform_draw_game_screen(int *object_map, int score, bool did_mode_change,
                 previous_object_map[map_index] = object_map[map_index];
                 if (object_map[map_index] == OBJECT_APPLE)
                 {
-                    draw_tile(j, i, APPLE_TILE_INDEX);
+                    draw_tile(j, i, APPLE_TILE_INDEX, BG_A, false, false);
                 }
                 else if (object_map[map_index] == OBJECT_SNAKE)
                 {
-                    draw_tile(j, i, SNAKE_TILE_INDEX);
+                    draw_tile(j, i, SNAKE_TILE_INDEX, BG_A, false, false);
                 }
                 else
                 {
-                    clear_tile(j, i);
+                    clear_tile(j, i, BG_A);
                 }
             }
         }
@@ -348,8 +354,6 @@ void platform_draw_game_screen(int *object_map, int score, bool did_mode_change,
         VDP_drawText(hud_string, MAP_WIDTH-14, 1);
         old_score = score;
     }
-
-    // draw_border(config);
 }
 
 int main(bool hardReset)
