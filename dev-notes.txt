@@ -102,6 +102,5 @@ todo
 	- jo engine public wiki
 
 - genesis
-	- score wiping bug
 	- single number score
 	- missing apple bug (only saw once!)

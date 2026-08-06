@@ -3,26 +3,15 @@
 #include "../../platform.h"
 
 /*
-*   Snake: Sega Saturn implementation of snake using joengine framework.
-*   Last Update: Jul 22, 2026
+*   Snake: Sega Genesis implementation of snake using sgdk framework.
+*   Last Update: Aug 5, 2026
 *   Author: Scott Harner
 */
 
-// #define OBJECT_ZINDEX 450
-// #define BORDER_ZINDEX 500
-// #define JO_GRID_WIDTH (JO_TV_WIDTH / 8)
-// #define JO_GRID_HEIGHT (JO_TV_HEIGHT / 8)
 #define MAP_HEIGHT 28
 #define MAP_WIDTH 40
 #define MAP_TILE_SIZE 8
 
-// static int snake_sprite_id;
-// static int apple_sprite_id;
-// static int border_top_sprite_id;
-// static int border_left_sprite_id;
-// static int border_corner_sprite_id;
-// static short pickup_sound_id;
-// static short lose_sound_id;
 static int frame_counter;
 static u16 tile_index = TILE_USER_INDEX;
 static int old_score = -1;
@@ -31,7 +20,7 @@ static u16 APPLE_TILE_INDEX;
 static u16 SNAKE_TILE_INDEX;
 
 
-// Saturn implementation of platform initialization
+// Genesis implementation of platform initialization
 void platform_initialize()
 {
     VDP_init();
@@ -50,16 +39,6 @@ void platform_initialize()
     previous_object_map = platform_memory_allocate(MAP_HEIGHT * MAP_WIDTH * sizeof(int));
 
     VDP_setTextPlane(BG_B); // draw text behind tiles
-
-    // jo_core_init(JO_COLOR_Black);
-    // load_drv(ADX_MASTER_2304);
-    // snake_sprite_id = jo_sprite_add_tga("TEX", "SNAKE.TGA", JO_COLOR_Transparent);
-    // apple_sprite_id = jo_sprite_add_tga("TEX", "APPLE.TGA", JO_COLOR_Transparent);
-    // border_top_sprite_id = jo_sprite_add_tga("TEX", "BORDERT.TGA", JO_COLOR_Transparent);
-    // border_left_sprite_id = jo_sprite_add_tga("TEX", "BORDERL.TGA", JO_COLOR_Transparent);
-    // border_corner_sprite_id = jo_sprite_add_tga("TEX", "BORDERC.TGA", JO_COLOR_Transparent);
-    // pickup_sound_id = load_8bit_pcm((Sint8 *)"PICKUP.PCM", 15360); // using ponetone due to issues with jo engine audio
-    // lose_sound_id = load_8bit_pcm((Sint8 *)"LOSE.PCM", 15360);
 }
 
 // plays the requested sound effect
@@ -331,14 +310,13 @@ void platform_draw_game_screen(int *object_map, int score, bool did_mode_change,
     }
 
     int i,j;
-    //O(N^2) runtime for this, 24^2 is pretty big.. so we may change this
-    //but for now, we draw every tile every frame!
     for (i = 0; i < config->map_height; i++)
     {
         int row = i * config->map_width;
         for (j = 0; j < config->map_width; j++)
         {
             int map_index = row + j;
+            // only draw tiles when they change
             if (object_map[map_index] != previous_object_map[map_index])
             {
                 previous_object_map[map_index] = object_map[map_index];
@@ -389,7 +367,6 @@ int main(bool hardReset)
         }
 
         game_update();
-        //wait_for_next_frame();
 
         // always call this method at the end of the frame
         SYS_doVBlankProcess();
