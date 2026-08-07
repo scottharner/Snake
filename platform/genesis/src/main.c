@@ -57,8 +57,8 @@ void platform_initialize()
 
     VDP_setTextPlane(BG_B); // draw text behind tiles
 
-    XGM_setPCM(SFX_LOSE, sfx_lose, sizeof(sfx_lose));
-    XGM_setPCM(SFX_PICKUP, sfx_pickup, sizeof(sfx_pickup));
+    XGM2_setFMVolume(45);
+    XGM2_setPSGVolume(45);
 }
 
 // plays the requested sound effect
@@ -66,11 +66,11 @@ void platform_play_sound(sound_type current_sound_type)
 {
     if (current_sound_type == SOUND_PICKUP)
     {
-        XGM_startPlayPCM(SFX_PICKUP,1,SOUND_PCM_CH2);
+        XGM2_playPCM(sfx_pickup, sizeof(sfx_pickup), SOUND_PCM_CH2);
     }
     else if (current_sound_type == SOUND_LOSE)
     {
-        XGM_startPlayPCM(SFX_LOSE,1,SOUND_PCM_CH2);
+        XGM2_playPCM(sfx_lose, sizeof(sfx_lose), SOUND_PCM_CH2);
     }
 }
 
@@ -84,7 +84,10 @@ static void clear_screen()
 void platform_draw_game_over_screen(int score, bool did_mode_change, loss_type current_loss_type)
 {
     if (did_mode_change)
+    {
+        XGM2_stop();
         clear_screen();
+    }
 
     VDP_setTextPalette(PAL0);
     VDP_drawText("Game Over", 5, 5);
@@ -107,7 +110,10 @@ void platform_draw_game_over_screen(int score, bool did_mode_change, loss_type c
 void platform_draw_win_screen(int score, bool did_mode_change)
 {
     if (did_mode_change)
+    {
+        XGM2_stop();
         clear_screen();
+    }
 
     VDP_setTextPalette(PAL0);
     VDP_drawText("You Win!", 5, 5);
@@ -132,7 +138,10 @@ static int get_option_color(speed selected_speed, speed option_speed)
 void platform_draw_title_screen(speed game_speed, bool did_mode_change)
 {
     if (did_mode_change)
+    {
         clear_screen();
+        XGM2_play(bgm_title);
+    }
 
     int white_color = RGB24_TO_VDPCOLOR(0xFFFFFF);
     
@@ -316,6 +325,8 @@ void platform_draw_game_screen(int *object_map, int score, bool did_mode_change,
 {
     if (did_mode_change)
     {
+        XGM2_stop();
+        XGM2_play(bgm_game);
         VDP_setTextPalette(PAL0);
         clear_screen();
         draw_border(config);
