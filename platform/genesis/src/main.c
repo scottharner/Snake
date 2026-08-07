@@ -170,6 +170,7 @@ void platform_set_random_seed(unsigned int seed)
 // platform specific random number generation
 int platform_get_random(int max)
 {
+    if (max <= 0) return 0;
     return random() % max;
 }
 

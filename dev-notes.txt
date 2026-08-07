@@ -102,4 +102,4 @@ todo
 	- jo engine public wiki
 
 - genesis
-	- missing apple bug (only saw once! - saw on saturn also now)
+	- missing apple bug (this is hopefully fixed now but keep it in mind)

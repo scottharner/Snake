@@ -130,7 +130,8 @@ void platform_set_random_seed(unsigned int seed)
 // platform specific random number generation
 int platform_get_random(int max)
 {
-    return jo_random(max);
+    if (max <= 0) return 0;
+    return (jo_random(max)-1); // jo_random requires passing parm so we cant use modulo
 }
 
 // platform specific memory allocation
