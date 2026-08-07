@@ -52,6 +52,21 @@ saturn
 			- load_drv(ADX_MASTER_2304); (needed if not using adx???)
 			- jo_core_add_vblank_callback(sdrv_vblank_rq);
 
+genesis
+-------
+- build is different
+	- we do "make" and "make clean" from the genesis folder due to the specific requirements of sgdk
+	- we run "run_with_mednafen.bat" from genesis/out (folder names are in required sgdk format)
+- we have to be concerned with palettes
+	- we have four palettes of 16 colors each (pal0, pal1, pal2, pal3)
+	- the last color of each palette is used for text display
+	- have to make sure we select the right palette when displaying text or an image
+	- mtpaint is useful for setting up your image palette
+		- you can save the palette in there and load it for other images
+		- have to set your images to 16 color (4 bit) indexed mode
+	- the first color in a palette is transparent
+	- vdp_init wipes all of the palettes so only do that at the very beginning
+
 general
 -------
 - we have one make file per platform now, so to make we need to
@@ -75,7 +90,6 @@ todo
 	- clean up game over screen
 	- add pause functionality
 	- track a high score
-	- port to a third platform (pc engine? megadrive?)
 	- add sound effects (credit notes - potone/ponut, freesfx)
 	- add music
 	- create release
@@ -85,3 +99,7 @@ todo
 
 - saturn
 	- jo engine public wiki
+
+- genesis
+	- missing apple bug (this is hopefully fixed now but keep it in mind)
+	- missing score at start

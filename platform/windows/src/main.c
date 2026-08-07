@@ -68,6 +68,12 @@ void platform_initialize()
     install_int(timer1, 1000);
 }
 
+// perform platform specific actions when the game resets
+void platform_reset(game_config *config)
+{
+    // no actions to perform on this platform
+}
+
 // plays the requested sound effect
 void platform_play_sound(sound_type current_sound_type)
 {

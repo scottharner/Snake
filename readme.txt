@@ -4,6 +4,7 @@ Added title screen.
 Added game over screen.
 Added game win screen.
 Added sound effects.
+Added Sega Genesis platform support (Mega Snake).
 
 #####################################################
 

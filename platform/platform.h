@@ -1,7 +1,7 @@
 #ifndef PLATFORM_H
 #define PLATFORM_H
 
-#include <stdbool.h>
+#include "../common/types.h"
 #include "../game/game.h"
 
 void platform_initialize();
@@ -17,5 +17,6 @@ void platform_draw_game_over_screen(int, bool, loss_type);
 void platform_draw_win_screen(int, bool);
 void platform_draw_title_screen(speed, bool);
 void platform_play_sound(sound_type);
+void platform_reset(game_config *);
 
 #endif
