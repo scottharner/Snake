@@ -102,5 +102,4 @@ todo
 	- jo engine public wiki
 
 - genesis
-	- single number score
-	- missing apple bug (only saw once!)
+	- missing apple bug (only saw once! - saw on saturn also now)

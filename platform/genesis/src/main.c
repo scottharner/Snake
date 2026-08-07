@@ -91,7 +91,7 @@ void platform_draw_game_over_screen(int score, bool did_mode_change, loss_type c
 
     char format_string[32];
     char score_string[8];
-    intToStr(score, score_string, 6);
+    intToStr(score, score_string, 0);
     strcpy(format_string, "Score: ");
     strcat(format_string, score_string);
     VDP_drawText(format_string, 5, 7);
@@ -114,7 +114,7 @@ void platform_draw_win_screen(int score, bool did_mode_change)
 
     char format_string[32];
     char score_string[8];
-    intToStr(score, score_string, 6);
+    intToStr(score, score_string, 0);
     strcpy(format_string, "Score: ");
     strcat(format_string, score_string);
     VDP_drawText(format_string, 5, 7);
@@ -352,11 +352,11 @@ void platform_draw_game_screen(int *object_map, int score, bool did_mode_change,
     {
         char hud_string[32];
         char score_string[8];
-        intToStr(score, score_string, 6);
+        intToStr(score, score_string, 0);
         strcpy(hud_string, "Score: ");
         strcat(hud_string, score_string);
-        VDP_clearTextArea(MAP_WIDTH-14, 1, 12, 1);
-        VDP_drawText(hud_string, MAP_WIDTH-14, 1);
+        VDP_clearTextArea(MAP_WIDTH-11, 1, 9, 1);
+        VDP_drawText(hud_string, MAP_WIDTH-11, 1);
         old_score = score;
     }
 }
