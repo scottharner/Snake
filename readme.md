@@ -4,8 +4,11 @@
 > - Added game over screen.
 > - Added game win screen.
 > - Added sound effects.
+> - Added Sega Genesis platform support (Mega Snake).
 
 ![Snake SS](documentation/screenshots/snake-ss.png)
+
+![Mega Snake](documentation/screenshots/mega-snake.png)
 
 Snake!
 ======

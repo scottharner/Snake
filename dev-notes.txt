@@ -90,7 +90,6 @@ todo
 	- clean up game over screen
 	- add pause functionality
 	- track a high score
-	- port to a third platform (pc engine? megadrive?)
 	- add sound effects (credit notes - potone/ponut, freesfx)
 	- add music
 	- create release
@@ -103,3 +102,4 @@ todo
 
 - genesis
 	- missing apple bug (this is hopefully fixed now but keep it in mind)
+	- missing score at start
