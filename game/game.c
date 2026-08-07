@@ -1,4 +1,4 @@
-#include "types.h"
+#include "../common/types.h"
 #include "game.h"
 #include "../platform/platform.h"
 
@@ -31,8 +31,8 @@ static void generate_new_apple()
 	int rand_y, rand_x;
 
     do{
-		rand_y = (int)(platform_get_random(config->map_height/2));
-		rand_x = (int)(platform_get_random(config->map_width/2));
+		rand_y = (int)(platform_get_random(config->map_height));
+		rand_x = (int)(platform_get_random(config->map_width));
 	}while (object_map[rand_y * config->map_width + rand_x] != OBJECT_NOTHING); //while we generate a spot that's taken, keep going;
 	object_map[rand_y * config->map_width + rand_x] = OBJECT_APPLE;
 }
