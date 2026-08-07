@@ -72,6 +72,7 @@ void platform_initialize()
 void platform_reset(game_config *config)
 {
     // no actions to perform on this platform
+    (void)config; // avoid compiler warnings
 }
 
 // plays the requested sound effect
@@ -194,21 +195,21 @@ input_type platform_get_input_type(mode game_mode, bool current_input_states[INP
     input_type current_input = INPUT_TYPE_NOTHING;
     clear_keybuf();
 
+    update_input_states(current_input_states);
     switch(game_mode)
     {
         case MODE_TITLE:
-            update_input_states(current_input_states);
             if (game_input_pressed(INPUT_TYPE_START)) current_input = INPUT_TYPE_START;
             else if (game_input_pressed(INPUT_TYPE_DOWN)) current_input = INPUT_TYPE_DOWN;
             else if (game_input_pressed(INPUT_TYPE_UP)) current_input = INPUT_TYPE_UP;
             break;
 
         default:
-            if (key[KEY_LEFT]) current_input = INPUT_TYPE_LEFT;
+            if (game_input_pressed(INPUT_TYPE_START)) current_input = INPUT_TYPE_START;
+            else if (key[KEY_LEFT]) current_input = INPUT_TYPE_LEFT;
             else if (key[KEY_RIGHT]) current_input = INPUT_TYPE_RIGHT;
             else if (key[KEY_DOWN]) current_input = INPUT_TYPE_DOWN;
             else if (key[KEY_UP]) current_input = INPUT_TYPE_UP;
-            else if (key[KEY_ENTER]) current_input = INPUT_TYPE_START;
 
             break;
     }

@@ -230,10 +230,10 @@ input_type platform_get_input_type(mode game_mode, bool current_input_states[INP
     if (joy_type == JOY_TYPE_PAD3 || joy_type == JOY_TYPE_PAD6)
     {
         u16 joy_read_value = JOY_readJoypad(JOY_1);
+        update_input_states(current_input_states, joy_read_value);
         switch(game_mode)
         {
             case MODE_TITLE:
-                update_input_states(current_input_states, joy_read_value);
                 if (game_input_pressed(INPUT_TYPE_START)) current_input = INPUT_TYPE_START;    
                 else if (game_input_pressed(INPUT_TYPE_DOWN)) current_input = INPUT_TYPE_DOWN;
                 else if (game_input_pressed(INPUT_TYPE_UP)) current_input = INPUT_TYPE_UP;
@@ -241,11 +241,11 @@ input_type platform_get_input_type(mode game_mode, bool current_input_states[INP
                 break;
 
             default:
-                if (joy_read_value & BUTTON_LEFT) current_input = INPUT_TYPE_LEFT;
+                if (game_input_pressed(INPUT_TYPE_START)) current_input = INPUT_TYPE_START;
+                else if (joy_read_value & BUTTON_LEFT) current_input = INPUT_TYPE_LEFT;
                 else if (joy_read_value & BUTTON_RIGHT) current_input = INPUT_TYPE_RIGHT;
                 else if (joy_read_value & BUTTON_DOWN) current_input = INPUT_TYPE_DOWN;
                 else if (joy_read_value & BUTTON_UP) current_input = INPUT_TYPE_UP;
-                else if (joy_read_value & BUTTON_START) current_input = INPUT_TYPE_START;
 
                 break;
         }

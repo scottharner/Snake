@@ -171,10 +171,10 @@ input_type platform_get_input_type(mode game_mode, bool current_input_states[INP
     input_type current_input = INPUT_TYPE_NOTHING;
     if (jo_is_pad1_available())
     {
+        update_input_states(current_input_states);
         switch(game_mode)
         {
             case MODE_TITLE:
-                update_input_states(current_input_states);
                 if (game_input_pressed(INPUT_TYPE_START)) current_input = INPUT_TYPE_START;    
                 else if (game_input_pressed(INPUT_TYPE_DOWN)) current_input = INPUT_TYPE_DOWN;
                 else if (game_input_pressed(INPUT_TYPE_UP)) current_input = INPUT_TYPE_UP;
@@ -182,11 +182,11 @@ input_type platform_get_input_type(mode game_mode, bool current_input_states[INP
                 break;
 
             default:
-                if (jo_is_pad1_key_pressed(JO_KEY_LEFT)) current_input = INPUT_TYPE_LEFT;
+                if (game_input_pressed(INPUT_TYPE_START)) current_input = INPUT_TYPE_START;
+                else if (jo_is_pad1_key_pressed(JO_KEY_LEFT)) current_input = INPUT_TYPE_LEFT;
                 else if (jo_is_pad1_key_pressed(JO_KEY_RIGHT)) current_input = INPUT_TYPE_RIGHT;
                 else if (jo_is_pad1_key_pressed(JO_KEY_DOWN)) current_input = INPUT_TYPE_DOWN;
                 else if (jo_is_pad1_key_pressed(JO_KEY_UP)) current_input = INPUT_TYPE_UP;
-                else if (jo_is_pad1_key_pressed(JO_KEY_START)) current_input = INPUT_TYPE_START;
 
                 break;
         }

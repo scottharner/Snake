@@ -20,6 +20,7 @@ static unsigned int frame_counter = 0;
 static bool game_started = false;
 static loss_type current_loss_type = LOSS_TYPE_SELF;
 static int snake_length;
+static bool game_paused = false;
 
 // track key changes for better title menu input handling
 static bool current_input_states[INPUT_TYPE_COUNT];
@@ -106,10 +107,9 @@ static void title_screen_read_input()
     }
 }
 
-static void move()
+static void move(input_type current_input)
 {
     //this contains the array of flags which tell which button has been pressed. It must be cleared before every input.
-    input_type current_input = platform_get_input_type(MODE_GAME, current_input_states);
     if (current_input == INPUT_TYPE_LEFT) player->dir = INPUT_TYPE_LEFT;
     if (current_input == INPUT_TYPE_RIGHT) player->dir = INPUT_TYPE_RIGHT;
     if (current_input == INPUT_TYPE_DOWN) player->dir = INPUT_TYPE_DOWN;
@@ -167,8 +167,8 @@ static void move()
     {
 
         if (player->y < config->map_height - 1)
-    	{
-        	temp_y = player->y + 1;
+        {
+            temp_y = player->y + 1;
         }
         else{
             game_mode = MODE_GAME_OVER;
@@ -187,7 +187,7 @@ static void move()
 
     if (object_map[temp_y * config->map_width + temp_x] == OBJECT_APPLE) //the snake has run into an apple and another node is created
     {
-	    score++;
+        score++;
         platform_play_sound(SOUND_PICKUP);
         snake_node* temp = player;
         while (temp->next != NULL) //the snake is essentially a linked list and we're traversing it
@@ -211,14 +211,14 @@ static void move()
     }
     else if (object_map[temp_y * config->map_width + temp_x] == OBJECT_SNAKE)
     {
-    	game_mode = MODE_GAME_OVER;
+        game_mode = MODE_GAME_OVER;
         current_loss_type = LOSS_TYPE_SELF;
         platform_play_sound(SOUND_LOSE);
         return;
     }
     else
     {
- 	    player = move_body(player,temp_x,temp_y);
+        player = move_body(player,temp_x,temp_y);
     }
 
     object_map[temp_y * config->map_width + temp_x] = OBJECT_SNAKE; //update the object map to the new snake head position
@@ -261,6 +261,7 @@ void game_update(void)
         did_mode_change = true;
 
     previous_game_mode = game_mode;
+    input_type current_input;
 
     switch (game_mode)   
     {
@@ -285,14 +286,26 @@ void game_update(void)
             break;
 
         default:
+            current_input = platform_get_input_type(MODE_GAME, current_input_states);
+            if (current_input == INPUT_TYPE_START)
+            {
+                if (!game_paused) 
+                    game_paused = true;
+                else
+                    game_paused = false;
+            }
+    
             if (action_cycles > get_move_max_cycles())    
             {
-                move();
+                if (!game_paused)
+                    move(current_input);
+
                 action_cycles = 0;
             }
         
             platform_draw_game_screen(object_map, score, did_mode_change, config);
             platform_update_platform_state();
+
             break;
     }
 

@@ -88,7 +88,6 @@ todo
 	- allow windows version to close window
 	- clean up title screen
 	- clean up game over screen
-	- add pause functionality
 	- track a high score
 	- add sound effects (credit notes - potone/ponut, freesfx)
 	- add music
