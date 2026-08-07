@@ -349,7 +349,7 @@ void platform_draw_game_screen(int *object_map, int score, bool did_mode_change,
     }
 
     //draw the score
-    if (score != old_score)
+    if (score != old_score || did_mode_change)
     {
         char hud_string[32];
         char score_string[8];

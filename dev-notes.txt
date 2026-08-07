@@ -102,4 +102,3 @@ todo
 
 - genesis
 	- missing apple bug (this is hopefully fixed now but keep it in mind)
-	- missing score at start
