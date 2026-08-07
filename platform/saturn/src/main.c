@@ -203,7 +203,7 @@ void platform_update_platform_state()
     // we dont have any updates to make on this platform
 }
 
-void draw_tile(int x, int y, int width, int height, int sprite_id, int z, int angle)
+void draw_tile(int x, int y, int sprite_id, int z, int angle)
 {
     if (angle == 0)
         jo_sprite_draw3D2(sprite_id, x, y, z);
@@ -220,6 +220,7 @@ void draw_tile(int x, int y, int width, int height, int sprite_id, int z, int an
 void platform_reset(game_config *config)
 {
     // no actions to perform on this platform
+    (void)config; // avoid compiler warnings
 }
 
 static void draw_border(game_config *config)
@@ -227,46 +228,46 @@ static void draw_border(game_config *config)
     for (int i = 1; i < config->map_width-1; i++)
     {
         // top
-        draw_tile(i * config->tile_size, 0, config->tile_size, config->tile_size, border_top_sprite_id, BORDER_ZINDEX, 0);
+        draw_tile(i * config->tile_size, 0, border_top_sprite_id, BORDER_ZINDEX, 0);
     }
 
     jo_sprite_enable_vertical_flip();
     for (int i = 1; i < config->map_width-1; i++)
     {
         // bottom
-        draw_tile(i * config->tile_size, (MAP_HEIGHT*config->tile_size)-config->tile_size-1, config->tile_size, config->tile_size, border_top_sprite_id, BORDER_ZINDEX, 0);
+        draw_tile(i * config->tile_size, (MAP_HEIGHT*config->tile_size)-config->tile_size-1, border_top_sprite_id, BORDER_ZINDEX, 0);
     }
     jo_sprite_disable_vertical_flip();
 
     for (int i = 1; i < config->map_height-1; i++)
     {
         // left
-        draw_tile(0, i * config->tile_size, config->tile_size, config->tile_size, border_left_sprite_id, BORDER_ZINDEX, 0);
+        draw_tile(0, i * config->tile_size, border_left_sprite_id, BORDER_ZINDEX, 0);
     }
 
     jo_sprite_enable_horizontal_flip();
     for (int i = 1; i < config->map_height-1; i++)
     {
         // right
-        draw_tile((MAP_WIDTH*config->tile_size)-config->tile_size-1, i * config->tile_size, config->tile_size, config->tile_size, border_left_sprite_id, BORDER_ZINDEX, 0);
+        draw_tile((MAP_WIDTH*config->tile_size)-config->tile_size-1, i * config->tile_size, border_left_sprite_id, BORDER_ZINDEX, 0);
     }
     jo_sprite_disable_horizontal_flip();
 
     // upper left
-    draw_tile(0, 0, config->tile_size, config->tile_size, border_corner_sprite_id, BORDER_ZINDEX, 0);
+    draw_tile(0, 0, border_corner_sprite_id, BORDER_ZINDEX, 0);
     
     // upper right
     jo_sprite_enable_horizontal_flip();
-    draw_tile((MAP_WIDTH*config->tile_size)-config->tile_size-1, 0, config->tile_size, config->tile_size, border_corner_sprite_id, BORDER_ZINDEX, 0);
+    draw_tile((MAP_WIDTH*config->tile_size)-config->tile_size-1, 0, border_corner_sprite_id, BORDER_ZINDEX, 0);
     jo_sprite_disable_horizontal_flip();
 
     // lower left
     jo_sprite_enable_vertical_flip();
-    draw_tile(0, (MAP_HEIGHT*config->tile_size)-config->tile_size-1, config->tile_size, config->tile_size, border_corner_sprite_id, BORDER_ZINDEX, 0);
+    draw_tile(0, (MAP_HEIGHT*config->tile_size)-config->tile_size-1, border_corner_sprite_id, BORDER_ZINDEX, 0);
 
     // lower right
     jo_sprite_enable_horizontal_flip();
-    draw_tile((MAP_WIDTH*config->tile_size)-config->tile_size-1, (MAP_HEIGHT*config->tile_size)-config->tile_size-1, config->tile_size, config->tile_size, border_corner_sprite_id, BORDER_ZINDEX, 0);
+    draw_tile((MAP_WIDTH*config->tile_size)-config->tile_size-1, (MAP_HEIGHT*config->tile_size)-config->tile_size-1, border_corner_sprite_id, BORDER_ZINDEX, 0);
     jo_sprite_disable_horizontal_flip();
     jo_sprite_disable_vertical_flip();
 }
@@ -298,7 +299,7 @@ void platform_draw_game_screen(int *object_map, int score, bool did_mode_change,
                 continue;
             }
 
-            draw_tile(config->tile_size*j, config->tile_size*i, config->tile_size, config->tile_size, sprite_id, OBJECT_ZINDEX, 0);
+            draw_tile(config->tile_size*j, config->tile_size*i, sprite_id, OBJECT_ZINDEX, 0);
         }
     }
 
