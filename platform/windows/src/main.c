@@ -25,6 +25,11 @@ static SAMPLE *pickup_sample;
 static bool did_pickup_load = false;
 static SAMPLE *lose_sample;
 static bool did_lose_load = false;
+static SAMPLE *title_sample;
+static bool did_title_load = false;
+static SAMPLE *game_sample;
+static bool did_game_load = false;
+static bool should_wait = false;
 
 //calculate framerate every second
 static void timer1(void)
@@ -51,8 +56,12 @@ void platform_initialize()
         did_sound_install = true;
         pickup_sample = load_sample("../assets/sfx/pickup.wav");
         lose_sample = load_sample("../assets/sfx/lose.wav");
+        title_sample = load_sample("../assets/bgm/only_air.wav");
+        game_sample = load_sample("../assets/bgm/battle_7.wav");
         did_pickup_load = (bool)pickup_sample;
         did_lose_load = (bool)lose_sample;
+        did_title_load = (bool)title_sample;
+        did_game_load = (bool)game_sample;
     }
 
 
@@ -94,7 +103,12 @@ void platform_play_sound(sound_type current_sound_type)
 // display a game over screen
 void platform_draw_game_over_screen(int score, bool did_mode_change, loss_type current_loss_type)
 {
-    (void)did_mode_change; // avoid compiler warning
+    if (did_mode_change)
+    {
+        should_wait = true; // wait to show this screen for a few seconds
+        stop_sample(game_sample);
+    }
+
     clear_to_color(buffer, makecol(0, 0, 0));
     
     textout_ex(buffer, font, "Game Over", 50, 50, makecol(255,255,255), -1);
@@ -107,7 +121,12 @@ void platform_draw_game_over_screen(int score, bool did_mode_change, loss_type c
 // display a win screen
 void platform_draw_win_screen(int score, bool did_mode_change)
 {
-    (void)did_mode_change; // avoid compiler warning
+    if (did_mode_change)
+    {
+        should_wait = true; // wait to show this screen for a few seconds
+        stop_sample(game_sample);
+    }
+
     clear_to_color(buffer, makecol(0, 0, 0));
     
     textout_ex(buffer, font, "You Win!", 50, 50, makecol(255,255,255), -1);
@@ -127,7 +146,12 @@ static int get_option_color(speed selected_speed, speed option_speed)
 // display a title screen
 void platform_draw_title_screen(speed game_speed, bool did_mode_change)
 {
-    (void)did_mode_change; // avoid compiler warning
+    if (did_mode_change)
+    {
+        should_wait = false; // dont wait because title screen music glitches when you do
+        play_sample(title_sample, 150, 128, 1000, 1);
+    }
+
     clear_to_color(buffer, makecol(0, 0, 0));
     textout_ex(buffer, font, "SNAKE", 50, 10, makecol(255,255,255), -1);
     
@@ -225,7 +249,13 @@ void platform_update_platform_state()
 
 void platform_draw_game_screen(int *object_map, int score, bool did_mode_change, game_config *config)
 {
-    (void)did_mode_change; // avoid compiler warning
+    if (did_mode_change)
+    {
+        should_wait = true; // wait so the game is a resonable speed
+        stop_sample(title_sample);
+        play_sample(game_sample, 150, 128, 1000, 1);
+    }
+
     int i,j;
     acquire_screen();	//O(N^2) runtime for this, 24^2 is pretty big.. so we may change this
                         //but for now, we draw every tile every frame!
@@ -263,7 +293,8 @@ void platform_draw_game_screen(int *object_map, int score, bool did_mode_change,
 static void wait_for_next_frame()
 {
     // 16ms is supposed to be about 60fps but 8ms seems to match closest to what we see on other platforms
-    rest(8); 
+    if (should_wait) // for some reason the title music gets messed up when we wait but the game music does not
+        rest(8); 
 }
 
 int main(void)

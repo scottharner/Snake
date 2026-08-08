@@ -66,6 +66,11 @@ genesis
 		- have to set your images to 16 color (4 bit) indexed mode
 	- the first color in a palette is transparent
 	- vdp_init wipes all of the palettes so only do that at the very beginning
+- had problems playing background music and sound effects at the same time
+	- had to switch everything over to using xgm2 methods
+	- you must feed vgm music files for this
+	- xgm2 lets us control our volume as well on each item
+	- music was found at https://safetystoatstudios.itch.io/free-vgms
 
 general
 -------
@@ -90,7 +95,7 @@ todo
 	- clean up game over screen
 	- track a high score
 	- add sound effects (credit notes - potone/ponut, freesfx)
-	- add music
+	- add music (credit - Safety Stoat Studios)
 	- create release
 	- post console releases somewhere
 	- clean up game win screen
