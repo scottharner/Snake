@@ -6,6 +6,8 @@
 > - Added sound effects.
 > - Added Sega Genesis platform support (Mega Snake).
 > - Added pause feature.
+> - Added background music.
+> - Added high score.
 
 ![Snake SS](documentation/screenshots/snake-ss.png)
 

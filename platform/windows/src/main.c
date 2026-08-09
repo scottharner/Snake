@@ -247,7 +247,7 @@ void platform_update_platform_state()
     ticks++;
 }
 
-void platform_draw_game_screen(int *object_map, int score, bool did_mode_change, game_config *config)
+void platform_draw_game_screen(int *object_map, int score, bool did_mode_change, game_config *config, int high_score)
 {
     if (did_mode_change)
     {
@@ -280,8 +280,13 @@ void platform_draw_game_screen(int *object_map, int score, bool did_mode_change,
 
     //draw the score
     char score_text[10];
-    sprintf(score_text,"score: %d",score);
+    sprintf(score_text,"Score: %d",score);
     textout_ex(buffer, font, score_text, config->tile_size*(config->map_width)*3/4, config->tile_size, makecol(255,255,255), makecol(0,0,0));
+
+    //draw the high score
+    char high_score_text[15];
+    sprintf(high_score_text,"High Score: %d",high_score);
+    textout_ex(buffer, font, high_score_text, config->tile_size*3, config->tile_size, makecol(255,255,255), makecol(0,0,0));
 
     //draw an outline of the game map
     rect( buffer, 0, 0, config->tile_size*config->map_width-1, config->tile_size*config->map_height-1, makecol( 0, 0, 255));

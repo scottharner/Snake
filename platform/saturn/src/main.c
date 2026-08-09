@@ -285,7 +285,7 @@ static void draw_border(game_config *config)
     jo_sprite_disable_vertical_flip();
 }
 
-void platform_draw_game_screen(int *object_map, int score, bool did_mode_change, game_config *config)
+void platform_draw_game_screen(int *object_map, int score, bool did_mode_change, game_config *config, int high_score)
 {
     if (did_mode_change)
     {        
@@ -322,6 +322,7 @@ void platform_draw_game_screen(int *object_map, int score, bool did_mode_change,
 
     //draw the score
     jo_printf_with_color(JO_GRID_WIDTH-10, 1, JO_COLOR_INDEX_White, "Score: %d", score);
+    jo_printf_with_color(3, 1, JO_COLOR_INDEX_White, "High Score: %d", high_score);
 
     draw_border(config);
 }

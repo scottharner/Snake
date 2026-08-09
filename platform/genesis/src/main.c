@@ -321,7 +321,30 @@ static void draw_border(game_config *config)
     draw_tile(config->map_width-1, config->map_height-1, BORDERC_TILE_INDEX, BG_B, true, true);
 }
 
-void platform_draw_game_screen(int *object_map, int score, bool did_mode_change, game_config *config)
+static void draw_score(int score)
+{
+    char hud_string[32];
+    char score_string[8];
+    intToStr(score, score_string, 0);
+    strcpy(hud_string, "Score: ");
+    strcat(hud_string, score_string);
+    VDP_clearTextArea(MAP_WIDTH-11, 1, 9, 1);
+    VDP_drawText(hud_string, MAP_WIDTH-11, 1);
+    old_score = score;
+}
+
+static void draw_high_score(int high_score)
+{
+    char hud_string[32];
+    char score_string[8];
+    intToStr(high_score, score_string, 0);
+    strcpy(hud_string, "High Score: ");
+    strcat(hud_string, score_string);
+    VDP_clearTextArea(3, 1, 9, 1);
+    VDP_drawText(hud_string, 3, 1);
+}
+
+void platform_draw_game_screen(int *object_map, int score, bool did_mode_change, game_config *config, int high_score)
 {
     if (did_mode_change)
     {
@@ -359,17 +382,10 @@ void platform_draw_game_screen(int *object_map, int score, bool did_mode_change,
         }
     }
 
-    //draw the score
     if (score != old_score || did_mode_change)
     {
-        char hud_string[32];
-        char score_string[8];
-        intToStr(score, score_string, 0);
-        strcpy(hud_string, "Score: ");
-        strcat(hud_string, score_string);
-        VDP_clearTextArea(MAP_WIDTH-11, 1, 9, 1);
-        VDP_drawText(hud_string, MAP_WIDTH-11, 1);
-        old_score = score;
+        draw_score(score);
+        draw_high_score(high_score);
     }
 }
 

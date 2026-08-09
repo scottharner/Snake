@@ -12,6 +12,7 @@ static struct game_config* config;
 static int *object_map;//This will contain all the objects. will use it to keep track of collisions
 static speed game_speed = SPEED_SLOW;
 static int score;//score for the game
+static int high_score = 0;
 static struct snake_node* player;
 static mode game_mode;
 static mode previous_game_mode;
@@ -123,6 +124,12 @@ static void title_screen_read_input()
     }
 }
 
+void set_high_score()
+{
+    if (score > high_score)
+        high_score = score;
+}
+
 static void move(input_type current_input)
 {
     //this contains the array of flags which tell which button has been pressed. It must be cleared before every input.
@@ -204,6 +211,8 @@ static void move(input_type current_input)
     if (object_map[temp_y * config->map_width + temp_x] == OBJECT_APPLE) //the snake has run into an apple and another node is created
     {
         score++;
+        set_high_score();
+
         platform_play_sound(SOUND_PICKUP);
         snake_node* temp = player;
         while (temp->next != NULL) //the snake is essentially a linked list and we're traversing it
@@ -296,14 +305,18 @@ void game_update(void)
         case MODE_GAME_OVER:
             platform_draw_game_over_screen(score, did_mode_change, current_loss_type);
             if (action_cycles > GAME_OVER_MAX_CYCLES)
+            {
                 game_reset(); // reset the game after showing game over
+            }
                 
             break;
 
         case MODE_WIN:
             platform_draw_win_screen(score, did_mode_change);
             if (action_cycles > WIN_MAX_CYCLES)
+            {
                 game_reset(); // reset the game after showing win screen
+            }
                 
             break;
 
@@ -325,7 +338,7 @@ void game_update(void)
                 action_cycles = 0;
             }
         
-            platform_draw_game_screen(object_map, score, did_mode_change, config);
+            platform_draw_game_screen(object_map, score, did_mode_change, config, high_score);
             platform_update_platform_state();
 
             break;
