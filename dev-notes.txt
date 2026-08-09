@@ -100,7 +100,7 @@ todo
 	- post console releases somewhere
 	- clean up game win screen
 	- migrate todos to issues
-	- missing apple bug (ugh..still exists but hard to reproduce)
+	- missing apple bug (hopefully fixed now)
 
 - saturn
 	- jo engine public wiki

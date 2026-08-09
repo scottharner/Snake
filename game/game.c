@@ -21,6 +21,9 @@ static bool game_started = false;
 static loss_type current_loss_type = LOSS_TYPE_SELF;
 static int snake_length;
 static bool game_paused = false;
+static bool needs_new_apple = false;
+static int apple_x = -1;
+static int apple_y = -1;
 
 // track key changes for better title menu input handling
 static bool current_input_states[INPUT_TYPE_COUNT];
@@ -36,6 +39,19 @@ static void generate_new_apple()
 		rand_x = (int)(platform_get_random(config->map_width));
 	}while (object_map[rand_y * config->map_width + rand_x] != OBJECT_NOTHING); //while we generate a spot that's taken, keep going;
 	object_map[rand_y * config->map_width + rand_x] = OBJECT_APPLE;
+    apple_x = rand_x;
+    apple_y = rand_y;
+}
+
+static void set_object_map(int x, int y, object target_object)
+{
+    object_map[y * config->map_width + x] = target_object;
+    
+    // we have seen a rare disappearing apple bug so make sure we get a new apple when overwriting
+    if (y == apple_y && x == apple_x)
+    {
+        needs_new_apple = true;
+    }
 }
 
 /*
@@ -46,7 +62,7 @@ static snake_node* move_body(snake_node* current_node, int temp_x, int temp_y)
 {
 	if (current_node->next == NULL) //we've reached the end of the snake's body
 	{
-		object_map[current_node->y * config->map_width + current_node->x] = OBJECT_NOTHING; //reset the object map at this position
+		set_object_map(current_node->x, current_node->y, OBJECT_NOTHING); //reset the object map at this position
 	}
 	else //we need to keep traversing
 	{
@@ -109,8 +125,6 @@ static void title_screen_read_input()
 
 static void move(input_type current_input)
 {
-    bool needs_new_apple = false;
-    
     //this contains the array of flags which tell which button has been pressed. It must be cleared before every input.
     if (current_input == INPUT_TYPE_LEFT) player->dir = INPUT_TYPE_LEFT;
     if (current_input == INPUT_TYPE_RIGHT) player->dir = INPUT_TYPE_RIGHT;
@@ -223,10 +237,13 @@ static void move(input_type current_input)
         player = move_body(player,temp_x,temp_y);
     }
 
-    object_map[temp_y * config->map_width + temp_x] = OBJECT_SNAKE; //update the object map to the new snake head position
+    set_object_map(temp_x, temp_y, OBJECT_SNAKE); //update the object map to the new snake head position
 
     if (needs_new_apple)
+    {
         generate_new_apple(); // only generate after head is set since we are looking at object_map
+        needs_new_apple = false;
+    }
 }
 
 void game_reset_input_states()
@@ -367,6 +384,8 @@ void game_reset()
     score = 0;
     action_cycles = 0;
     snake_length = 1;
+    apple_x = -1;
+    apple_y = -1;
     
      if (player->next != NULL)
          free_snake();
