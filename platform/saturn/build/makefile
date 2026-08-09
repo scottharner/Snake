@@ -42,10 +42,13 @@ $(TARGET2): prepare_cd
 # Rule to clean up compiled files and start fresh
 clean:
 	rm -rf cd/*
+	rm -f ./*.wav
 	rm -f $(OBJS) $(TARGET) 2>/dev/null || true
 
 prepare_cd:
 	touch cd/0.bin
 	mkdir -p cd/TEX
-	cp -r ../assets/* cd/
+	cp ../assets/sfx/*.PCM cd/
+	cp -r ../assets/tex/* cd/tex/
 	cp -r ../drivers/* cd/
+	cp ../assets/bgm/*.wav .

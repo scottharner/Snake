@@ -62,6 +62,8 @@ game.raw
 /platform/saturn/build/cd/tex/
 /platform/saturn/build/cd/*.PCM
 /platform/saturn/build/cd/*.bin
+!/platform/saturn/build/cd/sdrv.bin
+/platform/saturn/build/*.wav
 
 # sgdk out files
 /platform/genesis/out/*.*

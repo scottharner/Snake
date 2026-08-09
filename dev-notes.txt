@@ -95,14 +95,12 @@ todo
 	- clean up game over screen
 	- track a high score
 	- add sound effects (credit notes - potone/ponut, freesfx)
-	- add music (credit - Safety Stoat Studios)
+	- add music (credit - Safety Stoat Studios, potone/Ponut64, ReyeMe, Hassmaschine)
 	- create release
 	- post console releases somewhere
 	- clean up game win screen
 	- migrate todos to issues
+	- missing apple bug (ugh..still exists but hard to reproduce)
 
 - saturn
 	- jo engine public wiki
-
-- genesis
-	- missing apple bug (this is hopefully fixed now but keep it in mind)
