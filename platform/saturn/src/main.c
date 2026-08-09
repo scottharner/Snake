@@ -43,6 +43,8 @@
 #define MAP_HEIGHT 30
 #define MAP_WIDTH 40
 #define TILE_SIZE 8
+#define TITLE_TRACKID 3
+#define GAME_TRACKID 2
 
 static int snake_sprite_id;
 static int apple_sprite_id;
@@ -64,6 +66,7 @@ void platform_initialize()
     border_corner_sprite_id = jo_sprite_add_tga("TEX", "BORDERC.TGA", JO_COLOR_Transparent);
     pickup_sound_id = load_8bit_pcm((Sint8 *)"PICKUP.PCM", 15360); // using ponetone due to issues with jo engine audio
     lose_sound_id = load_8bit_pcm((Sint8 *)"LOSE.PCM", 15360);
+    CDDA_SetVolume(4);
 }
 
 // plays the requested sound effect
@@ -83,7 +86,10 @@ void platform_play_sound(sound_type current_sound_type)
 void platform_draw_game_over_screen(int score, bool did_mode_change, loss_type current_loss_type)
 {
     if (did_mode_change)
+    {
+        CDDA_Stop(); // stop game music
         jo_clear_screen();
+    }
 
     jo_printf_with_color(5, 5, JO_COLOR_INDEX_White, "Game Over");
     jo_printf_with_color(5, 7, JO_COLOR_INDEX_White, "Score: %d", score);
@@ -94,7 +100,10 @@ void platform_draw_game_over_screen(int score, bool did_mode_change, loss_type c
 void platform_draw_win_screen(int score, bool did_mode_change)
 {
     if (did_mode_change)
+    {
+        CDDA_Stop(); // stop game music
         jo_clear_screen();
+    }
 
     jo_printf_with_color(5, 5, JO_COLOR_INDEX_White, "You Win!");
     jo_printf_with_color(5, 7, JO_COLOR_INDEX_White, "Score: %d", score);
@@ -112,7 +121,10 @@ static int get_option_color(speed selected_speed, speed option_speed)
 void platform_draw_title_screen(speed game_speed, bool did_mode_change)
 {
     if (did_mode_change)
+    {
         jo_clear_screen();
+        CDDA_PlaySingle(TITLE_TRACKID, true);
+    }
 
     jo_printf_with_color(0, 1, JO_COLOR_INDEX_White, "SNAKE");
 
@@ -276,7 +288,11 @@ static void draw_border(game_config *config)
 void platform_draw_game_screen(int *object_map, int score, bool did_mode_change, game_config *config)
 {
     if (did_mode_change)
+    {        
+        CDDA_Stop(); // stop title
+        CDDA_PlaySingle(GAME_TRACKID, true);
         jo_clear_screen();
+    }
 
     int i,j;
     //O(N^2) runtime for this, 24^2 is pretty big.. so we may change this
