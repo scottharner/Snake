@@ -109,6 +109,8 @@ static void title_screen_read_input()
 
 static void move(input_type current_input)
 {
+    bool needs_new_apple = false;
+    
     //this contains the array of flags which tell which button has been pressed. It must be cleared before every input.
     if (current_input == INPUT_TYPE_LEFT) player->dir = INPUT_TYPE_LEFT;
     if (current_input == INPUT_TYPE_RIGHT) player->dir = INPUT_TYPE_RIGHT;
@@ -207,7 +209,7 @@ static void move(input_type current_input)
         if (snake_length == (config->map_height * config->map_width))
             game_mode = MODE_WIN; // the player wins if the snake can no longer grow
         else
-            generate_new_apple();
+            needs_new_apple = true;
     }
     else if (object_map[temp_y * config->map_width + temp_x] == OBJECT_SNAKE)
     {
@@ -222,6 +224,9 @@ static void move(input_type current_input)
     }
 
     object_map[temp_y * config->map_width + temp_x] = OBJECT_SNAKE; //update the object map to the new snake head position
+
+    if (needs_new_apple)
+        generate_new_apple(); // only generate after head is set since we are looking at object_map
 }
 
 void game_reset_input_states()
