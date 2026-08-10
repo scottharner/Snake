@@ -25,6 +25,7 @@ static bool game_paused = false;
 static bool needs_new_apple = false;
 static int apple_x = -1;
 static int apple_y = -1;
+static option title_option = OPTION_START;
 
 // track key changes for better title menu input handling
 static bool current_input_states[INPUT_TYPE_COUNT];
@@ -81,32 +82,56 @@ static void title_screen_read_input()
     input_type current_input = platform_get_input_type(MODE_TITLE, current_input_states);
     if (current_input == INPUT_TYPE_START)
     {
-        game_mode = MODE_GAME;
+        if (title_option == OPTION_START)
+        {
+            game_mode = MODE_GAME;
 
-        if (!game_started)
-            platform_set_random_seed(frame_counter); // use frames to seed since some platforms dont have clock
+            if (!game_started)
+                platform_set_random_seed(frame_counter); // use frames to seed since some platforms dont have clock
 
-        generate_new_apple();
+            generate_new_apple();
+        }
+        else if (title_option == OPTION_CREDITS)
+        {
+            // todo - switch to credits
+        }
     }
     else if (current_input == INPUT_TYPE_DOWN) 
     {
-        switch (game_speed)
+        switch (title_option)
         {
-            case SPEED_SLOW:
-                game_speed = SPEED_MEDIUM;
+            case OPTION_START:
+                title_option = OPTION_SPEED;
                 break;
 
-            case SPEED_MEDIUM:
-                game_speed = SPEED_FAST;
+            case OPTION_SPEED:
+                title_option = OPTION_CREDITS;
                 break;
 
             default:
-                game_speed = SPEED_SLOW;
+                title_option = OPTION_START;
                 break;
         }
     }
     else if (current_input == INPUT_TYPE_UP) 
     {
+        switch (title_option)
+        {
+            case OPTION_START:
+                title_option = OPTION_CREDITS;
+                break;
+
+            case OPTION_SPEED:
+                title_option = OPTION_START;
+                break;
+
+            default:
+                title_option = OPTION_SPEED;
+                break;
+        }
+    }
+    else if (current_input == INPUT_TYPE_LEFT && title_option == OPTION_SPEED)
+    {
         switch (game_speed)
         {
             case SPEED_SLOW:
@@ -119,6 +144,23 @@ static void title_screen_read_input()
 
             default:
                 game_speed = SPEED_MEDIUM;
+                break;
+        }
+    }
+    else if (current_input == INPUT_TYPE_RIGHT && title_option == OPTION_SPEED)
+    {
+        switch (game_speed)
+        {
+            case SPEED_SLOW:
+                game_speed = SPEED_MEDIUM;
+                break;
+
+            case SPEED_MEDIUM:
+                game_speed = SPEED_FAST;
+                break;
+
+            default:
+                game_speed = SPEED_SLOW;
                 break;
         }
     }
@@ -283,6 +325,22 @@ static int get_move_max_cycles()
     }
 }
 
+void game_get_speed_string(char* buffer)
+{
+    if (game_speed == SPEED_SLOW)
+    {
+        platform_copy_string(buffer, "Slow");
+    }
+    else if (game_speed == SPEED_MEDIUM)
+    {
+        platform_copy_string(buffer, "Medium");
+    }
+    else
+    {
+        platform_copy_string(buffer, "Fast");
+    }
+}
+
 void game_update(void)
 {
     action_cycles++;
@@ -298,7 +356,7 @@ void game_update(void)
     {
         case MODE_TITLE:
             title_screen_read_input();
-            platform_draw_title_screen(game_speed, did_mode_change);
+            platform_draw_title_screen(did_mode_change, title_option);
             action_cycles = 0; // always reset for title screen as were not timing anything
             break;
         

@@ -127,15 +127,20 @@ void platform_draw_win_screen(int score, bool did_mode_change)
 }
 
 // calculate the color to display for a menu option
-static int get_option_color(speed selected_speed, speed option_speed)
+static int get_option_color(option selected_option, option display_option)
 {
     int selected_color = RGB24_TO_VDPCOLOR(0xFFFF00);
     int default_color = RGB24_TO_VDPCOLOR(0xFFFFFF);
-    return selected_speed == option_speed ? selected_color : default_color;
+    return selected_option == display_option ? selected_color : default_color;
+}
+
+void platform_copy_string(char * buffer, char * source)
+{
+    strcpy(buffer, source);
 }
 
 // display a title screen
-void platform_draw_title_screen(speed game_speed, bool did_mode_change)
+void platform_draw_title_screen(bool did_mode_change, option title_option)
 {
     if (did_mode_change)
     {
@@ -143,31 +148,40 @@ void platform_draw_title_screen(speed game_speed, bool did_mode_change)
         XGM2_play(bgm_title);
     }
 
+    char speed_string[6];
+    game_get_speed_string(speed_string);
     int white_color = RGB24_TO_VDPCOLOR(0xFFFFFF);
     
     VDP_setTextPalette(PAL0);
     VDP_drawText("SNAKE", 0, 1);
 
-    if (get_option_color(game_speed, SPEED_SLOW) == white_color)
+    if (get_option_color(title_option, OPTION_START) == white_color)
         VDP_setTextPalette(PAL0);
     else
         VDP_setTextPalette(PAL1);
 
-    VDP_drawText("Slow", 0, 5);
+    VDP_drawText("Start Game", 0, 5);
 
-    if (get_option_color(game_speed, SPEED_MEDIUM) == white_color)
+    if (get_option_color(title_option, OPTION_SPEED) == white_color)
         VDP_setTextPalette(PAL0);
     else
         VDP_setTextPalette(PAL1);
 
-    VDP_drawText("Medium", 0, 7);
+    char format_string[20];
+    sprintf(format_string, "Speed: < %-6s >", speed_string);
+    VDP_drawText(format_string, 0, 7);
 
-    if (get_option_color(game_speed, SPEED_FAST) == white_color)
+    if (get_option_color(title_option, OPTION_CREDITS) == white_color)
         VDP_setTextPalette(PAL0);
     else
         VDP_setTextPalette(PAL1);
 
-    VDP_drawText("Fast", 0, 9);
+    VDP_drawText("Credits", 0, 9);
+
+    // draw credits white
+    VDP_setTextPalette(PAL0);
+    VDP_drawText("Game (C) 2010 Stephen Bryant", 0, 24);
+    VDP_drawText("Port (C) 2026 Scott Harner", 0, 26);
 }
 
 // platform specific setting of random generator seed
@@ -246,6 +260,8 @@ input_type platform_get_input_type(mode game_mode, bool current_input_states[INP
                 if (game_input_pressed(INPUT_TYPE_START)) current_input = INPUT_TYPE_START;    
                 else if (game_input_pressed(INPUT_TYPE_DOWN)) current_input = INPUT_TYPE_DOWN;
                 else if (game_input_pressed(INPUT_TYPE_UP)) current_input = INPUT_TYPE_UP;
+                else if (game_input_pressed(INPUT_TYPE_LEFT)) current_input = INPUT_TYPE_LEFT;
+                else if (game_input_pressed(INPUT_TYPE_RIGHT)) current_input = INPUT_TYPE_RIGHT;
 
                 break;
 

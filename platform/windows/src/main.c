@@ -136,15 +136,20 @@ void platform_draw_win_screen(int score, bool did_mode_change)
 }
 
 // calculate the color to display for a menu option
-static int get_option_color(speed selected_speed, speed option_speed)
+static int get_option_color(option selected_option, option display_option)
 {
     int selected_color = makecol(255,255,0);
     int default_color = makecol(255,255,255);
-    return selected_speed == option_speed ? selected_color : default_color;
+    return selected_option == display_option ? selected_color : default_color;
+}
+
+void platform_copy_string(char * buffer, char * source)
+{
+    strcpy(buffer, source);
 }
 
 // display a title screen
-void platform_draw_title_screen(speed game_speed, bool did_mode_change)
+void platform_draw_title_screen(bool did_mode_change, option title_option)
 {
     if (did_mode_change)
     {
@@ -152,12 +157,21 @@ void platform_draw_title_screen(speed game_speed, bool did_mode_change)
         play_sample(title_sample, 150, 128, 1000, 1);
     }
 
+    char speed_string[6];
+    game_get_speed_string(speed_string);
+
     clear_to_color(buffer, makecol(0, 0, 0));
     textout_ex(buffer, font, "SNAKE", 50, 10, makecol(255,255,255), -1);
     
-    textout_ex(buffer, font, "Slow", 50, 50, get_option_color(game_speed, SPEED_SLOW), -1);
-    textout_ex(buffer, font, "Medium", 50, 70, get_option_color(game_speed, SPEED_MEDIUM), -1);
-    textout_ex(buffer, font, "Fast", 50, 90, get_option_color(game_speed, SPEED_FAST), -1);
+    char format_string[20];
+    sprintf(format_string,"Speed: < %-6s >",speed_string);
+
+    textout_ex(buffer, font, "Start Game", 50, 50, get_option_color(title_option, OPTION_START), -1);
+    textout_ex(buffer, font, format_string, 50, 70, get_option_color(title_option, OPTION_SPEED), -1);
+    textout_ex(buffer, font, "Credits", 50, 90, get_option_color(title_option, OPTION_CREDITS), -1);
+
+    textout_ex(buffer, font, "Game © 2010 Stephen Bryant", 50, 440, makecol(255,255,255), -1);
+    textout_ex(buffer, font, "Port © 2026 Scott Harner", 50, 460, makecol(255,255,255), -1);
 
     blit(buffer, screen, 0, 0, 0, 0, SCREEN_W, SCREEN_H);
 }
@@ -226,6 +240,8 @@ input_type platform_get_input_type(mode game_mode, bool current_input_states[INP
             if (game_input_pressed(INPUT_TYPE_START)) current_input = INPUT_TYPE_START;
             else if (game_input_pressed(INPUT_TYPE_DOWN)) current_input = INPUT_TYPE_DOWN;
             else if (game_input_pressed(INPUT_TYPE_UP)) current_input = INPUT_TYPE_UP;
+            else if (game_input_pressed(INPUT_TYPE_LEFT)) current_input = INPUT_TYPE_LEFT;
+            else if (game_input_pressed(INPUT_TYPE_RIGHT)) current_input = INPUT_TYPE_RIGHT;
             break;
 
         default:

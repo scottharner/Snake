@@ -27,6 +27,7 @@
 */
 
 #include <jo/jo.h>
+#include <string.h>
 #include "../../platform.h"
 #include "pcmsys.h"
 
@@ -45,6 +46,7 @@
 #define TILE_SIZE 8
 #define TITLE_TRACKID 3
 #define GAME_TRACKID 2
+#define COPYRIGHT_INDEX 64
 
 static int snake_sprite_id;
 static int apple_sprite_id;
@@ -110,15 +112,20 @@ void platform_draw_win_screen(int score, bool did_mode_change)
 }
 
 // calculate the color to display for a menu option
-static int get_option_color(speed selected_speed, speed option_speed)
+static int get_option_color(option selected_option, option display_option)
 {
     int selected_color = JO_COLOR_INDEX_Yellow;
     int default_color = JO_COLOR_INDEX_White;
-    return selected_speed == option_speed ? selected_color : default_color;
+    return selected_option == display_option ? selected_color : default_color;
+}
+
+void platform_copy_string(char * buffer, char * source)
+{
+    strcpy(buffer, source);
 }
 
 // display a title screen
-void platform_draw_title_screen(speed game_speed, bool did_mode_change)
+void platform_draw_title_screen(bool did_mode_change, option title_option)
 {
     if (did_mode_change)
     {
@@ -126,11 +133,18 @@ void platform_draw_title_screen(speed game_speed, bool did_mode_change)
         CDDA_PlaySingle(TITLE_TRACKID, true);
     }
 
+    char speed_string[6];
+    game_get_speed_string(speed_string);
+
     jo_printf_with_color(0, 1, JO_COLOR_INDEX_White, "SNAKE");
 
-    jo_printf_with_color(0, 5, get_option_color(game_speed, SPEED_SLOW), "Slow");
-    jo_printf_with_color(0, 7, get_option_color(game_speed, SPEED_MEDIUM), "Medium");
-    jo_printf_with_color(0, 9, get_option_color(game_speed, SPEED_FAST), "Fast");
+    jo_printf_with_color(0, 5, get_option_color(title_option, OPTION_START), "Start Game");
+    jo_printf_with_color(0, 7, get_option_color(title_option, OPTION_SPEED), "Speed: < %-6s >", speed_string);
+    jo_printf_with_color(0, 9, get_option_color(title_option, OPTION_CREDITS), "Credits");
+
+    char copyright = (char)COPYRIGHT_INDEX;
+    jo_printf_with_color(0, 26, JO_COLOR_INDEX_White, "Game %c 2010 Stephen Bryant", copyright);
+    jo_printf_with_color(0, 28, JO_COLOR_INDEX_White, "Port %c 2026 Scott Harner", copyright);
 }
 
 // platform specific setting of random generator seed
@@ -190,6 +204,8 @@ input_type platform_get_input_type(mode game_mode, bool current_input_states[INP
                 if (game_input_pressed(INPUT_TYPE_START)) current_input = INPUT_TYPE_START;    
                 else if (game_input_pressed(INPUT_TYPE_DOWN)) current_input = INPUT_TYPE_DOWN;
                 else if (game_input_pressed(INPUT_TYPE_UP)) current_input = INPUT_TYPE_UP;
+                else if (game_input_pressed(INPUT_TYPE_LEFT)) current_input = INPUT_TYPE_LEFT;
+                else if (game_input_pressed(INPUT_TYPE_RIGHT)) current_input = INPUT_TYPE_RIGHT;
 
                 break;
 

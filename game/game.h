@@ -51,6 +51,11 @@ typedef enum
 
 typedef enum
 {
+	OPTION_START = 0, OPTION_SPEED, OPTION_CREDITS
+}option;
+
+typedef enum
+{
 	LOSS_TYPE_WALL = 0, LOSS_TYPE_SELF
 }loss_type;
 
@@ -66,5 +71,6 @@ void game_reset();
 bool game_input_pressed(input_type);
 void game_save_previous_inputstates();
 void game_reset_input_states();
+void game_get_speed_string(char *);
 
 #endif
