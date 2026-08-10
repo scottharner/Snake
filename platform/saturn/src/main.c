@@ -111,6 +111,27 @@ void platform_draw_win_screen(int score, bool did_mode_change)
     jo_printf_with_color(5, 7, JO_COLOR_INDEX_White, "Score: %d", score);
 }
 
+// display a credits screen
+void platform_draw_credits_screen(bool did_mode_change)
+{
+    if (did_mode_change)
+    {
+        CDDA_Stop(); // stop game music
+        jo_clear_screen();
+    }
+
+    jo_printf_with_color(0, 1, JO_COLOR_INDEX_White, "Game Engineer - Stephen Bryant");
+    jo_printf_with_color(0, 3, JO_COLOR_INDEX_White, "Port/Enhancements Engineer - Slim Shaky");
+    jo_printf_with_color(0, 5, JO_COLOR_INDEX_White, "QA Tester - Ryder Blackheart");
+    jo_printf_with_color(0, 7, JO_COLOR_INDEX_White, "Music Composer - Safety Stoat Studios");
+    jo_printf_with_color(0, 9, JO_COLOR_INDEX_White, "Sound Effects Designer - Kronbits");
+    jo_printf_with_color(0, 11, JO_COLOR_INDEX_White, "Audio Driver Engineer - Ponut64");
+    jo_printf_with_color(0, 13, JO_COLOR_INDEX_White, "Advisor - ReyeMe");
+    jo_printf_with_color(0, 15, JO_COLOR_INDEX_White, "Advisor - Hassmaschine");
+    jo_printf_with_color(0, 17, JO_COLOR_INDEX_White, "Advisor - supahfly");
+    jo_printf_with_color(0, 28, JO_COLOR_INDEX_White, "Powered By - Jo Engine");
+}
+
 // calculate the color to display for a menu option
 static int get_option_color(option selected_option, option display_option)
 {
@@ -200,21 +221,23 @@ input_type platform_get_input_type(mode game_mode, bool current_input_states[INP
         update_input_states(current_input_states);
         switch(game_mode)
         {
-            case MODE_TITLE:
-                if (game_input_pressed(INPUT_TYPE_START)) current_input = INPUT_TYPE_START;    
-                else if (game_input_pressed(INPUT_TYPE_DOWN)) current_input = INPUT_TYPE_DOWN;
-                else if (game_input_pressed(INPUT_TYPE_UP)) current_input = INPUT_TYPE_UP;
-                else if (game_input_pressed(INPUT_TYPE_LEFT)) current_input = INPUT_TYPE_LEFT;
-                else if (game_input_pressed(INPUT_TYPE_RIGHT)) current_input = INPUT_TYPE_RIGHT;
+            case MODE_GAME:
 
-                break;
-
-            default:
                 if (game_input_pressed(INPUT_TYPE_START)) current_input = INPUT_TYPE_START;
                 else if (jo_is_pad1_key_pressed(JO_KEY_LEFT)) current_input = INPUT_TYPE_LEFT;
                 else if (jo_is_pad1_key_pressed(JO_KEY_RIGHT)) current_input = INPUT_TYPE_RIGHT;
                 else if (jo_is_pad1_key_pressed(JO_KEY_DOWN)) current_input = INPUT_TYPE_DOWN;
                 else if (jo_is_pad1_key_pressed(JO_KEY_UP)) current_input = INPUT_TYPE_UP;
+
+                break;
+
+            default:
+
+                if (game_input_pressed(INPUT_TYPE_START)) current_input = INPUT_TYPE_START;    
+                else if (game_input_pressed(INPUT_TYPE_DOWN)) current_input = INPUT_TYPE_DOWN;
+                else if (game_input_pressed(INPUT_TYPE_UP)) current_input = INPUT_TYPE_UP;
+                else if (game_input_pressed(INPUT_TYPE_LEFT)) current_input = INPUT_TYPE_LEFT;
+                else if (game_input_pressed(INPUT_TYPE_RIGHT)) current_input = INPUT_TYPE_RIGHT;
 
                 break;
         }

@@ -19,5 +19,6 @@ void platform_draw_title_screen(bool, option);
 void platform_play_sound(sound_type);
 void platform_reset(game_config *);
 void platform_copy_string(char *, char *);
+void platform_draw_credits_screen(bool);
 
 #endif

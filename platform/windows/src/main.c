@@ -135,6 +135,27 @@ void platform_draw_win_screen(int score, bool did_mode_change)
     blit(buffer, screen, 0, 0, 0, 0, SCREEN_W, SCREEN_H);
 }
 
+// display a credits screen
+void platform_draw_credits_screen(bool did_mode_change)
+{
+    if (did_mode_change)
+    {
+        should_wait = true; // wait to show this screen for a few seconds
+        stop_sample(title_sample);
+    }
+
+    clear_to_color(buffer, makecol(0, 0, 0));
+    
+    textout_ex(buffer, font, "Game Engineer - Stephen Bryant", 10, 10, makecol(255,255,255), -1);
+    textout_ex(buffer, font, "Port/Enhancements Engineer - Slim Shaky", 10, 30, makecol(255,255,255), -1);
+    textout_ex(buffer, font, "QA Tester - Ryder Blackheart", 10, 50, makecol(255,255,255), -1);
+    textout_ex(buffer, font, "Music Composer - Safety Stoat Studios", 10, 70, makecol(255,255,255), -1);
+    textout_ex(buffer, font, "Sound Effects Designer - Kronbits", 10, 90, makecol(255,255,255), -1);
+    textout_ex(buffer, font, "Powered By - Allegro", 10, 460, makecol(255,255,255), -1);
+
+    blit(buffer, screen, 0, 0, 0, 0, SCREEN_W, SCREEN_H);
+}
+
 // calculate the color to display for a menu option
 static int get_option_color(option selected_option, option display_option)
 {
@@ -236,20 +257,21 @@ input_type platform_get_input_type(mode game_mode, bool current_input_states[INP
     update_input_states(current_input_states);
     switch(game_mode)
     {
-        case MODE_TITLE:
-            if (game_input_pressed(INPUT_TYPE_START)) current_input = INPUT_TYPE_START;
-            else if (game_input_pressed(INPUT_TYPE_DOWN)) current_input = INPUT_TYPE_DOWN;
-            else if (game_input_pressed(INPUT_TYPE_UP)) current_input = INPUT_TYPE_UP;
-            else if (game_input_pressed(INPUT_TYPE_LEFT)) current_input = INPUT_TYPE_LEFT;
-            else if (game_input_pressed(INPUT_TYPE_RIGHT)) current_input = INPUT_TYPE_RIGHT;
-            break;
-
-        default:
+        case MODE_GAME:
             if (game_input_pressed(INPUT_TYPE_START)) current_input = INPUT_TYPE_START;
             else if (key[KEY_LEFT]) current_input = INPUT_TYPE_LEFT;
             else if (key[KEY_RIGHT]) current_input = INPUT_TYPE_RIGHT;
             else if (key[KEY_DOWN]) current_input = INPUT_TYPE_DOWN;
             else if (key[KEY_UP]) current_input = INPUT_TYPE_UP;
+
+            break;
+
+        default:
+            if (game_input_pressed(INPUT_TYPE_START)) current_input = INPUT_TYPE_START;
+            else if (game_input_pressed(INPUT_TYPE_DOWN)) current_input = INPUT_TYPE_DOWN;
+            else if (game_input_pressed(INPUT_TYPE_UP)) current_input = INPUT_TYPE_UP;
+            else if (game_input_pressed(INPUT_TYPE_LEFT)) current_input = INPUT_TYPE_LEFT;
+            else if (game_input_pressed(INPUT_TYPE_RIGHT)) current_input = INPUT_TYPE_RIGHT;
 
             break;
     }

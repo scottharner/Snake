@@ -93,7 +93,7 @@ static void title_screen_read_input()
         }
         else if (title_option == OPTION_CREDITS)
         {
-            // todo - switch to credits
+            game_mode = MODE_CREDITS;
         }
     }
     else if (current_input == INPUT_TYPE_DOWN) 
@@ -164,6 +164,21 @@ static void title_screen_read_input()
                 break;
         }
     }
+}
+
+// check for input on a screen that will otherwise timeout eventually
+static bool timeout_screen_read_input()
+{
+    bool did_trigger_timeout = false;
+
+    //this contains the array of flags which tell which button has been pressed. It must be cleared before every input.
+    input_type current_input = platform_get_input_type(MODE_TITLE, current_input_states);
+    if (current_input == INPUT_TYPE_START)
+    {
+        did_trigger_timeout = true;
+    }
+
+    return did_trigger_timeout;
 }
 
 void set_high_score()
@@ -347,10 +362,13 @@ void game_update(void)
     frame_counter++;
     bool did_mode_change = false;
     if (previous_game_mode != game_mode)
+    {
         did_mode_change = true;
+    }
 
     previous_game_mode = game_mode;
     input_type current_input;
+    bool did_trigger_timeout = false;
 
     switch (game_mode)   
     {
@@ -361,8 +379,10 @@ void game_update(void)
             break;
         
         case MODE_GAME_OVER:
+            did_trigger_timeout = timeout_screen_read_input();
             platform_draw_game_over_screen(score, did_mode_change, current_loss_type);
-            if (action_cycles > GAME_OVER_MAX_CYCLES)
+            if (did_trigger_timeout || 
+                action_cycles > TIMEOUT_SCREEN_MAX_CYCLES)
             {
                 game_reset(); // reset the game after showing game over
             }
@@ -370,12 +390,25 @@ void game_update(void)
             break;
 
         case MODE_WIN:
+            did_trigger_timeout = timeout_screen_read_input();    
             platform_draw_win_screen(score, did_mode_change);
-            if (action_cycles > WIN_MAX_CYCLES)
+            if (did_trigger_timeout || 
+                action_cycles > TIMEOUT_SCREEN_MAX_CYCLES)
             {
                 game_reset(); // reset the game after showing win screen
             }
                 
+            break;
+
+        case MODE_CREDITS:
+            did_trigger_timeout = timeout_screen_read_input();
+            platform_draw_credits_screen(did_mode_change);
+            if (did_trigger_timeout || 
+                action_cycles > TIMEOUT_SCREEN_MAX_CYCLES)
+            {
+                game_mode = MODE_TITLE;
+            }
+                            
             break;
 
         default:
@@ -473,8 +506,6 @@ void game_reset()
             object_map[i * config->map_width + j] = OBJECT_NOTHING;
         }
     }
-
-    game_reset_input_states();
 }
 
 void game_shutdown(void)
