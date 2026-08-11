@@ -136,8 +136,8 @@ void platform_draw_credits_screen(bool did_mode_change)
     }
 
     VDP_drawText("Game Engineer - Stephen Bryant", 0, 1);
-    VDP_drawText("Port/Enhancements Engineer - Slim Shaky", 0, 3);
-    VDP_drawText("QA Tester - Ryder Blackheart", 0, 5);
+    VDP_drawText("Port/Enhancements Engineer - Scott Harner", 0, 3);
+    VDP_drawText("QA Tester - Evan Harner", 0, 5);
     VDP_drawText("Music Composer - Safety Stoat Studios", 0, 7);
     VDP_drawText("Sound Effects Designer - Kronbits", 0, 9);
     VDP_drawText("Powered By - SGDK", 0, 26);

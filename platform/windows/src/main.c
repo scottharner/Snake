@@ -147,8 +147,8 @@ void platform_draw_credits_screen(bool did_mode_change)
     clear_to_color(buffer, makecol(0, 0, 0));
     
     textout_ex(buffer, font, "Game Engineer - Stephen Bryant", 10, 10, makecol(255,255,255), -1);
-    textout_ex(buffer, font, "Port/Enhancements Engineer - Slim Shaky", 10, 30, makecol(255,255,255), -1);
-    textout_ex(buffer, font, "QA Tester - Ryder Blackheart", 10, 50, makecol(255,255,255), -1);
+    textout_ex(buffer, font, "Port/Enhancements Engineer - Scott Harner", 10, 30, makecol(255,255,255), -1);
+    textout_ex(buffer, font, "QA Tester - Evan Harner", 10, 50, makecol(255,255,255), -1);
     textout_ex(buffer, font, "Music Composer - Safety Stoat Studios", 10, 70, makecol(255,255,255), -1);
     textout_ex(buffer, font, "Sound Effects Designer - Kronbits", 10, 90, makecol(255,255,255), -1);
     textout_ex(buffer, font, "Powered By - Allegro", 10, 460, makecol(255,255,255), -1);
