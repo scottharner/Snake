@@ -3,9 +3,10 @@ IMAGE snake "Tiles/snake.png" BEST ALL
 IMAGE bordert "Tiles/bordert.png" BEST ALL
 IMAGE borderl "Tiles/borderl.png" BEST ALL
 IMAGE borderc "Tiles/borderc.png" BEST ALL
-IMAGE gameover "Tiles/gameover.png" BEST ALL
-IMAGE credits "Tiles/credits.png" BEST ALL
-IMAGE youwin "Tiles/youwin.png" BEST ALL
+IMAGE gameover "Images/gameover.png" BEST ALL
+IMAGE credits "Images/credits.png" BEST ALL
+IMAGE youwin "Images/youwin.png" BEST ALL
+IMAGE title "Images/title.png" BEST ALL
 WAV sfx_lose "Sfx/lose.wav" XGM2
 WAV sfx_pickup "Sfx/pickup.wav" XGM2
 XGM2 bgm_title "Bgm/only_air.vgm"

@@ -27,6 +27,7 @@ static u16 BORDERT_TILE_INDEX;
 static u16 GAMEOVER_TILE_INDEX;
 static u16 CREDITS_TILE_INDEX;
 static u16 YOUWIN_TILE_INDEX;
+static u16 TITLE_TILE_INDEX;
 
 
 // Genesis implementation of platform initialization
@@ -68,8 +69,13 @@ void platform_initialize()
     YOUWIN_TILE_INDEX = tile_index;
     tile_index += youwin.tileset->numTile;
     
+    VDP_loadTileSet(title.tileset, tile_index, DMA);
+    TITLE_TILE_INDEX = tile_index;
+    tile_index += title.tileset->numTile;
+    
     PAL_setPalette(PAL1, apple.palette->data, DMA); // setup foreground palette including a final index for yellow text
     PAL_setPalette(PAL2, gameover.palette->data, DMA); // minor titles palette
+    PAL_setPalette(PAL3, title.palette->data, DMA); // main title palette
     previous_object_map = platform_memory_allocate(MAP_HEIGHT * MAP_WIDTH * sizeof(int));
 
     VDP_setTextPlane(BG_B); // draw text behind tiles
@@ -210,14 +216,15 @@ void platform_draw_title_screen(bool did_mode_change, option title_option)
     int white_color = RGB24_TO_VDPCOLOR(0xFFFFFF);
     
     VDP_setTextPalette(PAL0);
-    VDP_drawText("SNAKE", 0, 1);
+    
+    VDP_drawImageEx(BG_A, &title, TILE_ATTR_FULL(PAL3, FALSE, FALSE, FALSE, TITLE_TILE_INDEX), 0, 0, FALSE, TRUE);
 
     if (get_option_color(title_option, OPTION_START) == white_color)
         VDP_setTextPalette(PAL0);
     else
         VDP_setTextPalette(PAL1);
 
-    VDP_drawText("Start Game", 0, 5);
+    print_centered_text(10, "Start Game");
 
     if (get_option_color(title_option, OPTION_SPEED) == white_color)
         VDP_setTextPalette(PAL0);
@@ -226,19 +233,19 @@ void platform_draw_title_screen(bool did_mode_change, option title_option)
 
     char format_string[20];
     sprintf(format_string, "Speed: < %-6s >", speed_string);
-    VDP_drawText(format_string, 0, 7);
+    print_centered_text(12, format_string);
 
     if (get_option_color(title_option, OPTION_CREDITS) == white_color)
         VDP_setTextPalette(PAL0);
     else
         VDP_setTextPalette(PAL1);
 
-    VDP_drawText("Credits", 0, 9);
+    print_centered_text(14, "Credits");
 
     // draw credits white
     VDP_setTextPalette(PAL0);
-    VDP_drawText("Game (C) 2010 Stephen Bryant", 0, 24);
-    VDP_drawText("Port (C) 2026 Scott Harner", 0, 26);
+    print_centered_text(24, "Game (C) 2010 Stephen Bryant");
+    print_centered_text(26, "Port (C) 2026 Scott Harner");
 }
 
 // platform specific setting of random generator seed

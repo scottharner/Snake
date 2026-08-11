@@ -15,5 +15,6 @@ extern const Image borderc;
 extern const Image gameover;
 extern const Image credits;
 extern const Image youwin;
+extern const Image title;
 
 #endif // _RES_RESOURCES_H_

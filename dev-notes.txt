@@ -99,13 +99,8 @@ general
 todo
 ----
 - general
-	- allow windows version to close window
-	- clean up title screen
-	- clean up game over screen
-	- clean up credits screen
 	- create release
 	- post console releases somewhere
-	- clean up game win screen
 	- migrate todos to issues
 
 - saturn
