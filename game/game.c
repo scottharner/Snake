@@ -404,7 +404,7 @@ void game_update(void)
             did_trigger_timeout = timeout_screen_read_input();
             platform_draw_credits_screen(did_mode_change);
             if (did_trigger_timeout || 
-                action_cycles > TIMEOUT_SCREEN_MAX_CYCLES)
+                action_cycles > CREDITS_SCREEN_MAX_CYCLES)
             {
                 game_mode = MODE_TITLE;
             }
