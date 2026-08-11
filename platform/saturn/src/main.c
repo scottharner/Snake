@@ -42,6 +42,7 @@
 #define JO_GRID_WIDTH (JO_TV_WIDTH / 8)
 #define JO_GRID_HEIGHT (JO_TV_HEIGHT / 8)
 #define MAP_HEIGHT 30
+#define HALF_MAP_WIDTH 20
 #define MAP_WIDTH 40
 #define TILE_SIZE 8
 #define TITLE_TRACKID 3
@@ -53,6 +54,10 @@ static int apple_sprite_id;
 static int border_top_sprite_id;
 static int border_left_sprite_id;
 static int border_corner_sprite_id;
+static int title_sprite_id;
+static int game_over_sprite_id;
+static int you_win_sprite_id;
+static int credits_sprite_id;
 static short pickup_sound_id;
 static short lose_sound_id;
 
@@ -66,9 +71,26 @@ void platform_initialize()
     border_top_sprite_id = jo_sprite_add_tga("TEX", "BORDERT.TGA", JO_COLOR_Transparent);
     border_left_sprite_id = jo_sprite_add_tga("TEX", "BORDERL.TGA", JO_COLOR_Transparent);
     border_corner_sprite_id = jo_sprite_add_tga("TEX", "BORDERC.TGA", JO_COLOR_Transparent);
+    title_sprite_id = jo_sprite_add_tga("TEX", "TITLE.TGA", JO_COLOR_Transparent);
+    game_over_sprite_id = jo_sprite_add_tga("TEX", "GAMEOVER.TGA", JO_COLOR_Transparent);
+    you_win_sprite_id = jo_sprite_add_tga("TEX", "YOUWIN.TGA", JO_COLOR_Transparent);
+    credits_sprite_id = jo_sprite_add_tga("TEX", "CREDITS.TGA", JO_COLOR_Transparent);
     pickup_sound_id = load_8bit_pcm((Sint8 *)"PICKUP.PCM", 15360); // using ponetone due to issues with jo engine audio
     lose_sound_id = load_8bit_pcm((Sint8 *)"LOSE.PCM", 15360);
     CDDA_SetVolume(4);
+}
+
+void draw_tile(int x, int y, int sprite_id, int z, int angle)
+{
+    if (angle == 0)
+        jo_sprite_draw3D2(sprite_id, x, y, z);
+    else
+        jo_sprite_draw3D_and_rotate2(sprite_id, x, y, z, angle);
+
+#if JO_DEBUG
+    jo_printf_with_color(0, 0, JO_COLOR_INDEX_White, "tile x: %d", x);
+    jo_printf_with_color(0, 1, JO_COLOR_INDEX_White, "tile y: %d", y);
+#endif
 }
 
 // plays the requested sound effect
@@ -84,6 +106,19 @@ void platform_play_sound(sound_type current_sound_type)
     }
 }
 
+static void print_centered_text(int y, const char *string, int color)
+{
+    int length = strlen(string);
+    int x = HALF_MAP_WIDTH - (length / 2);
+
+    if (x < 0)
+    {
+        x = 0;
+    }
+
+    jo_printf_with_color(x, y, color, string);
+}
+
 // display a game over screen
 void platform_draw_game_over_screen(int score, bool did_mode_change, loss_type current_loss_type)
 {
@@ -93,9 +128,14 @@ void platform_draw_game_over_screen(int score, bool did_mode_change, loss_type c
         jo_clear_screen();
     }
 
-    jo_printf_with_color(5, 5, JO_COLOR_INDEX_White, "Game Over");
-    jo_printf_with_color(5, 7, JO_COLOR_INDEX_White, "Score: %d", score);
-    jo_printf_with_color(5, 9, JO_COLOR_INDEX_White, "Reason: %s", current_loss_type == LOSS_TYPE_SELF ? "Self Collision" : "Wall Collision");
+    draw_tile(0, 40, game_over_sprite_id, BORDER_ZINDEX, 0);
+
+    char score_string[12];
+    sprintf(score_string, "Score: %d", score);
+    print_centered_text(10, score_string, JO_COLOR_INDEX_White);
+    char reason_string[25];
+    sprintf(reason_string, "Reason: %s", current_loss_type == LOSS_TYPE_SELF ? "Self Collision" : "Wall Collision");
+    print_centered_text(12, reason_string, JO_COLOR_INDEX_White);
 }
 
 // display a win screen
@@ -107,8 +147,11 @@ void platform_draw_win_screen(int score, bool did_mode_change)
         jo_clear_screen();
     }
 
-    jo_printf_with_color(5, 5, JO_COLOR_INDEX_White, "You Win!");
-    jo_printf_with_color(5, 7, JO_COLOR_INDEX_White, "Score: %d", score);
+    draw_tile(0, 40, you_win_sprite_id, BORDER_ZINDEX, 0);
+
+    char score_string[12];
+    sprintf(score_string, "Score: %d", score);
+    print_centered_text(10, score_string, JO_COLOR_INDEX_White);
 }
 
 // display a credits screen
@@ -120,16 +163,18 @@ void platform_draw_credits_screen(bool did_mode_change)
         jo_clear_screen();
     }
 
-    jo_printf_with_color(0, 1, JO_COLOR_INDEX_White, "Game Engineer - Stephen Bryant");
-    jo_printf_with_color(0, 3, JO_COLOR_INDEX_White, "Port/Enhancements Engineer - Slim Shaky");
-    jo_printf_with_color(0, 5, JO_COLOR_INDEX_White, "QA Tester - Ryder Blackheart");
-    jo_printf_with_color(0, 7, JO_COLOR_INDEX_White, "Music Composer - Safety Stoat Studios");
-    jo_printf_with_color(0, 9, JO_COLOR_INDEX_White, "Sound Effects Designer - Kronbits");
-    jo_printf_with_color(0, 11, JO_COLOR_INDEX_White, "Audio Driver Engineer - Ponut64");
-    jo_printf_with_color(0, 13, JO_COLOR_INDEX_White, "Advisor - ReyeMe");
-    jo_printf_with_color(0, 15, JO_COLOR_INDEX_White, "Advisor - Hassmaschine");
-    jo_printf_with_color(0, 17, JO_COLOR_INDEX_White, "Advisor - supahfly");
-    jo_printf_with_color(0, 28, JO_COLOR_INDEX_White, "Powered By - Jo Engine");
+    draw_tile(0, 0, credits_sprite_id, BORDER_ZINDEX, 0);
+
+    print_centered_text(7, "Game Engineer - Stephen Bryant", JO_COLOR_INDEX_White);
+    print_centered_text(9, "Port Engineer - Scott Harner", JO_COLOR_INDEX_White);
+    print_centered_text(11, "QA Tester - Evan Harner", JO_COLOR_INDEX_White);
+    print_centered_text(13, "Music Composer - Safety Stoat Studios", JO_COLOR_INDEX_White);
+    print_centered_text(15, "Sound Effects Designer - Kronbits", JO_COLOR_INDEX_White);
+    print_centered_text(17, "Audio Driver Engineer - Ponut64", JO_COLOR_INDEX_White);
+    print_centered_text(19, "Advisor - ReyeMe", JO_COLOR_INDEX_White);
+    print_centered_text(21, "Advisor - Hassmaschine", JO_COLOR_INDEX_White);
+    print_centered_text(23, "Advisor - supahfly", JO_COLOR_INDEX_White);
+    print_centered_text(28, "Powered By - Jo Engine", JO_COLOR_INDEX_White);
 }
 
 // calculate the color to display for a menu option
@@ -157,15 +202,20 @@ void platform_draw_title_screen(bool did_mode_change, option title_option)
     char speed_string[6];
     game_get_speed_string(speed_string);
 
-    jo_printf_with_color(0, 1, JO_COLOR_INDEX_White, "SNAKE");
+    draw_tile(0, 0, title_sprite_id, BORDER_ZINDEX, 0);
 
-    jo_printf_with_color(0, 5, get_option_color(title_option, OPTION_START), "Start Game");
-    jo_printf_with_color(0, 7, get_option_color(title_option, OPTION_SPEED), "Speed: < %-6s >", speed_string);
-    jo_printf_with_color(0, 9, get_option_color(title_option, OPTION_CREDITS), "Credits");
+    print_centered_text(12, "Start Game", get_option_color(title_option, OPTION_START));
+    char speed_menu_string[20];
+    sprintf(speed_menu_string, "Speed: < %-6s >", speed_string);
+    print_centered_text(14, speed_menu_string, get_option_color(title_option, OPTION_SPEED));
+    print_centered_text(16, "Credits", get_option_color(title_option, OPTION_CREDITS));
 
     char copyright = (char)COPYRIGHT_INDEX;
-    jo_printf_with_color(0, 26, JO_COLOR_INDEX_White, "Game %c 2010 Stephen Bryant", copyright);
-    jo_printf_with_color(0, 28, JO_COLOR_INDEX_White, "Port %c 2026 Scott Harner", copyright);
+    char copyright_string[30];
+    sprintf(copyright_string, "Game %c 2010 Stephen Bryant", copyright);
+    print_centered_text(26, copyright_string, JO_COLOR_INDEX_White);
+    sprintf(copyright_string, "Game %c 2026 Scott Harner", copyright);
+    print_centered_text(28, copyright_string, JO_COLOR_INDEX_White);
 }
 
 // platform specific setting of random generator seed
@@ -253,19 +303,6 @@ input_type platform_get_input_type(mode game_mode, bool current_input_states[INP
 void platform_update_platform_state()
 {
     // we dont have any updates to make on this platform
-}
-
-void draw_tile(int x, int y, int sprite_id, int z, int angle)
-{
-    if (angle == 0)
-        jo_sprite_draw3D2(sprite_id, x, y, z);
-    else
-        jo_sprite_draw3D_and_rotate2(sprite_id, x, y, z, angle);
-
-#if JO_DEBUG
-    jo_printf_with_color(0, 0, JO_COLOR_INDEX_White, "tile x: %d", x);
-    jo_printf_with_color(0, 1, JO_COLOR_INDEX_White, "tile y: %d", y);
-#endif
 }
 
 // perform platform specific actions when the game resets
