@@ -66,11 +66,20 @@ genesis
 		- have to set your images to 16 color (4 bit) indexed mode
 	- the first color in a palette is transparent
 	- vdp_init wipes all of the palettes so only do that at the very beginning
+	- if you need several images to use the same palette
+		- load into mtpaint rgb (not indexed)
+		- load desired palette
+		- add palette colors if needed
+		- save palette
+		- change image to 16 color index and specify using current palette
+		- save image
 - had problems playing background music and sound effects at the same time
 	- had to switch everything over to using xgm2 methods
 	- you must feed vgm music files for this
 	- xgm2 lets us control our volume as well on each item
 	- music was found at https://safetystoatstudios.itch.io/free-vgms
+- need to use VDP_drawImageEx when trying to load up more than one tile
+- can use VDP_setTileMapXY for just a single tile
 
 general
 -------

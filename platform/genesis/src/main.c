@@ -10,6 +10,7 @@
 
 #define MAP_HEIGHT 28
 #define MAP_WIDTH 40
+#define HALF_MAP_WIDTH 20
 #define MAP_TILE_SIZE 8
 #define SFX_LOSE 64
 #define SFX_PICKUP 65
@@ -23,6 +24,9 @@ static u16 SNAKE_TILE_INDEX;
 static u16 BORDERC_TILE_INDEX;
 static u16 BORDERL_TILE_INDEX;
 static u16 BORDERT_TILE_INDEX;
+static u16 GAMEOVER_TILE_INDEX;
+static u16 CREDITS_TILE_INDEX;
+static u16 YOUWIN_TILE_INDEX;
 
 
 // Genesis implementation of platform initialization
@@ -52,7 +56,20 @@ void platform_initialize()
     BORDERT_TILE_INDEX = tile_index;
     tile_index += bordert.tileset->numTile;
     
+    VDP_loadTileSet(gameover.tileset, tile_index, DMA);
+    GAMEOVER_TILE_INDEX = tile_index;
+    tile_index += gameover.tileset->numTile;
+    
+    VDP_loadTileSet(credits.tileset, tile_index, DMA);
+    CREDITS_TILE_INDEX = tile_index;
+    tile_index += credits.tileset->numTile;
+    
+    VDP_loadTileSet(youwin.tileset, tile_index, DMA);
+    YOUWIN_TILE_INDEX = tile_index;
+    tile_index += youwin.tileset->numTile;
+    
     PAL_setPalette(PAL1, apple.palette->data, DMA); // setup foreground palette including a final index for yellow text
+    PAL_setPalette(PAL2, gameover.palette->data, DMA); // minor titles palette
     previous_object_map = platform_memory_allocate(MAP_HEIGHT * MAP_WIDTH * sizeof(int));
 
     VDP_setTextPlane(BG_B); // draw text behind tiles
@@ -60,6 +77,12 @@ void platform_initialize()
     XGM2_setFMVolume(45);
     XGM2_setPSGVolume(45);
 }
+
+void draw_tile(int x, int y, u16 current_tile_index, VDPPlane plane, bool flip_vertical, bool flip_horizontal)
+{
+    VDP_setTileMapXY(plane, TILE_ATTR_FULL(PAL1, FALSE, flip_vertical, flip_horizontal, current_tile_index), x, y);
+}
+
 
 // plays the requested sound effect
 void platform_play_sound(sound_type current_sound_type)
@@ -80,6 +103,19 @@ static void clear_screen()
     VDP_clearPlane(BG_B, TRUE);
 }
 
+static void print_centered_text(int y, const char *string)
+{
+    int length = strlen(string);
+    int x = HALF_MAP_WIDTH - (length / 2);
+
+    if (x < 0)
+    {
+        x = 0;
+    }
+
+    VDP_drawText(string, x, y);
+}
+
 // display a game over screen
 void platform_draw_game_over_screen(int score, bool did_mode_change, loss_type current_loss_type)
 {
@@ -90,20 +126,21 @@ void platform_draw_game_over_screen(int score, bool did_mode_change, loss_type c
     }
 
     VDP_setTextPalette(PAL0);
-    VDP_drawText("Game Over", 5, 5);
+    
+    VDP_drawImageEx(BG_A, &gameover, TILE_ATTR_FULL(PAL2, FALSE, FALSE, FALSE, GAMEOVER_TILE_INDEX), 0, 5, FALSE, TRUE);
 
     char format_string[32];
     char score_string[8];
     intToStr(score, score_string, 0);
     strcpy(format_string, "Score: ");
     strcat(format_string, score_string);
-    VDP_drawText(format_string, 5, 7);
+    print_centered_text(11, format_string);
 
     char reason_string[15];
     strcpy(reason_string, current_loss_type == LOSS_TYPE_SELF ? "Self Collision" : "Wall Collision");
     strcpy(format_string, "Reason: ");
     strcat(format_string, reason_string);
-    VDP_drawText(format_string, 5, 9);
+    print_centered_text(13, format_string);
 }
 
 // display a win screen
@@ -116,14 +153,15 @@ void platform_draw_win_screen(int score, bool did_mode_change)
     }
 
     VDP_setTextPalette(PAL0);
-    VDP_drawText("You Win!", 5, 5);
+
+    VDP_drawImageEx(BG_A, &youwin, TILE_ATTR_FULL(PAL2, FALSE, FALSE, FALSE, YOUWIN_TILE_INDEX), 0, 5, FALSE, TRUE);
 
     char format_string[32];
     char score_string[8];
     intToStr(score, score_string, 0);
     strcpy(format_string, "Score: ");
     strcat(format_string, score_string);
-    VDP_drawText(format_string, 5, 7);
+    print_centered_text(11, format_string);
 }
 
 // display a credits screen
@@ -135,12 +173,14 @@ void platform_draw_credits_screen(bool did_mode_change)
         clear_screen();
     }
 
-    VDP_drawText("Game Engineer - Stephen Bryant", 0, 1);
-    VDP_drawText("Port/Enhancements Engineer - Scott Harner", 0, 3);
-    VDP_drawText("QA Tester - Evan Harner", 0, 5);
-    VDP_drawText("Music Composer - Safety Stoat Studios", 0, 7);
-    VDP_drawText("Sound Effects Designer - Kronbits", 0, 9);
-    VDP_drawText("Powered By - SGDK", 0, 26);
+    VDP_drawImageEx(BG_A, &credits, TILE_ATTR_FULL(PAL2, FALSE, FALSE, FALSE, CREDITS_TILE_INDEX), 0, 0, FALSE, TRUE);
+
+    print_centered_text(7, "Game Engineer - Stephen Bryant");
+    print_centered_text(9, "Port Engineer - Scott Harner");
+    print_centered_text(11, "QA Tester - Evan Harner");
+    print_centered_text(13, "Music Composer - Safety Stoat Studios");
+    print_centered_text(15, "Sound Effects Designer - Kronbits");
+    print_centered_text(26, "Powered By - SGDK");
 }
 
 // calculate the color to display for a menu option
@@ -303,11 +343,6 @@ input_type platform_get_input_type(mode game_mode, bool current_input_states[INP
 void platform_update_platform_state()
 {
     // we dont have any updates to make on this platform
-}
-
-void draw_tile(int x, int y, u16 current_tile_index, VDPPlane plane, bool flip_vertical, bool flip_horizontal)
-{
-    VDP_setTileMapXY(plane, TILE_ATTR_FULL(PAL1, FALSE, flip_vertical, flip_horizontal, current_tile_index), x, y);
 }
 
 void clear_tile(int x, int y, VDPPlane plane)

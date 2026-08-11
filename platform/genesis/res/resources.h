@@ -12,5 +12,8 @@ extern const Image snake;
 extern const Image bordert;
 extern const Image borderl;
 extern const Image borderc;
+extern const Image gameover;
+extern const Image credits;
+extern const Image youwin;
 
 #endif // _RES_RESOURCES_H_
