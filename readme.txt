@@ -1,3 +1,11 @@
+#####################################################
+
+Snake Console Ports
+By Scott Harner
+August 11, 2026
+
+######################################################
+
 **Note:** This is a fork of rondorkerin/Snake (https://github.com/rondorkerin/Snake). 
 Added Sega Saturn platform support (Snake SS).
 Added title screen.
