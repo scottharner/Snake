@@ -9,9 +9,17 @@
 > - Added background music.
 > - Added high score.
 
-![Snake SS](documentation/screenshots/snake-ss.png)
+![Snake SS Title](documentation/screenshots/snake-ss-title.png)
+*Snake SS Title*
 
-![Mega Snake](documentation/screenshots/mega-snake.png)
+![Snake SS Gameplay](documentation/screenshots/snake-ss-game.png)
+*Snake SS Gameplay*
+
+![Mega Snake Title](documentation/screenshots/mega-snake-title.png)
+*Mega Snake Title*
+
+![Mega Snake Gameplay](documentation/screenshots/mega-snake-game.png)
+*Mega Snake Gameplay*
 
 Snake!
 ======
