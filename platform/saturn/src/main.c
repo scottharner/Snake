@@ -214,7 +214,7 @@ void platform_draw_title_screen(bool did_mode_change, option title_option)
     char copyright_string[30];
     sprintf(copyright_string, "Game %c 2010 Stephen Bryant", copyright);
     print_centered_text(26, copyright_string, JO_COLOR_INDEX_White);
-    sprintf(copyright_string, "Game %c 2026 Scott Harner", copyright);
+    sprintf(copyright_string, "Port %c 2026 Scott Harner", copyright);
     print_centered_text(28, copyright_string, JO_COLOR_INDEX_White);
 }
 

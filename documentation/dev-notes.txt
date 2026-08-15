@@ -100,8 +100,6 @@ general
 todo
 ----
 - general
-	- create release
-	- post console releases somewhere
 
 - enhancements (possible future todos)
 	- 2 player mode
